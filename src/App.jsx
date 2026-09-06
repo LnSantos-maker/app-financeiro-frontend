@@ -135,7 +135,7 @@ export default function App() {
   
   const carregarSetup2FA = async (email) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`https://app-financeiro-10tz.onrender.com/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
       const dados = await res.json();
       
       if (res.ok) {
