@@ -137,17 +137,19 @@ export default function App() {
     try {
       const res = await fetch(`http://127.0.0.1:8000/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
       const dados = await res.json();
+      
       if (res.ok) {
-        if (dados.precisa_qrcode) {
-          // É a primeira vez. Mostra o QR Code!
-          setChaveSecreta2FA(dados.chave_secreta);
-          const urlImage = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(dados.link_qrcode)}`;
-          setQrCodeUrl(urlImage);
-        } else {
-          // Já configurou antes. Esconde a foto.
-          setQrCodeUrl('');
-          setChaveSecreta2FA('');
-        }
+        // Removemos a trava do "if (dados.precisa_qrcode)". 
+        // Agora o React força a criação do QR Code toda vez!
+        
+        const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
+        setChaveSecreta2FA(chave);
+        
+        // Monta a URL da imagem usando os dados do backend ou forçando uma nova URI
+        const linkTotp = dados.link_qrcode || `otpauth://totp/PF:${email}?secret=${chave}&issuer=PF`;
+        const urlImage = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(linkTotp)}`;
+        
+        setQrCodeUrl(urlImage);
       }
     } catch (e) {
       console.error("Erro ao carregar QR Code do 2FA", e);
