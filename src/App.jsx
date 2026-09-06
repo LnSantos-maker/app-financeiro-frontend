@@ -20,7 +20,6 @@ export default function App() {
   const [senhaLogin, setSenhaLogin] = useState('');
   const [codigo2FA, setCodigo2FA] = useState('');
 
-  // NOVOS ESTADOS PARA A TELA DE CADASTRO
   const [nomeRegistro, setNomeRegistro] = useState('');
   const [sobrenomeRegistro, setSobrenomeRegistro] = useState('');
   const [emailConfirma, setEmailConfirma] = useState('');
@@ -102,7 +101,6 @@ export default function App() {
   const [descricaoCompraCartao, setDescricaoCompraCartao] = useState('');
   const [valorCompraCartao, setValorCompraCartao] = useState('');
 
-  // NOVO: MEMÓRIAS DA PLANILHA FANTASMA
   const [planilhaReal, setPlanilhaReal] = useState([]);
   const [modalPlanilhaAberto, setModalPlanilhaAberto] = useState(false);
   const [tituloPlanilha, setTituloPlanilha] = useState('');
@@ -145,11 +143,9 @@ export default function App() {
       const dados = await res.json();
       
       if (res.ok) {
-        // Agora o React força a criação do QR Code toda vez!
         const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
         setChaveSecreta2FA(chave);
         
-        // Monta a URL da imagem usando os dados do backend ou forçando uma nova URI
         const linkTotp = dados.link_qrcode || `otpauth://totp/PF:${email}?secret=${chave}&issuer=PF`;
         const urlImage = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(linkTotp)}`;
         
@@ -163,14 +159,12 @@ export default function App() {
   const handleSubmeterLogin = async (e) => {
     e.preventDefault();
     
-    // Travas de segurança para o Cadastro
     if (!isLoginMode) {
       if (!nomeRegistro || !sobrenomeRegistro) return mostrarNotificacao("Preencha nome e sobrenome.", "erro");
       if (!emailLogin || !emailConfirma) return mostrarNotificacao("Preencha o e-mail.", "erro");
       if (emailLogin !== emailConfirma) return mostrarNotificacao("Os e-mails não coincidem.", "erro");
       if (senhaLogin !== senhaConfirma) return mostrarNotificacao("As senhas não coincidem.", "erro");
     } else {
-      // Trava para o Login normal
       if (!emailLogin || !senhaLogin) return mostrarNotificacao("Preencha e-mail e senha.", "erro");
     }
 
@@ -179,7 +173,6 @@ export default function App() {
         await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
       } else {
         await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
-        // Salva o nome do usuário assim que a conta é criada no banco (opcional para o futuro)
       }
       
       await carregarSetup2FA(emailLogin);
@@ -310,6 +303,27 @@ export default function App() {
         try {
           const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/zerar_saldo/${idContaReal}`, { method: 'PUT' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta formatada! Ficha limpa."); setTelaAtiva('home'); }
+        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      }
+    });
+  };
+
+  // NOVA FUNÇÃO DE RESETAR O 2FA
+  const handleReset2FA = () => {
+    setDialogoConfirmacao({
+      aberto: true, 
+      titulo: 'Redefinir Autenticador (2FA)', 
+      mensagem: 'Isso apagará sua chave de segurança atual. No próximo login, você precisará escanear um novo QR Code no Google Authenticator. Tem certeza?', 
+      textoAcao: 'Sim, Redefinir 2FA', 
+      corAcao: 'bg-amber-500 hover:bg-amber-400', 
+      corIcone: 'text-amber-500',
+      onConfirm: async () => {
+        setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
+        try {
+          const emailAtual = auth.currentUser ? auth.currentUser.email : emailLogin;
+          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/auth/reset-2fa/${encodeURIComponent(emailAtual)}`, { method: 'DELETE' });
+          if (resposta.ok) { mostrarNotificacao("2FA resetado! O QR Code voltará a aparecer no próximo login."); }
+          else { mostrarNotificacao("Erro ao resetar no servidor.", "erro"); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
       }
     });
@@ -917,7 +931,7 @@ export default function App() {
                   </div>
                   <div className="flex-1">
                     <p className="text-white font-bold text-xl capitalize">{nomeUsuario}</p>
-                    <p className="text-slate-400 text-sm">{emailLogin || "luan@admin.com"}</p>
+                    <p className="text-slate-400 text-sm">{auth.currentUser ? auth.currentUser.email : emailLogin}</p>
                   </div>
                   <button onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }} className="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
                     <Pencil size={16} /> Editar Perfil
@@ -925,7 +939,27 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg"><h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><ShieldCheck className="text-[#d4af37]"/> Segurança</h2><div className="flex items-center justify-between py-3 border-b border-slate-800/50"><div><p className="text-white font-medium">Autenticação de Dois Fatores (2FA)</p><p className="text-slate-500 text-sm">Protegendo sua conta através do Google Authenticator.</p></div><span className="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/20">Ativado</span></div><div className="flex items-center justify-between py-3"><div><p className="text-white font-medium">Palavra-passe de Acesso</p><p className="text-slate-500 text-sm">Proteção ativa no banco de dados da nuvem.</p></div><button onClick={() => mostrarNotificacao("Troca de palavra-passe pelo painel Web ativada!", "sucesso")} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm transition-colors border border-slate-700">Alterar Palavra-passe</button></div></div>
+              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
+                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><ShieldCheck className="text-[#d4af37]"/> Segurança</h2>
+                <div className="flex items-center justify-between py-3 border-b border-slate-800/50">
+                  <div>
+                    <p className="text-white font-medium">Autenticação de Dois Fatores (2FA)</p>
+                    <p className="text-slate-500 text-sm">Protegendo sua conta através do Google Authenticator.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/20">Ativado</span>
+                    <button onClick={handleReset2FA} className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs px-3 py-1 rounded-lg font-bold border border-amber-500/20 transition-colors">Resetar</button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="text-white font-medium">Palavra-passe de Acesso</p>
+                    <p className="text-slate-500 text-sm">Proteção ativa no banco de dados da nuvem.</p>
+                  </div>
+                  <button onClick={() => mostrarNotificacao("Troca de palavra-passe pelo painel Web ativada!", "sucesso")} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm transition-colors border border-slate-700">Alterar Palavra-passe</button>
+                </div>
+              </div>
+
               <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg border-l-4 border-l-rose-500"><h2 className="text-lg font-bold text-rose-400 mb-4 flex items-center gap-2"><AlertCircle /> Zona de Perigo</h2><p className="text-slate-400 text-sm mb-4">Ações irreversíveis para a sua conta e seus dados financeiros. Proceda com extrema cautela.</p><div className="flex gap-4"><button onClick={handleZerarSaldo} className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 px-4 py-3 rounded-xl text-sm font-bold border border-rose-500/20 transition-colors flex items-center gap-2 shadow-lg"><Trash2 size={16} /> Formatar e Zerar Conta</button></div></div>
               <button onClick={() => { setIsAutenticado(false); setEtapaLogin(0); setTelaAtiva('home'); }} className="w-full bg-[#090b10] hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold py-4 rounded-xl mt-2 transition-all border border-slate-800 hover:border-rose-500/30 flex justify-center items-center gap-2">Sair do Aplicativo <LogOut size={18} /></button>
             </div>
