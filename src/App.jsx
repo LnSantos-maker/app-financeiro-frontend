@@ -20,6 +20,12 @@ export default function App() {
   const [senhaLogin, setSenhaLogin] = useState('');
   const [codigo2FA, setCodigo2FA] = useState('');
 
+  // NOVOS ESTADOS PARA A TELA DE CADASTRO
+  const [nomeRegistro, setNomeRegistro] = useState('');
+  const [sobrenomeRegistro, setSobrenomeRegistro] = useState('');
+  const [emailConfirma, setEmailConfirma] = useState('');
+  const [senhaConfirma, setSenhaConfirma] = useState('');
+
   const [chaveSecreta2FA, setChaveSecreta2FA] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
 
@@ -139,9 +145,7 @@ export default function App() {
       const dados = await res.json();
       
       if (res.ok) {
-        // Removemos a trava do "if (dados.precisa_qrcode)". 
         // Agora o React força a criação do QR Code toda vez!
-        
         const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
         setChaveSecreta2FA(chave);
         
@@ -158,20 +162,34 @@ export default function App() {
 
   const handleSubmeterLogin = async (e) => {
     e.preventDefault();
-    if (!emailLogin || !senhaLogin) return mostrarNotificacao("Preencha e-mail e palavra-passe.", "erro");
+    
+    // Travas de segurança para o Cadastro
+    if (!isLoginMode) {
+      if (!nomeRegistro || !sobrenomeRegistro) return mostrarNotificacao("Preencha nome e sobrenome.", "erro");
+      if (!emailLogin || !emailConfirma) return mostrarNotificacao("Preencha o e-mail.", "erro");
+      if (emailLogin !== emailConfirma) return mostrarNotificacao("Os e-mails não coincidem.", "erro");
+      if (senhaLogin !== senhaConfirma) return mostrarNotificacao("As senhas não coincidem.", "erro");
+    } else {
+      // Trava para o Login normal
+      if (!emailLogin || !senhaLogin) return mostrarNotificacao("Preencha e-mail e senha.", "erro");
+    }
 
     try {
-      if (isLoginMode) await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      else await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
+      if (isLoginMode) {
+        await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
+      } else {
+        await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
+        // Salva o nome do usuário assim que a conta é criada no banco (opcional para o futuro)
+      }
       
       await carregarSetup2FA(emailLogin);
-      mostrarNotificacao("Palavra-passe confirmada!", "sucesso");
+      mostrarNotificacao(isLoginMode ? "Acesso liberado!" : "Conta criada com sucesso!", "sucesso");
       setEtapaLogin(1); 
     } catch (error) {
       let mensagem = "Erro ao conectar com a conta.";
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "E-mail ou palavra-passe incorretos.";
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "E-mail ou senha incorretos.";
       if (error.code === 'auth/email-already-in-use') mensagem = "Este e-mail já está em uso.";
-      if (error.code === 'auth/weak-password') mensagem = "A palavra-passe deve ter pelo menos 6 caracteres.";
+      if (error.code === 'auth/weak-password') mensagem = "A senha deve ter pelo menos 6 caracteres.";
       mostrarNotificacao(mensagem, "erro");
     }
   };
@@ -181,8 +199,7 @@ export default function App() {
     if (codigo2FA.length !== 6) return mostrarNotificacao("O código deve ter 6 dígitos.", "erro");
 
     try {
-      // Agora o React manda APENAS o email e o código numérico. A chave fica oculta no Python!
-      const resposta = await fetch('http://127.0.0.1:8000/auth/verificar-2fa/', { 
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ email: emailLogin, codigo_2fa: codigo2FA }) 
@@ -204,39 +221,39 @@ export default function App() {
 
   const carregarDadosDaTela = async (idConta) => {
     try {
-      const resPerfil = await fetch(`http://127.0.0.1:8000/perfil/${idConta}`);
+      const resPerfil = await fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idConta}`);
       if (resPerfil.ok) { setNomeUsuario((await resPerfil.json()).nome_usuario); }
 
-      const resSaldo = await fetch(`http://127.0.0.1:8000/saldo/${idConta}`);
+      const resSaldo = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idConta}`);
       setSaldoReal((await resSaldo.json()).saldo_atual || 0);
 
-      const resTx = await fetch(`http://127.0.0.1:8000/listar_transacoes/${idConta}?mes=${mesParametroAPI}`);
+      const resTx = await fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idConta}?mes=${mesParametroAPI}`);
       setTransacoesReais((await resTx.json()).transacoes || []);
 
       const paramMesAtual = `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
       
-      const resGraficos = await fetch(`http://127.0.0.1:8000/graficos/${idConta}?mes=${paramMesAtual}`);
+      const resGraficos = await fetch(`https://app-financeiro-10tz.onrender.com/graficos/${idConta}?mes=${paramMesAtual}`);
       setCategoriasReais((await resGraficos.json()).categorias || []);
 
-      const resMetas = await fetch(`http://127.0.0.1:8000/listar_metas/${idConta}`);
+      const resMetas = await fetch(`https://app-financeiro-10tz.onrender.com/listar_metas/${idConta}`);
       setMetasReais((await resMetas.json()).metas || []);
 
-      const resBalanco = await fetch(`http://127.0.0.1:8000/balanco/${idConta}?mes=${paramMesAtual}`);
+      const resBalanco = await fetch(`https://app-financeiro-10tz.onrender.com/balanco/${idConta}?mes=${paramMesAtual}`);
       setBalancoReal(await resBalanco.json());
 
-      const resEvolucao = await fetch(`http://127.0.0.1:8000/evolucao/${idConta}?mes=${paramMesAtual}`);
+      const resEvolucao = await fetch(`https://app-financeiro-10tz.onrender.com/evolucao/${idConta}?mes=${paramMesAtual}`);
       setEvolucaoReal((await resEvolucao.json()).evolucao || []);
 
-      const resInteligencia = await fetch(`http://127.0.0.1:8000/inteligencia/${idConta}?mes=${paramMesAtual}`);
+      const resInteligencia = await fetch(`https://app-financeiro-10tz.onrender.com/inteligencia/${idConta}?mes=${paramMesAtual}`);
       setInteligenciaReal(await resInteligencia.json());
 
-      const resCartoes = await fetch(`http://127.0.0.1:8000/listar_cartoes/${idConta}`);
+      const resCartoes = await fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idConta}`);
       setCartoesReais((await resCartoes.json()).cartoes || []);
 
-      const resAgendamentos = await fetch(`http://127.0.0.1:8000/listar_agendamentos/${idConta}?mes=${paramMesAtual}`);
+      const resAgendamentos = await fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idConta}?mes=${paramMesAtual}`);
       setAgendamentosReais((await resAgendamentos.json()).agendamentos || []);
 
-      const resPlanilha = await fetch(`http://127.0.0.1:8000/listar_planilha/${idConta}`);
+      const resPlanilha = await fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idConta}`);
       setPlanilhaReal((await resPlanilha.json()).planilha || []);
 
     } catch (erro) {
@@ -248,7 +265,7 @@ export default function App() {
 
   useEffect(() => {
     if (isAutenticado && emailLogin) {
-      fetch(`http://127.0.0.1:8000/configurar/?email=${encodeURIComponent(emailLogin)}`)
+      fetch(`https://app-financeiro-10tz.onrender.com/configurar/?email=${encodeURIComponent(emailLogin)}`)
         .then(res => res.json())
         .then(data => { setIdContaReal(data.id_conta); carregarDadosDaTela(data.id_conta); })
         .catch(err => console.error("Erro na configuração", err));
@@ -261,7 +278,7 @@ export default function App() {
   const handleSalvarPerfil = async () => {
     if (!editNomeUsuario.trim()) return mostrarNotificacao("O nome não pode ficar vazio.", "erro");
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/perfil/${idContaReal}`, { 
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`, { 
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome_usuario: editNomeUsuario }) 
       });
       if (resposta.ok) { 
@@ -278,7 +295,7 @@ export default function App() {
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch(`http://127.0.0.1:8000/transacoes/${idContaReal}/${idTransacao}`, { method: 'DELETE' });
+          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${idTransacao}`, { method: 'DELETE' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação apagada com sucesso!"); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
       }
@@ -291,7 +308,7 @@ export default function App() {
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch(`http://127.0.0.1:8000/zerar_saldo/${idContaReal}`, { method: 'PUT' });
+          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/zerar_saldo/${idContaReal}`, { method: 'PUT' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta formatada! Ficha limpa."); setTelaAtiva('home'); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
       }
@@ -305,7 +322,7 @@ export default function App() {
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch('http://127.0.0.1:8000/cartoes/pagar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: idCartao, valor: valorFaturaAtual }) });
+          const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/pagar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: idCartao, valor: valorFaturaAtual }) });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Fatura paga com sucesso!"); } 
           else { const erro = await resposta.json(); mostrarNotificacao(erro.detail, "erro"); }
         } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
@@ -320,7 +337,7 @@ export default function App() {
   const handleSalvarEditSaldo = async () => {
     if (editSaldoValor === '') return mostrarNotificacao("Preencha um valor", "erro");
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/saldo/${idContaReal}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_saldo: parseFloat(editSaldoValor.replace(',', '.')) }) });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_saldo: parseFloat(editSaldoValor.replace(',', '.')) }) });
       if (resposta.ok) { setModalEditSaldoAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Saldo ajustado!"); }
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -335,7 +352,7 @@ export default function App() {
     if (!txEditTitulo || !txEditValor) return mostrarNotificacao("Preencha título e valor.", "erro");
     const txAtualizada = { id_conta: idContaReal, tipo: txEditTipo, valor: parseFloat(txEditValor.replace(',', '.')), categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo, data: new Date().toISOString().split('T')[0], classificacao: txEditCat };
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/transacoes/${idContaReal}/${txEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txAtualizada) });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${txEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txAtualizada) });
       if (resposta.ok) { setModalEditTxAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação editada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -346,7 +363,7 @@ export default function App() {
     if (!metaEditTitulo || !metaEditObjetivo || !metaEditGuardado) return mostrarNotificacao("Preencha os campos essenciais.", "erro");
     const metaAtualizada = { id_conta: idContaReal, titulo: metaEditTitulo, objetivo: parseFloat(metaEditObjetivo.toString().replace(',', '.')), guardado: parseFloat(metaEditGuardado.toString().replace(',', '.')), dias_restantes: parseInt(metaEditPrazo || 1) * 30 };
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/metas/${idContaReal}/${metaEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metaAtualizada) });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/metas/${idContaReal}/${metaEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metaAtualizada) });
       if (resposta.ok) { setModalEditMetaAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre editado!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -355,7 +372,7 @@ export default function App() {
     if (!tituloReceita || !valorReceita) return mostrarNotificacao("Preencha título e valor.", "erro");
     const novaTransacao = { id_conta: idContaReal, tipo: 'Receita', valor: parseFloat(valorReceita.replace(',', '.')), categoria: `${categoriaReceita}: ${tituloReceita}`, data: new Date().toISOString().split('T')[0], classificacao: 'receita' };
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
       if (resposta.ok) { setModalReceitaAberto(false); setTituloReceita(''); setValorReceita(''); setCategoriaReceita('Salário'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Receita registrada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -363,7 +380,7 @@ export default function App() {
   const processarSalvamentoDespesa = async () => {
     const novaTransacao = { id_conta: idContaReal, tipo: 'Despesa', valor: parseFloat(valorDespesa.replace(',', '.')), categoria: `${categoriaDespesa}: ${tituloDespesa}`, data: new Date().toISOString().split('T')[0], classificacao: classificacaoDespesa };
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
       if (resposta.ok) { setModalDespesaAberto(false); setTituloDespesa(''); setValorDespesa(''); setCategoriaDespesa('Alimentação'); setClassificacaoDespesa('essencial'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Despesa registrada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -380,21 +397,21 @@ export default function App() {
   const handleSalvarAgendamento = async () => {
     if (!tituloAgendamento || !valorAgendamento || !dataAgendamento) return mostrarNotificacao("Preencha todos os campos do agendamento.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/agendamentos/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloAgendamento, valor: parseFloat(valorAgendamento.replace(',', '.')), data_vencimento: dataAgendamento, categoria: categoriaAgendamento, classificacao: classificacaoAgendamento }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/agendamentos/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloAgendamento, valor: parseFloat(valorAgendamento.replace(',', '.')), data_vencimento: dataAgendamento, categoria: categoriaAgendamento, classificacao: classificacaoAgendamento }) });
       if (resposta.ok) { setModalAgendamentoAberto(false); setTituloAgendamento(''); setValorAgendamento(''); setDataAgendamento(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta programada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
   const handlePagarAgendamento = async (idAgendamento) => {
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/agendamentos/pagar/${idAgendamento}`, { method: 'POST' });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/agendamentos/pagar/${idAgendamento}`, { method: 'POST' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta paga e registrada com sucesso!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
   const handleExcluirAgendamento = async (idAgendamento) => {
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/agendamentos/${idAgendamento}`, { method: 'DELETE' });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/agendamentos/${idAgendamento}`, { method: 'DELETE' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Agendamento cancelado!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -412,7 +429,7 @@ export default function App() {
   const handleSalvarMeta = async () => {
     if (!tituloMeta || !objetivoMeta || !mesesMeta) return mostrarNotificacao("Preencha todos os campos.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/metas/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, titulo: tituloMeta, objetivo: parseFloat(objetivoMeta.toString().replace(',', '.')), dias_restantes: parseInt(mesesMeta) * 30 }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/metas/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, titulo: tituloMeta, objetivo: parseFloat(objetivoMeta.toString().replace(',', '.')), dias_restantes: parseInt(mesesMeta) * 30 }) });
       if (resposta.ok) { setModalCofreAberto(false); setTituloMeta(''); setObjetivoMeta(''); setMesesMeta(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre criado com sucesso!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -420,7 +437,7 @@ export default function App() {
   const handleSalvarAporte = async () => {
     if (!metaSelecionada || !valorAporte) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/aportes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaSelecionada, valor_aporte: parseFloat(valorAporte.replace(',', '.')) }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/aportes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaSelecionada, valor_aporte: parseFloat(valorAporte.replace(',', '.')) }) });
       if (resposta.ok) { setModalAporteAberto(false); setValorAporte(''); setMetaSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro guardado!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -428,7 +445,7 @@ export default function App() {
   const handleSalvarResgate = async () => {
     if (!metaResgateSelecionada || !valorResgate) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/resgatar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaResgateSelecionada, valor_resgate: parseFloat(valorResgate.replace(',', '.')) }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/resgatar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaResgateSelecionada, valor_resgate: parseFloat(valorResgate.replace(',', '.')) }) });
       if (resposta.ok) { setModalResgateAberto(false); setValorResgate(''); setMetaResgateSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro resgatado para o Saldo Livre!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -436,7 +453,7 @@ export default function App() {
   const handleSalvarCartao = async () => {
     if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/cartoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento) }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento) }) });
       if (resposta.ok) { setModalCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão adicionado!"); } 
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -446,7 +463,7 @@ export default function App() {
   const handleLancarCompraCartao = async () => {
     if (!descricaoCompraCartao || !valorCompraCartao) return mostrarNotificacao("Preencha a descrição e o valor.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')) }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')) }) });
       if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -454,14 +471,14 @@ export default function App() {
   const handleSalvarPlanilha = async () => {
     if (!tituloPlanilha || !valorPlanilha || !dataPlanilha) return mostrarNotificacao("Preencha todos os campos.", "erro");
     try {
-      const resposta = await fetch('http://127.0.0.1:8000/planilha/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloPlanilha, valor: parseFloat(valorPlanilha.replace(',', '.')), vencimento: dataPlanilha }) });
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/planilha/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloPlanilha, valor: parseFloat(valorPlanilha.replace(',', '.')), vencimento: dataPlanilha }) });
       if (resposta.ok) { setModalPlanilhaAberto(false); setTituloPlanilha(''); setValorPlanilha(''); setDataPlanilha(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Item adicionado à planilha!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
   const handleExcluirPlanilha = async (idItem) => {
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/planilha/${idItem}`, { method: 'DELETE' });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/planilha/${idItem}`, { method: 'DELETE' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Item removido!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -469,7 +486,7 @@ export default function App() {
   const handleAlternarStatusPlanilha = async (idItem, statusAtual) => {
     const novoStatus = statusAtual === 'pendente' ? 'pago' : 'pendente';
     try {
-      const resposta = await fetch(`http://127.0.0.1:8000/planilha/${idItem}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: novoStatus }) });
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/planilha/${idItem}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: novoStatus }) });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -526,7 +543,7 @@ export default function App() {
                ) : (
                  <div className="flex flex-col items-center justify-center mb-6 bg-[#090b10] p-6 rounded-2xl border border-slate-800 text-center">
                    <ShieldCheck size={48} className="text-[#d4af37] mb-4" />
-                   <p className="text-sm text-slate-400">Dispositivo reconhecido. Abra o <strong>Google Authenticator</strong> e digite o seu código atual.</p>
+                   <p className="text-sm text-slate-400">Gerando QR Code...</p>
                  </div>
                )}
                <form onSubmit={handleSubmeter2FA} className="flex flex-col gap-5">
@@ -546,13 +563,93 @@ export default function App() {
 
             <div className={`transition-transform duration-500 w-full ${etapaLogin === 0 ? 'translate-x-0' : '-translate-x-[150%] absolute top-8 left-0 px-8'}`}>
               <div className="text-center mb-8"><h1 className="text-3xl font-semibold mb-2">{isLoginMode ? t.welcome : t.create}<span className="text-[#d4af37]">{isLoginMode ? t.back : t.account}</span></h1><p className="text-slate-400 text-sm">{isLoginMode ? t.subIn : t.subUp}</p></div>
-              <form className="flex flex-col gap-5" onSubmit={handleSubmeterLogin}>
-                {!isLoginMode && (<div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center w-full focus-within:border-slate-600 transition-colors"><User className="text-slate-500 shrink-0" size={20} /><div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{t.fName}</span><input type="text" placeholder="Luan" className="bg-transparent text-white text-sm outline-none w-full" /></div></div>)}
-                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors"><Mail className="text-slate-500 shrink-0" size={20} /><div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{t.email}</span><input type="email" value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)} placeholder={t.placeEmail} className="bg-transparent text-white text-sm outline-none w-full" /></div></div>
-                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors"><Lock className="text-slate-500 shrink-0" size={20} /><div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{t.pass}</span><input type={mostrarSenha ? "text" : "password"} value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)} placeholder={t.placePass} className="bg-transparent text-white text-sm outline-none w-full" /></div><button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="text-slate-500 hover:text-slate-300">{mostrarSenha ? <Eye size={18}/> : <EyeOff size={18}/>}</button></div>
-                {isLoginMode && (<div className="flex justify-end"><button type="button" onClick={() => mostrarNotificacao("A recuperação de palavra-passe foi ativada!", "sucesso")} className="text-xs text-[#d4af37] hover:text-[#f3cd57] transition-colors">{t.forgot}</button></div>)}
-                <button type="submit" className="mt-2 w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-medium py-4 rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg">{isLoginMode ? t.signIn : t.signUp} <ArrowRight size={18} /></button>
+              
+              <form className="flex flex-col gap-4" onSubmit={handleSubmeterLogin}>
+                
+                {/* 1. NOME E SOBRENOME (Só aparece no Cadastro) */}
+                {!isLoginMode && (
+                  <div className="flex gap-3">
+                    <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center w-full focus-within:border-slate-600 transition-colors">
+                      <User className="text-slate-500 shrink-0" size={20} />
+                      <div className="flex flex-col w-full">
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Nome</span>
+                        <input type="text" value={nomeRegistro} onChange={(e) => setNomeRegistro(e.target.value)} placeholder="Seu nome" className="bg-transparent text-white text-sm outline-none w-full" />
+                      </div>
+                    </div>
+                    <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center w-full focus-within:border-slate-600 transition-colors">
+                      <div className="flex flex-col w-full">
+                        <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Sobrenome</span>
+                        <input type="text" value={sobrenomeRegistro} onChange={(e) => setSobrenomeRegistro(e.target.value)} placeholder="Seu sobrenome" className="bg-transparent text-white text-sm outline-none w-full" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. E-MAIL PRINCIPAL */}
+                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
+                  <Mail className="text-slate-500 shrink-0" size={20} />
+                  <div className="flex flex-col w-full">
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">E-mail</span>
+                    <input type="email" value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)} placeholder="Digite seu e-mail" className="bg-transparent text-white text-sm outline-none w-full" />
+                  </div>
+                </div>
+
+                {/* 3. CONFIRMAR E-MAIL (Só aparece no Cadastro) */}
+                {!isLoginMode && (
+                  <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
+                    <Mail className="text-slate-500 shrink-0" size={20} />
+                    <div className="flex flex-col w-full">
+                      <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Confirmar E-mail</span>
+                      <input type="email" value={emailConfirma} onChange={(e) => setEmailConfirma(e.target.value)} placeholder="Repita seu e-mail" className="bg-transparent text-white text-sm outline-none w-full" />
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. SENHA PRINCIPAL */}
+                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
+                  <Lock className="text-slate-500 shrink-0" size={20} />
+                  <div className="flex flex-col w-full">
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Senha</span>
+                    <input type={mostrarSenha ? "text" : "password"} value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)} placeholder="Sua senha" className="bg-transparent text-white text-sm outline-none w-full" />
+                  </div>
+                  <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="text-slate-500 hover:text-slate-300">
+                    {mostrarSenha ? <Eye size={18}/> : <EyeOff size={18}/>}
+                  </button>
+                </div>
+
+                {/* 5. CONFIRMAR SENHA (Só aparece no Cadastro) */}
+                {!isLoginMode && (
+                  <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
+                    <Lock className="text-slate-500 shrink-0" size={20} />
+                    <div className="flex flex-col w-full">
+                      <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Confirmar Senha</span>
+                      <input type={mostrarSenha ? "text" : "password"} value={senhaConfirma} onChange={(e) => setSenhaConfirma(e.target.value)} placeholder="Repita sua senha" className="bg-transparent text-white text-sm outline-none w-full" />
+                    </div>
+                  </div>
+                )}
+
+                {/* ESQUECEU A SENHA (Só aparece no Login) */}
+                {isLoginMode && (
+                  <div className="flex justify-end mt-[-8px]">
+                    <button type="button" onClick={() => mostrarNotificacao("A recuperação de senha foi ativada!", "sucesso")} className="text-xs text-[#d4af37] hover:text-[#f3cd57] transition-colors">Esqueceu a Senha?</button>
+                  </div>
+                )}
+                
+                {/* BOTÃO PRINCIPAL */}
+                <button type="submit" className="mt-2 w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-medium py-4 rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg">
+                  {isLoginMode ? "Entrar" : "Criar Conta"} <ArrowRight size={18} />
+                </button>
               </form>
+
+              {/* LINK PARA ALTERNAR ENTRE LOGIN E CADASTRO */}
+              <div className="mt-6 flex justify-center text-sm text-slate-400">
+                {isLoginMode ? (
+                  <span>Não tem uma conta? <button type="button" onClick={() => setIsLoginMode(false)} className="text-[#d4af37] hover:underline font-semibold ml-1">Cadastre-se</button></span>
+                ) : (
+                  <span>Já tem uma conta? <button type="button" onClick={() => setIsLoginMode(true)} className="text-[#d4af37] hover:underline font-semibold ml-1">Fazer Login</button></span>
+                )}
+              </div>
+
               <div className="mt-8 flex justify-center items-center gap-3 text-xs font-medium uppercase tracking-widest">
                 <button onClick={() => setIdioma('en')} className={`transition-colors ${idioma === 'en' ? 'text-[#d4af37]' : 'text-slate-600 hover:text-slate-400'}`}>EN</button><span className="text-slate-800">|</span><button onClick={() => setIdioma('pt')} className={`transition-colors ${idioma === 'pt' ? 'text-[#d4af37]' : 'text-slate-600 hover:text-slate-400'}`}>PT</button>
               </div>
