@@ -6,6 +6,13 @@ import { auth } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 import { MotionWrapper } from '../components/ui/MotionWrapper';
+import HomeView from './dashboard/HomeView';
+import ExtratoView from './dashboard/ExtratoView';
+import ExtratoView from './dashboard/ExtratoView';
+import MetasView from './dashboard/MetasView';
+import PlanilhaView from './dashboard/PlanilhaView';
+import CartoesView from './dashboard/CartoesView';
+import ConfiguracoesView from './dashboard/ConfiguracoesView';
 
 export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) {
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
@@ -536,280 +543,91 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       <main className="flex-1 p-10 overflow-y-auto">
         
         {telaAtiva === 'home' && (
-          <div className="animate-in fade-in duration-300">
-            <header className="flex justify-between items-center mb-10">
-              <div className="flex items-center gap-4 bg-[#161922] border border-slate-800/60 rounded-xl px-4 py-2 shadow-lg">
-                <button onClick={mesAnterior} className="p-1 hover:bg-[#d4af37]/10 hover:text-[#d4af37] rounded-lg transition-colors text-slate-400"><ChevronLeft size={24} /></button>
-                <div className="flex flex-col items-center min-w-[140px]"><span className="text-xl font-bold text-white capitalize">{mesFormatadoExibicao}</span><span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Período Selecionado</span></div>
-                <button onClick={proximoMes} className="p-1 hover:bg-[#d4af37]/10 hover:text-[#d4af37] rounded-lg transition-colors text-slate-400"><ChevronRight size={24} /></button>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => setModalAgendamentoAberto(true)} className="bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 px-4 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all border border-indigo-500/20"><CalendarClock size={18} /> Agendar</button>
-                <button onClick={() => setModalReceitaAberto(true)} className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 px-4 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all border border-emerald-500/20"><TrendingUp size={18} /> Receita</button>
-                <button onClick={() => setModalDespesaAberto(true)} className="bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-4 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all border border-rose-500/20"><TrendingDown size={18} /> Despesa</button>
-                <button onClick={() => abrirModalAporte('')} className="bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all shadow-lg"><ArrowRightLeft size={18} /> Guardar</button>
-              </div>
-            </header>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 transition-transform hover:-translate-y-1 hover:border-[#d4af37]/30 group shadow-lg">
-                <div className="flex justify-between items-start mb-6"><div className="bg-[#d4af37]/10 p-2 rounded-lg text-[#d4af37]"><Wallet size={20} /></div><div className="flex gap-2"><button onClick={abrirModalEditSaldo} className="text-slate-600 hover:text-[#d4af37] opacity-0 group-hover:opacity-100 transition-all p-1 rounded-md hover:bg-[#d4af37]/10" title="Editar Saldo Manualmente"><Pencil size={18} /></button></div></div>
-                <h3 className="text-slate-400 text-sm mb-1">Saldo Livre</h3><p className="text-3xl font-bold text-[#d4af37] mb-1">{saldoReal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p><p className="text-slate-500 text-xs">Disponível para uso</p>
-              </div>
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 transition-transform hover:-translate-y-1 hover:border-emerald-500/30 shadow-lg">
-                <div className="flex justify-between items-start mb-6"><div className="bg-emerald-500/10 p-2 rounded-lg text-emerald-400"><Target size={20} /></div></div>
-                <h3 className="text-slate-400 text-sm mb-1">Total Guardado</h3><p className="text-3xl font-bold text-emerald-400 mb-1">{totalGuardado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p><p className="text-slate-500 text-xs">Soma de todos os cofres</p>
-              </div>
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 transition-transform hover:-translate-y-1 hover:border-[#d4af37]/30 shadow-lg">
-                <div className="flex justify-between items-start mb-6"><div className="bg-slate-700/30 p-2 rounded-lg text-slate-300"><ArrowRightLeft size={20} /></div></div>
-                <h3 className="text-slate-400 text-sm mb-1">Balanço do Mês</h3><p className={`text-3xl font-bold mb-1 ${(balancoReal?.balanco || 0) >= 0 ? 'text-white' : 'text-rose-400'}`}>{(balancoReal?.balanco || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p><p className="text-slate-500 text-xs">R: {(balancoReal?.receitas || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} · D: {(balancoReal?.despesas || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              </div>
-            </div>
-
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 mb-8 shadow-lg">
-              <div className="flex items-center gap-3 mb-6"><div className="bg-[#d4af37]/10 p-2 rounded-lg text-[#d4af37]"><BrainCircuit size={24} /></div><div><h2 className="text-lg font-bold text-white mb-1">Diagnóstico Financeiro (50/30/20)</h2><p className="text-slate-500 text-sm">Com base nas receitas do mês selecionado: {(inteligenciaReal?.total_receitas || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div></div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div onClick={() => toggleCategoria('essenciais')} className="bg-[#090b10] border border-slate-800/50 rounded-xl p-5 cursor-pointer hover:bg-black/40 transition-colors group">
-                  <div className="flex justify-between items-center mb-2"><h4 className="font-semibold text-white flex items-center gap-1 group-hover:text-slate-300 transition-colors">Essenciais <ChevronDown size={14} className={`transition-transform ${categoriaExpandida === 'essenciais' ? 'rotate-180' : ''}`} /></h4><span className={`text-xs font-bold px-2 py-1 rounded ${(inteligenciaReal?.essenciais?.porcentagem || 0) > 50 ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-300'}`}>{inteligenciaReal?.essenciais?.porcentagem || 0}% (Ideal: 50%)</span></div>
-                  <p className="text-3xl font-bold text-white mb-3">{(inteligenciaReal?.essenciais?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 ${(inteligenciaReal?.essenciais?.porcentagem || 0) > 50 ? 'bg-rose-500' : 'bg-slate-500'}`} style={{ width: `${Math.min(inteligenciaReal?.essenciais?.porcentagem || 0, 100)}%` }}></div></div>
-                  {categoriaExpandida === 'essenciais' && (<div className="mt-5 pt-4 border-t border-slate-800/50 flex flex-col gap-3 animate-in slide-in-from-top-2 fade-in duration-200">{(inteligenciaReal?.essenciais?.itens || []).map((item, index) => (<div key={index} className="flex justify-between items-center text-sm"><span className="text-slate-400 capitalize">{item.nome}</span><span className="text-slate-300 font-medium">{item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>))}{(inteligenciaReal?.essenciais?.itens || []).length === 0 && <span className="text-xs text-slate-500 italic">Nenhum gasto essencial registrado.</span>}</div>)}
-                </div>
-
-                <div onClick={() => toggleCategoria('estilo_vida')} className="bg-[#090b10] border border-slate-800/50 rounded-xl p-5 cursor-pointer hover:bg-black/40 transition-colors group">
-                  <div className="flex justify-between items-center mb-2"><h4 className="font-semibold text-white flex items-center gap-1 group-hover:text-[#d4af37] transition-colors">Estilo de Vida <ChevronDown size={14} className={`transition-transform ${categoriaExpandida === 'estilo_vida' ? 'rotate-180' : ''}`} /></h4><span className={`text-xs font-bold px-2 py-1 rounded ${(inteligenciaReal?.estilo_vida?.porcentagem || 0) > 30 ? 'bg-rose-500/20 text-rose-400' : 'bg-[#d4af37]/20 text-[#d4af37]'}`}>{inteligenciaReal?.estilo_vida?.porcentagem || 0}% (Ideal: 30%)</span></div>
-                  <p className="text-3xl font-bold text-white mb-3">{(inteligenciaReal?.estilo_vida?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 ${(inteligenciaReal?.estilo_vida?.porcentagem || 0) > 30 ? 'bg-rose-500' : 'bg-[#d4af37]'}`} style={{ width: `${Math.min(inteligenciaReal?.estilo_vida?.porcentagem || 0, 100)}%` }}></div></div>
-                  {categoriaExpandida === 'estilo_vida' && (<div className="mt-5 pt-4 border-t border-slate-800/50 flex flex-col gap-3 animate-in slide-in-from-top-2 fade-in duration-200">{(inteligenciaReal?.estilo_vida?.itens || []).map((item, index) => (<div key={index} className="flex justify-between items-center text-sm"><span className="text-slate-400 capitalize">{item.nome}</span><span className="text-slate-300 font-medium">{item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>))}{(inteligenciaReal?.estilo_vida?.itens || []).length === 0 && <span className="text-xs text-slate-500 italic">Nenhum gasto de lazer registrado.</span>}</div>)}
-                </div>
-
-                <div onClick={() => toggleCategoria('futuro')} className="bg-[#090b10] border border-slate-800/50 rounded-xl p-5 cursor-pointer hover:bg-black/40 transition-colors group">
-                  <div className="flex justify-between items-center mb-2"><h4 className="font-semibold text-white flex items-center gap-1 group-hover:text-[#d4af37] transition-colors">Investimento <ChevronDown size={14} className={`transition-transform ${categoriaExpandida === 'futuro' ? 'rotate-180' : ''}`} /></h4><span className={`text-xs font-bold px-2 py-1 rounded ${(inteligenciaReal?.futuro?.porcentagem || 0) >= 20 ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-slate-800 text-slate-400'}`}>{inteligenciaReal?.futuro?.porcentagem || 0}% (Ideal: 20%)</span></div>
-                  <p className="text-3xl font-bold text-white mb-3">{(inteligenciaReal?.futuro?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 ${(inteligenciaReal?.futuro?.porcentagem || 0) >= 20 ? 'bg-[#d4af37]' : 'bg-slate-500'}`} style={{ width: `${Math.min(inteligenciaReal?.futuro?.porcentagem || 0, 100)}%` }}></div></div>
-                  {categoriaExpandida === 'futuro' && (<div className="mt-5 pt-4 border-t border-slate-800/50 flex flex-col gap-3 animate-in slide-in-from-top-2 fade-in duration-200">{(inteligenciaReal?.futuro?.itens || []).map((item, index) => (<div key={index} className={`flex justify-between items-center text-sm ${item.valor < 0 ? 'text-amber-400' : ''}`}><span className="capitalize">{item.nome}</span><span className="font-medium">{item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>))}{(inteligenciaReal?.futuro?.itens || []).length === 0 && <span className="text-xs text-slate-500 italic">Nenhum aporte realizado este mês.</span>}</div>)}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg mb-8">
-              <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold text-white flex items-center gap-2"><CalendarClock className="text-indigo-400" /> Agenda de Pagamentos</h2><button onClick={() => setModalAgendamentoAberto(true)} className="text-indigo-400 hover:text-indigo-300 text-sm font-medium flex items-center gap-1 transition-colors"><Plus size={16} /> Nova Conta</button></div>
-              <div className="flex flex-col gap-4">
-                {(agendamentosReais || []).length === 0 ? (<p className="text-slate-500 text-sm text-center py-4">Nenhuma conta agendada para este mês.</p>) : (
-                  (agendamentosReais || []).map((agenda) => (
-                    <div key={agenda.id} className="flex items-center justify-between p-4 bg-[#090b10] border border-slate-800/50 rounded-xl hover:border-indigo-500/30 transition-colors group">
-                      <div className="flex items-center gap-4"><div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400"><Calendar size={20} /></div><div><h4 className="font-semibold text-white">{agenda.categoria}: {agenda.descricao}</h4><p className="text-slate-500 text-xs flex items-center gap-1 mt-1">Vence dia: <span className="text-indigo-300 font-bold">{agenda.data_vencimento.split('-').reverse().join('/')}</span></p></div></div>
-                      <div className="flex items-center gap-4"><span className="font-bold text-rose-400 text-lg">{(agenda.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span><div className="flex gap-2"><button onClick={() => handlePagarAgendamento(agenda.id)} className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 font-bold px-4 py-2 rounded-lg flex items-center gap-1 transition-colors text-sm border border-emerald-500/20"><CheckSquare size={16} /> Pagar</button><button onClick={() => handleExcluirAgendamento(agenda.id)} className="text-slate-600 hover:text-rose-500 p-2 rounded transition-colors" title="Cancelar Agendamento"><Trash2 size={18} /></button></div></div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              <div className="lg:col-span-2 bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
-                <div className="flex justify-between items-center mb-6"><div><h2 className="text-lg font-bold text-white mb-1">Evolução Financeira (Últimos 6 Meses)</h2></div></div>
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={(evolucaoReal || [])} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" /><XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} /><YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} /><RechartsTooltip contentStyle={{ backgroundColor: '#090b10', borderColor: '#1e293b', borderRadius: '8px', color: '#fff' }} itemStyle={{ color: '#d4af37' }} /><Line type="monotone" dataKey="saldo" stroke="#d4af37" strokeWidth={3} dot={{ fill: '#d4af37', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#f3cd57', stroke: '#fff' }} /></LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
-                <h2 className="text-lg font-bold text-white mb-1">Gastos por Categoria</h2>
-                {(categoriasReais || []).length === 0 ? (<div className="flex h-48 items-center justify-center text-slate-500 text-sm">Nenhuma despesa no período.</div>) : (
-                  <div className="flex items-center justify-between h-48 mt-4">
-                    <div className="w-1/2 h-full"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={categoriasReais} cx="50%" cy="50%" innerRadius={45} outerRadius={65} paddingAngle={2} dataKey="value" stroke="none">{(categoriasReais || []).map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}</Pie></PieChart></ResponsiveContainer></div>
-                    <div className="w-1/2 flex flex-col gap-3 pl-4">{(categoriasReais || []).map((item, index) => (<div key={index} className="flex items-center justify-between text-xs"><div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></div><span className="text-slate-300 truncate w-16">{item.name}</span></div><span className="font-medium text-white">R$ {item.value}</span></div>))}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg pb-10">
-              <h2 className="text-lg font-bold text-white mb-6">Transações do Mês (Extrato)</h2>
-              <div className="flex flex-col gap-4">
-                {(transacoesReais || []).map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors group">
-                    <div className="flex items-center gap-4"><div className={`p-3 rounded-xl ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-[#d4af37]/10 text-[#d4af37]' : 'bg-rose-500/10 text-rose-400'}`}>{tx.tipo === 'Receita' ? <Zap size={20} /> : tx.tipo === 'Cartao' ? <CreditCard size={20} /> : <ShoppingBag size={20} />}</div><div><h4 className="font-semibold text-white">{tx.categoria}</h4><p className="text-slate-500 text-xs">{tx.tipo === 'Cartao' ? 'Cartão de Crédito' : tx.tipo} · {tx.data.split('-').reverse().join('/')}</p></div></div>
-                    <div className="flex items-center gap-4"><span className={`font-bold ${tx.tipo === 'Receita' ? 'text-emerald-400' : tx.tipo === 'Cartao' ? 'text-[#d4af37]' : 'text-rose-400'}`}>{tx.tipo === 'Receita' ? '+' : '-'}{(tx.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span><div className="flex gap-1">{tx.tipo !== 'Cartao' && (<button onClick={() => abrirModalEditTx(tx)} className="text-slate-600 hover:text-[#d4af37] opacity-0 group-hover:opacity-100 transition-all p-1" title="Editar transação"><Pencil size={18} /></button>)}<button onClick={() => handleExcluirTransacao(tx.id)} className="text-slate-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all p-1" title="Apagar transação"><Trash2 size={18} /></button></div></div>
-                  </div>
-                ))}
-                {(transacoesReais || []).length === 0 && <p className="text-slate-500 text-sm text-center py-4">Nenhuma transação registrada neste mês.</p>}
-              </div>
-            </div>
-          </div>
+          <HomeView
+            dataSelecionada={dataSelecionada}
+            saldoReal={saldoReal}
+            totalGuardado={totalGuardado}
+            balancoReal={balancoReal}
+            inteligenciaReal={inteligenciaReal}
+            categoriaExpandida={categoriaExpandida}
+            agendamentosReais={agendamentosReais}
+            evolucaoReal={evolucaoReal}
+            categoriasReais={categoriasReais}
+            transacoesReais={transacoesReais}
+            mesFormatadoExibicao={mesFormatadoExibicao}
+            mesAnterior={mesAnterior}
+            proximoMes={proximoMes}
+            toggleCategoria={toggleCategoria}
+            setModalAgendamentoAberto={setModalAgendamentoAberto}
+            setModalReceitaAberto={setModalReceitaAberto}
+            setModalDespesaAberto={setModalDespesaAberto}
+            abrirModalAporte={abrirModalAporte}
+            abrirModalEditSaldo={abrirModalEditSaldo}
+            abrirModalEditTx={abrirModalEditTx}
+            handlePagarAgendamento={handlePagarAgendamento}
+            handleExcluirAgendamento={handleExcluirAgendamento}
+            handleExcluirTransacao={handleExcluirTransacao}
+          />
         )}
 
         {/* ================================== EXTRATO ================================== */}
         {telaAtiva === 'extrato' && (
-          <div className="animate-in fade-in duration-300 flex flex-col h-[calc(100vh-80px)]">
-             <header className="flex justify-between items-center mb-8 shrink-0">
-               <div><h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Extrato Completo</h1><p className="text-slate-400 text-sm">Busque, filtre e analise todo o seu histórico financeiro.</p></div>
-             </header>
-
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-5 mb-6 flex flex-col md:flex-row gap-4 shadow-lg shrink-0">
-              <div className="flex-1 bg-[#090b10] border border-slate-800 rounded-xl px-4 py-3 flex gap-3 items-center focus-within:border-[#d4af37] transition-colors"><Search className="text-slate-500 shrink-0" size={20} /><input type="text" value={buscaExtrato} onChange={(e) => setBuscaExtrato(e.target.value)} placeholder="Buscar por nome da transação, mercado, faculdade..." className="bg-transparent text-white text-sm outline-none w-full placeholder:text-slate-600" /></div>
-              <div className="md:w-64 bg-[#090b10] border border-slate-800 rounded-xl px-4 py-3 flex gap-3 items-center focus-within:border-[#d4af37] transition-colors"><Filter className="text-slate-500 shrink-0" size={20} /><select value={filtroTipoExtrato} onChange={(e) => setFiltroTipoExtrato(e.target.value)} className="bg-transparent text-white text-sm outline-none w-full cursor-pointer"><option value="Todos" className="bg-[#090b10]">Todas as Transações</option><option value="Receita" className="bg-[#090b10]">Apenas Receitas</option><option value="Despesa" className="bg-[#090b10]">Apenas Despesas</option><option value="Cartao" className="bg-[#090b10]">Apenas Cartão de Crédito</option></select></div>
-            </div>
-            
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl flex-1 overflow-hidden flex flex-col shadow-lg">
-              <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-slate-800/60 bg-black/20 text-xs font-bold text-slate-500 uppercase tracking-widest"><div className="col-span-2">Data</div><div className="col-span-5">Descrição</div><div className="col-span-2 text-center">Tipo</div><div className="col-span-2 text-right">Valor</div><div className="col-span-1 text-center">Ações</div></div>
-              <div className="flex-1 overflow-y-auto p-2">
-                {transacoesFiltradas.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-500"><Search size={48} className="mb-4 text-slate-700 opacity-50" /><p>Nenhuma transação encontrada.</p></div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {transacoesFiltradas.map((tx) => (
-                      <div key={tx.id} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-[#090b10] rounded-xl transition-colors group">
-                        <div className="col-span-2 text-sm text-slate-400">{tx.data.split('-').reverse().join('/')}</div>
-                        <div className="col-span-5 flex items-center gap-3"><div className={`p-2 rounded-lg shrink-0 ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-[#d4af37]/10 text-[#d4af37]' : 'bg-rose-500/10 text-rose-400'}`}>{tx.tipo === 'Receita' ? <Zap size={16} /> : tx.tipo === 'Cartao' ? <CreditCard size={16} /> : <ShoppingBag size={16} />}</div><span className="text-white font-medium truncate">{tx.categoria}</span></div>
-                        <div className="col-span-2 flex justify-center"><span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${tx.tipo === 'Receita' ? 'bg-emerald-500/20 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-[#d4af37]/20 text-[#d4af37]' : 'bg-rose-500/20 text-rose-400'}`}>{tx.tipo === 'Cartao' ? 'Cartão' : tx.tipo}</span></div>
-                        <div className={`col-span-2 text-right font-bold ${tx.tipo === 'Receita' ? 'text-emerald-400' : tx.tipo === 'Cartao' ? 'text-[#d4af37]' : 'text-rose-400'}`}>{tx.tipo === 'Receita' ? '+' : '-'}{(tx.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                        <div className="col-span-1 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">{tx.tipo !== 'Cartao' && (<button onClick={() => abrirModalEditTx(tx)} className="text-slate-600 hover:text-[#d4af37] p-1 rounded transition-colors" title="Editar"><Pencil size={16} /></button>)}<button onClick={() => handleExcluirTransacao(tx.id)} className="text-slate-600 hover:text-rose-500 p-1 rounded transition-colors" title="Excluir"><Trash2 size={16} /></button></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <ExtratoView 
+            transacoesReais={transacoesReais}
+            abrirModalEditTx={abrirModalEditTx}
+            handleExcluirTransacao={handleExcluirTransacao}
+          />
         )}
 
         {/* ================================== METAS ================================== */}
         {telaAtiva === 'metas' && (
-          <div className="animate-in fade-in duration-300">
-            <header className="flex justify-between items-center mb-10"><div><h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Meus Cofres e Metas</h1><p className="text-slate-400 text-sm">Planeje, invista e acompanhe a realização dos seus sonhos.</p></div><button onClick={() => setModalCofreAberto(true)} className="bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(212,175,55,0.15)]"><Plus size={20} /> Novo Cofre</button></header>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              <div className="bg-gradient-to-br from-[#161922] to-[#090b10] border border-[#d4af37]/30 rounded-2xl p-6 shadow-lg relative overflow-hidden"><div className="absolute top-0 right-0 p-4 opacity-10 text-[#d4af37]"><Target size={64} /></div><h3 className="text-slate-400 text-sm mb-2">Total Guardado Hoje</h3><p className="text-4xl font-bold text-white mb-1">{totalGuardado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p><p className="text-[#d4af37] text-xs font-medium tracking-wide uppercase mt-4">Liquidez Imediata</p></div>
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg"><h3 className="text-slate-400 text-sm mb-2">Meta Global</h3><p className="text-3xl font-bold text-slate-300 mb-1">{totalObjetivoGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p><p className="text-slate-500 text-xs mt-4">Soma de todos os objetivos</p></div>
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg flex flex-col justify-center"><h3 className="text-slate-400 text-sm mb-4">Progresso Médio Geral</h3><div className="flex items-center gap-4"><div className="text-4xl font-bold text-[#d4af37]">{progressoGlobal}%</div><div className="flex-1 h-3 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-[#8c6b4a] to-[#d4af37] rounded-full transition-all duration-1000" style={{ width: `${progressoGlobal}%` }}></div></div></div></div>
-            </div>
-            {(metasReais || []).length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-center bg-[#161922] border border-dashed border-slate-700/60 rounded-2xl p-8 shadow-lg"><Target size={48} className="text-slate-600 mb-4" /><h2 className="text-xl font-bold text-white mb-2">Sua lista de sonhos está vazia!</h2><p className="text-slate-400 text-sm">Crie seu primeiro cofre para começar a guardar dinheiro de forma organizada.</p></div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
-                {(metasReais || []).map((cofre) => (
-                  <div key={cofre.id} className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg hover:border-[#d4af37]/30 transition-all group flex flex-col">
-                    <div className="flex justify-between items-start mb-6"><div><h3 className="text-xl font-bold text-white mb-1">{cofre.titulo}</h3><p className="text-slate-500 text-xs flex items-center gap-1"><Calendar size={12} /> {cofre.dias_restantes} dias restantes para o alvo</p></div><button onClick={() => abrirModalEditMeta(cofre)} className="text-slate-600 hover:text-[#d4af37] opacity-0 group-hover:opacity-100 transition-all p-2 rounded-lg bg-[#090b10] border border-slate-800" title="Editar Cofre"><Pencil size={16} /></button></div>
-                    <div className="bg-[#090b10] rounded-xl p-5 mb-6 border border-slate-800/50 flex-1"><div className="flex justify-between items-end mb-2"><div><p className="text-slate-400 text-xs mb-1 uppercase tracking-wider font-semibold">Guardado</p><p className="text-2xl font-bold text-[#d4af37]">R$ {(cofre.guardado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></div><div className="text-right"><p className="text-slate-500 text-xs mb-1 uppercase tracking-wider font-semibold">Objetivo</p><p className="text-lg font-bold text-slate-300">R$ {(cofre.objetivo || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></div></div><div className="h-3 w-full bg-slate-800 rounded-full mt-4 mb-2 overflow-hidden"><div className="h-full bg-gradient-to-r from-[#8c6b4a] to-[#d4af37] rounded-full transition-all duration-1000" style={{ width: `${cofre.progresso}%` }}></div></div><div className="flex justify-end"><span className="text-xs font-bold text-[#d4af37] bg-[#d4af37]/10 px-2 py-1 rounded">{cofre.progresso}% concluído</span></div></div>
-                    <div className="flex gap-3"><button onClick={() => abrirModalResgate(cofre.id)} className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2 border border-slate-700"><Download size={16} /> Resgatar</button><button onClick={() => abrirModalAporte(cofre.id)} className="flex-1 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 text-[#d4af37] font-bold py-3 rounded-xl transition-colors text-sm flex justify-center items-center gap-2 border border-[#d4af37]/30"><Speed size={16} /> Aportar</button></div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <MetasView
+            totalGuardado={totalGuardado}
+            totalObjetivoGlobal={totalObjetivoGlobal}
+            progressoGlobal={progressoGlobal}
+            metasReais={metasReais}
+            setModalCofreAberto={setModalCofreAberto}
+            abrirModalEditMeta={abrirModalEditMeta}
+            abrirModalResgate={abrirModalResgate}
+            abrirModalAporte={abrirModalAporte}
+          />
         )}
 
         {/* ================================== PLANILHA FANTASMA ================================== */}
         {telaAtiva === 'planilha' && (
-          <div className="animate-in fade-in duration-300">
-            <header className="flex justify-between items-center mb-10">
-              <div><h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Planilha Fantasma</h1><p className="text-slate-400 text-sm">Contas avulsas que não afetam o seu saldo livre.</p></div>
-              <div className="flex gap-3">
-                <button onClick={handleExportarWhatsApp} className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all border border-emerald-500/20"><MessageCircle size={20} /> Enviar p/ WhatsApp</button>
-                <button onClick={() => setModalPlanilhaAberto(true)} className="bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all shadow-lg"><Plus size={20} /> Novo Item</button>
-              </div>
-            </header>
-
-            <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
-              {planilhaReal.length === 0 ? (
-                <div className="text-center py-10"><ClipboardList size={48} className="mx-auto text-slate-700 mb-4" /><p className="text-slate-500">Sua planilha está vazia.</p></div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {planilhaReal.map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-4 bg-[#090b10] border border-slate-800/50 rounded-xl">
-                      <div className="flex items-center gap-4">
-                        <button onClick={() => handleAlternarStatusPlanilha(item.id, item.status)} className={`p-1 rounded-full border-2 transition-colors ${item.status === 'pago' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'border-slate-600 text-transparent hover:border-slate-400'}`}><CheckCircle size={20} /></button>
-                        <div>
-                          <h4 className={`font-semibold ${item.status === 'pago' ? 'text-slate-500 line-through' : 'text-white'}`}>{item.descricao}</h4>
-                          <p className="text-slate-500 text-xs">Vence em: {item.vencimento.split('-').reverse().join('/')}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className={`font-bold ${item.status === 'pago' ? 'text-slate-600' : 'text-white'}`}>R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <button onClick={() => handleExcluirPlanilha(item.id)} className="text-slate-600 hover:text-rose-500 transition-colors"><Trash2 size={18} /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <PlanilhaView
+            planilhaReal={planilhaReal}
+            setModalPlanilhaAberto={setModalPlanilhaAberto}
+            handleExportarWhatsApp={handleExportarWhatsApp}
+            handleAlternarStatusPlanilha={handleAlternarStatusPlanilha}
+            handleExcluirPlanilha={handleExcluirPlanilha}
+          />
         )}
 
         {/* ================================== CONFIGURAÇÕES ================================== */}
         {telaAtiva === 'configuracoes' && (
-          <div className="animate-in fade-in duration-300">
-            <header className="mb-10"><h1 className="text-2xl font-bold mb-1">Configurações</h1><p className="text-slate-400 text-sm">Gerencie sua conta, segurança e dados.</p></header>
-            <div className="max-w-3xl flex flex-col gap-6">
-              
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><User className="text-[#d4af37]"/> Meu Perfil</h2>
-                <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 bg-[#090b10] border border-slate-800 rounded-full flex items-center justify-center text-3xl font-bold text-[#d4af37] uppercase">
-                    {nomeUsuario.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white font-bold text-xl capitalize">{nomeUsuario}</p>
-                    <p className="text-slate-400 text-sm">{auth.currentUser ? auth.currentUser.email : emailLogin}</p>
-                  </div>
-                  <button onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }} className="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center gap-2">
-                    <Pencil size={16} /> Editar Perfil
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><ShieldCheck className="text-[#d4af37]"/> Segurança</h2>
-                <div className="flex items-center justify-between py-3 border-b border-slate-800/50">
-                  <div>
-                    <p className="text-white font-medium">Autenticação de Dois Fatores (2FA)</p>
-                    <p className="text-slate-500 text-sm">Protegendo sua conta através do Google Authenticator.</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/20">Ativado</span>
-                    <button onClick={handleReset2FA} className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs px-3 py-1 rounded-lg font-bold border border-amber-500/20 transition-colors">Resetar</button>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="text-white font-medium">Palavra-passe de Acesso</p>
-                    <p className="text-slate-500 text-sm">Proteção ativa no banco de dados da nuvem.</p>
-                  </div>
-                  <button onClick={() => mostrarNotificacao("Troca de palavra-passe pelo painel Web ativada!", "sucesso")} className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm transition-colors border border-slate-700">Alterar Palavra-passe</button>
-                </div>
-              </div>
-
-              <div className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 shadow-lg border-l-4 border-l-rose-500"><h2 className="text-lg font-bold text-rose-400 mb-4 flex items-center gap-2"><AlertCircle /> Zona de Perigo</h2><p className="text-slate-400 text-sm mb-4">Ações irreversíveis para a sua conta e seus dados financeiros. Proceda com extrema cautela.</p><div className="flex gap-4"><button onClick={handleZerarSaldo} className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 px-4 py-3 rounded-xl text-sm font-bold border border-rose-500/20 transition-colors flex items-center gap-2 shadow-lg"><Trash2 size={16} /> Formatar e Zerar Conta</button></div></div>
-              <button onClick={onLogout} className="w-full bg-[#090b10] hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold py-4 rounded-xl mt-2 transition-all border border-slate-800 hover:border-rose-500/30 flex justify-center items-center gap-2">Sair do Aplicativo <LogOut size={18} /></button>
-            </div>
-          </div>
+          <ConfiguracoesView
+            nomeUsuario={nomeUsuario}
+            emailLogin={emailLogin}
+            auth={auth}
+            setEditNomeUsuario={setEditNomeUsuario}
+            setModalPerfilAberto={setModalPerfilAberto}
+            mostrarNotificacao={mostrarNotificacao}
+            handleReset2FA={handleReset2FA}
+            handleZerarSaldo={handleZerarSaldo}
+            onLogout={onLogout}
+          />
         )}
         
         {telaAtiva === 'cartoes' && (
-          <div className="animate-in fade-in duration-300">
-             <header className="flex justify-between items-center mb-10"><div><h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Meus Cartões</h1><p className="text-slate-400 text-sm">Controle de limites e faturas</p></div><button onClick={() => setModalCartaoAberto(true)} className="bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(212,175,55,0.15)]"><Plus size={20} /> Adicionar Cartão</button></header>
-            {(cartoesReais || []).length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-[60vh] text-center bg-[#161922] border border-slate-800/60 rounded-2xl p-8 shadow-lg"><div className="bg-[#d4af37]/10 p-6 rounded-full text-[#d4af37] mb-6 border border-[#d4af37]/20 shadow-[0_0_30px_rgba(212,175,55,0.15)]"><CreditCard size={48} /></div><h2 className="text-2xl font-bold text-white mb-4">Nenhum cartão cadastrado</h2><p className="text-slate-400 max-w-md text-sm mb-8">Adicione o seu primeiro cartão de crédito para começar a controlar faturas e limites.</p></div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {(cartoesReais || []).map(cartao => (
-                  <div key={cartao.id} className="bg-[#161922] border border-slate-800/60 rounded-2xl p-6 transition-transform hover:-translate-y-1 shadow-lg">
-                    <div className="flex justify-between items-center mb-6"><div className="flex items-center gap-3"><div className="bg-[#d4af37]/10 p-3 rounded-xl text-[#d4af37] border border-[#d4af37]/20"><CreditCard size={24} /></div><div><h3 className="text-lg font-bold text-white">{cartao.nome}</h3><p className="text-slate-500 text-xs">Vence dia {cartao.dia_vencimento} • Fecha dia {cartao.dia_fechamento}</p></div></div></div>
-                    <div className="bg-[#090b10] rounded-xl p-5 mb-4 border border-slate-800/50">
-                      <div className="flex justify-between items-end mb-2"><div><p className="text-slate-400 text-xs mb-1">Fatura Atual</p><p className="text-2xl font-bold text-white">R$ {(cartao.fatura_atual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p></div></div>
-                      <div className="h-2 w-full bg-slate-800 rounded-full mb-3 overflow-hidden"><div className="h-full bg-gradient-to-r from-[#8c6b4a] to-[#d4af37] rounded-full transition-all duration-1000" style={{ width: `${cartao.progresso_limite || 0}%` }}></div></div>
-                      <div className="flex justify-between text-xs"><span className="text-emerald-400">Disponível: R$ {(cartao.limite_disponivel || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><span className="text-slate-500">Limite: R$ {(cartao.limite_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></div>
-                    </div>
-                    <div className="flex gap-2 mt-4"><button onClick={() => abrirModalCompraCartao(cartao.id)} className="flex-1 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 text-[#d4af37] font-medium py-2 rounded-lg transition-colors text-sm border border-[#d4af37]/20">Lançar Compra</button><button onClick={() => handlePagarFatura(cartao.id, cartao.fatura_atual)} className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition-colors text-sm border border-slate-700">Pagar Fatura</button></div>
-                    <div onClick={() => toggleExtratoCartao(cartao.id)} className="flex justify-between items-center mt-6 pt-4 border-t border-slate-800/50 cursor-pointer group"><span className="text-sm text-slate-400 group-hover:text-[#d4af37] transition-colors">Ver compras desta fatura</span><ChevronDown size={16} className={`text-slate-500 transition-transform ${cartaoExpandidoExtrato === cartao.id ? 'rotate-180' : ''}`} /></div>
-                    {cartaoExpandidoExtrato === cartao.id && (<div className="mt-4 flex flex-col gap-3 animate-in slide-in-from-top-2 fade-in duration-200">{(cartao.extrato || []).map(compra => (<div key={compra.id} className="flex justify-between items-center text-sm border-b border-slate-800/50 pb-2 last:border-0 last:pb-0"><span className="text-slate-300">{compra.descricao}</span><span className="text-white font-medium">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></div>))}{(cartao.extrato || []).length === 0 && <span className="text-xs text-slate-500 italic">Nenhuma compra nesta fatura.</span>}</div>)}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <CartoesView
+            cartoesReais={cartoesReais}
+            setModalCartaoAberto={setModalCartaoAberto}
+            abrirModalCompraCartao={abrirModalCompraCartao}
+            handlePagarFatura={handlePagarFatura}
+            toggleExtratoCartao={toggleExtratoCartao}
+            cartaoExpandidoExtrato={cartaoExpandidoExtrato}
+          />
         )}
       </main>
 
