@@ -1,4 +1,5 @@
-import { CreditCard, Plus, ChevronDown } from 'lucide-react';
+import { CreditCard, Plus, ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import { TransactionIcon } from '../../components/ui/TransactionIcon';
 
 export default function CartoesView({
   cartoesReais,
@@ -6,7 +7,9 @@ export default function CartoesView({
   abrirModalCompraCartao,
   handlePagarFatura,
   toggleExtratoCartao,
-  cartaoExpandidoExtrato
+  cartaoExpandidoExtrato,
+  abrirModalEdicaoCartao,
+  handleExcluirCartao
 }) {
   return (
     <div className="animate-in fade-in duration-300">
@@ -33,13 +36,17 @@ export default function CartoesView({
             <div key={cartao.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 transition-transform hover:-translate-y-1 shadow-none">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-zinc-800 p-3 rounded-2xl text-zinc-100 border border-zinc-700">
-                    <CreditCard size={24} />
+                  <div className="bg-zinc-800 p-3 rounded-2xl text-zinc-100 border border-zinc-700 flex items-center justify-center overflow-hidden">
+                    <TransactionIcon categoria={cartao.nome} tipo="Cartao" size={24} />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-zinc-100">{cartao.nome}</h3>
                     <p className="text-zinc-400 text-xs">Vence dia {cartao.dia_vencimento} • Fecha dia {cartao.dia_fechamento}</p>
                   </div>
+                </div>
+                <div className="flex gap-2">
+                   <button onClick={() => abrirModalEdicaoCartao(cartao)} className="text-zinc-500 hover:text-zinc-100 p-1 rounded transition-colors" title="Editar"><Pencil size={18} /></button>
+                   <button onClick={() => handleExcluirCartao(cartao.id)} className="text-zinc-500 hover:text-rose-500 p-1 rounded transition-colors" title="Excluir"><Trash2 size={18} /></button>
                 </div>
               </div>
               <div className="bg-[#0a0a0a] rounded-2xl p-5 mb-4 border border-zinc-800">

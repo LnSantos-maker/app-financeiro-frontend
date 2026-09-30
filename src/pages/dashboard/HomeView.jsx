@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, CalendarClock, TrendingUp, TrendingDown, ArrowRightLeft, Wallet, Pencil, Target, BrainCircuit, ChevronDown, Calendar, CheckSquare, Trash2, Zap, CreditCard, ShoppingBag, Plus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { TransactionIcon } from '../../components/ui/TransactionIcon';
 
 export default function HomeView({
   // Variáveis
@@ -248,8 +249,8 @@ export default function HomeView({
           {(transacoesReais || []).map((tx) => (
             <div key={tx.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-zinc-800 transition-colors group">
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-2xl ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-zinc-800 text-zinc-100' : 'bg-rose-500/10 text-rose-400'}`}>
-                  {tx.tipo === 'Receita' ? <Zap size={20} /> : tx.tipo === 'Cartao' ? <CreditCard size={20} /> : <ShoppingBag size={20} />}
+                <div className={`p-3 rounded-2xl flex items-center justify-center overflow-hidden ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-zinc-800 text-zinc-100' : 'bg-rose-500/10 text-rose-400'}`}>
+                  <TransactionIcon categoria={tx.categoria} tipo={tx.tipo} />
                 </div>
                 <div>
                   <h4 className="font-semibold text-zinc-100">{tx.categoria}</h4>

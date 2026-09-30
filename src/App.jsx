@@ -16,7 +16,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[#090b10] text-white font-sans overflow-hidden relative">
+    <div className="flex w-full h-screen bg-[#090b10] text-white font-sans overflow-hidden relative">
       {toast.visivel && (
         <div className={`fixed top-6 right-6 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border transition-all z-[100] animate-in slide-in-from-top-5 fade-in duration-300 ${toast.tipo === 'sucesso' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
           {toast.tipo === 'sucesso' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}

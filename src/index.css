@@ -5,9 +5,22 @@
 }
 
 @layer base {
+  html {
+    font-size: 95%; /* Reduz a escala geral em 5% */
+  }
   body {
     background-color: #09090b;
     color: #f4f4f5;
+  }
+
+  /* Custom Premium Scrollbar - Hidden */
+  ::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
+  * {
+    scrollbar-width: none; /* Firefox */
   }
 }
 

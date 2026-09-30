@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Filter, Zap, CreditCard, ShoppingBag, Pencil, Trash2 } from 'lucide-react';
+import { TransactionIcon } from '../../components/ui/TransactionIcon';
 
 export default function ExtratoView({
   transacoesReais,
@@ -60,8 +61,8 @@ export default function ExtratoView({
                 <div key={tx.id} className="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-[#0a0a0a] rounded-2xl transition-colors group">
                   <div className="col-span-2 text-sm text-zinc-400">{tx.data.split('-').reverse().join('/')}</div>
                   <div className="col-span-5 flex items-center gap-3">
-                    <div className={`p-2 rounded-xl shrink-0 ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-zinc-800 text-zinc-100' : 'bg-rose-500/10 text-rose-400'}`}>
-                      {tx.tipo === 'Receita' ? <Zap size={16} /> : tx.tipo === 'Cartao' ? <CreditCard size={16} /> : <ShoppingBag size={16} />}
+                    <div className={`p-2 rounded-xl shrink-0 flex items-center justify-center overflow-hidden ${tx.tipo === 'Receita' ? 'bg-emerald-500/10 text-emerald-400' : tx.tipo === 'Cartao' ? 'bg-zinc-800 text-zinc-100' : 'bg-rose-500/10 text-rose-400'}`}>
+                      <TransactionIcon categoria={tx.categoria} tipo={tx.tipo} />
                     </div>
                     <span className="text-zinc-100 font-medium truncate">{tx.categoria}</span>
                   </div>

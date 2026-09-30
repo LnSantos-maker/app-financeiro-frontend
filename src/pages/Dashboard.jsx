@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, CreditCard, ArrowRightLeft, Target, Settings, Wallet, Plus, TrendingUp, TrendingDown, Zap, ShoppingBag, Calendar, ChevronDown, X, CheckCircle, AlertCircle, BrainCircuit, Trash2, Download, Eraser, Pencil, User, Mail, Lock, EyeOff, Eye, ArrowRight, ChevronLeft, ChevronRight, Smartphone, ShieldCheck, Search, Filter, TrendingUp as Speed, LogOut, CalendarClock, CheckSquare, QrCode, ClipboardList, MessageCircle } from 'lucide-react';
+import { Home, CreditCard, ArrowRightLeft, Target, Settings, Wallet, Plus, TrendingUp, TrendingDown, Zap, ShoppingBag, Calendar, ChevronDown, X, CheckCircle, AlertCircle, BrainCircuit, Trash2, Download, Eraser, Pencil, User, Mail, Lock, EyeOff, Eye, ArrowRight, ChevronLeft, ChevronRight, Smartphone, ShieldCheck, Search, Filter, TrendingUp as Speed, LogOut, CalendarClock, CheckSquare, QrCode, ClipboardList, MessageCircle, Calculator } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import MetasView from './dashboard/MetasView';
 import PlanilhaView from './dashboard/PlanilhaView';
 import CartoesView from './dashboard/CartoesView';
 import ConfiguracoesView from './dashboard/ConfiguracoesView';
+import UtilitariosView from './dashboard/UtilitariosView';
 import { useFinanceStore } from '../store/useFinanceStore';
 
 export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) {
@@ -89,6 +90,8 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [limiteCartao, setLimiteCartao] = useState('');
   const [diaFechamento, setDiaFechamento] = useState('');
   const [diaVencimento, setDiaVencimento] = useState('');
+  const [modalEditCartaoAberto, setModalEditCartaoAberto] = useState(false);
+  const [cartaoEditId, setCartaoEditId] = useState('');
   const [cartaoSelecionadoId, setCartaoSelecionadoId] = useState('');
   const [descricaoCompraCartao, setDescricaoCompraCartao] = useState('');
   const [valorCompraCartao, setValorCompraCartao] = useState('');
@@ -321,6 +324,36 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
+  const abrirModalEdicaoCartao = (cartao) => {
+    setCartaoEditId(cartao.id);
+    setNomeCartao(cartao.nome);
+    setLimiteCartao(cartao.limite_total.toString());
+    setDiaFechamento(cartao.dia_fechamento.toString());
+    setDiaVencimento(cartao.dia_vencimento.toString());
+    setModalEditCartaoAberto(true);
+  };
+
+  const handleEditarCartao = async () => {
+    if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
+    try {
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/${idContaReal}/${cartaoEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento) }) });
+      if (resposta.ok) { setModalEditCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão atualizado!"); } 
+    } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+  };
+
+  const handleExcluirCartao = (idCartao) => {
+    setDialogoConfirmacao({
+      aberto: true, titulo: 'Excluir Cartão', mensagem: 'Tem certeza que deseja apagar este cartão? Todas as compras na fatura serão perdidas.', textoAcao: 'Sim, Apagar', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      onConfirm: async () => {
+        setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
+        try {
+          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/${idContaReal}/${idCartao}`, { method: 'DELETE' });
+          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão apagado com sucesso!"); }
+        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      }
+    });
+  };
+
   const abrirModalCompraCartao = (idCartao) => { setCartaoSelecionadoId(idCartao); setModalCompraCartaoAberto(true); };
   
   const handleLancarCompraCartao = async () => {
@@ -374,7 +407,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   // 6. RENDERIZAÇÃO DO APLICATIVO INTERNO
   // ==============================================================================
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-zinc-100 font-sans overflow-hidden relative">
+    <div className="flex w-full flex-1 h-screen bg-[#0a0a0a] text-zinc-100 font-sans overflow-hidden relative">
       
       
 
@@ -399,6 +432,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           <button onClick={() => setTelaAtiva('extrato')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'extrato' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Extrato Completo"><ArrowRightLeft size={24} /></button>
           <button onClick={() => setTelaAtiva('metas')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'metas' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Cofres"><Target size={24} /></button>
           <button onClick={() => setTelaAtiva('planilha')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'planilha' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Planilha Fantasma"><ClipboardList size={24} /></button>
+          <button onClick={() => setTelaAtiva('utilitarios')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'utilitarios' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Utilitários"><Calculator size={24} /></button>
           <button onClick={() => setTelaAtiva('configuracoes')} className={`p-3 rounded-2xl transition-colors mt-auto ${telaAtiva === 'configuracoes' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Configurações"><Settings size={24} /></button>
         </nav>
       </aside>
@@ -490,14 +524,23 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           />
         )}
         
+        {telaAtiva === 'utilitarios' && (
+          <UtilitariosView />
+        )}
+        
         {telaAtiva === 'cartoes' && (
           <CartoesView
             cartoesReais={cartoesReais}
-            setModalCartaoAberto={setModalCartaoAberto}
+            setModalCartaoAberto={(val) => {
+              if (val) { setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); }
+              setModalCartaoAberto(val);
+            }}
             abrirModalCompraCartao={abrirModalCompraCartao}
             handlePagarFatura={handlePagarFatura}
             toggleExtratoCartao={toggleExtratoCartao}
             cartaoExpandidoExtrato={cartaoExpandidoExtrato}
+            abrirModalEdicaoCartao={abrirModalEdicaoCartao}
+            handleExcluirCartao={handleExcluirCartao}
           />
         )}
           </motion.div>
@@ -712,6 +755,23 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                 <div><label className="text-zinc-400 text-sm mb-1 block">Dia de Vencimento</label><input type="number" value={diaVencimento} onChange={(e) => setDiaVencimento(e.target.value)} placeholder="Ex: 05" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               </div>
               <button onClick={handleSalvarCartao} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Cartão</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalEditCartaoAberto && (
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><CreditCard size={24} className="text-zinc-100"/> Editar Cartão</h2><button onClick={() => setModalEditCartaoAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
+            <div className="flex flex-col gap-4">
+              <div><label className="text-zinc-400 text-sm mb-1 block">Nome do Cartão (Ex: Nubank, Itaú)</label><input type="text" value={nomeCartao} onChange={(e) => setNomeCartao(e.target.value)} placeholder="Nome do Cartão" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Limite Total (R$)</label><input type="number" value={limiteCartao} onChange={(e) => setLimiteCartao(e.target.value)} placeholder="Ex: 5000,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="text-zinc-400 text-sm mb-1 block">Dia de Fechamento</label><input type="number" value={diaFechamento} onChange={(e) => setDiaFechamento(e.target.value)} placeholder="Ex: 25" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Dia de Vencimento</label><input type="number" value={diaVencimento} onChange={(e) => setDiaVencimento(e.target.value)} placeholder="Ex: 05" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              </div>
+              <button onClick={handleEditarCartao} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Alterações</button>
             </div>
           </div>
         </div>
