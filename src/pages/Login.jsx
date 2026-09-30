@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Smartphone, User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { ShieldCheck, User, Mail, Lock, Eye, EyeOff, ArrowRight, CornerDownRight } from 'lucide-react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { MotionWrapper } from '../components/ui/MotionWrapper';
@@ -19,14 +19,6 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
 
   const [chaveSecreta2FA, setChaveSecreta2FA] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
-  
-  const [idioma, setIdioma] = useState('en');
-
-  const traducoes = {
-    en: { welcome: "Welcome ", back: "Back", create: "Create ", account: "Account", subIn: "Sign in to continue your financial journey", subUp: "Sign up to start your financial journey", signIn: "Sign In", signUp: "Create Account", twoFactor: "Two-Factor Auth", subTwoFactor: "Scan the QR Code with Google Authenticator and enter the 6-digit code", verify: "Verify Code", backToLogin: "Back to Login" },
-    pt: { welcome: "Bem-vindo de ", back: "Volta", create: "Criar ", account: "Conta", subIn: "Entre para continuar sua jornada financeira", subUp: "Cadastre-se para iniciar sua jornada financeira", signIn: "Entrar", signUp: "Criar Conta", twoFactor: "Autenticação 2FA", subTwoFactor: "Escaneie o QR Code com o Google Authenticator e digite o código de 6 dígitos", verify: "Verificar Código", backToLogin: "Voltar para Login" }
-  };
-  const t = traducoes[idioma] || traducoes['en'];
 
   const carregarSetup2FA = async (email) => {
     try {
@@ -57,133 +49,192 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       if (isLoginMode) await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
       else await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
       await carregarSetup2FA(emailLogin);
-      mostrarNotificacao(isLoginMode ? "Acesso liberado!" : "Conta criada com sucesso!", "sucesso");
+      mostrarNotificacao(isLoginMode ? "Acesso liberado" : "Conta criada", "sucesso");
       setEtapaLogin(1); 
     } catch (error) {
-      let mensagem = "Erro ao conectar com a conta.";
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "E-mail ou senha incorretos.";
-      if (error.code === 'auth/email-already-in-use') mensagem = "Este e-mail já está em uso.";
-      if (error.code === 'auth/weak-password') mensagem = "A senha deve ter pelo menos 6 caracteres.";
+      let mensagem = "Erro de conexão.";
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "Credenciais inválidas.";
+      if (error.code === 'auth/email-already-in-use') mensagem = "E-mail indisponível.";
+      if (error.code === 'auth/weak-password') mensagem = "Senha muito fraca.";
       mostrarNotificacao(mensagem, "erro");
     }
   };
 
   const handleSubmeter2FA = async (e) => {
     e.preventDefault();
-    if (codigo2FA.length !== 6) return mostrarNotificacao("O código deve ter 6 dígitos.", "erro");
+    if (codigo2FA.length !== 6) return mostrarNotificacao("Código inválido.", "erro");
     try {
       const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailLogin, codigo_2fa: codigo2FA }) 
       });
       const dados = await resposta.json();
-      if (resposta.ok) { mostrarNotificacao(dados.mensagem, "sucesso"); onLoginSuccess(emailLogin); } 
+      if (resposta.ok) { mostrarNotificacao("Autenticado", "sucesso"); onLoginSuccess(emailLogin); } 
       else { mostrarNotificacao(dados.detail, "erro"); }
-    } catch (erro) { mostrarNotificacao("Erro ao validar 2FA no servidor.", "erro"); }
+    } catch (erro) { mostrarNotificacao("Erro no servidor.", "erro"); }
   };
 
   return (
-    <div className="flex min-h-screen bg-[#090b10] text-white font-sans relative overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop')] bg-cover bg-center opacity-30 blur-[2px]"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#090b10] via-[#090b10]/80 to-[#090b10]/40"></div>
+    <div className="flex min-h-screen w-full bg-[#0a0a0a] text-zinc-100 font-sans relative overflow-hidden selection:bg-emerald-500 selection:text-white">
+      {/* Grid architecture lines representing precise banking aesthetic */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
       </div>
       
-      <MotionWrapper className="relative z-10 flex flex-col w-full items-center justify-center p-6">
-        <div className="mb-8 flex items-center justify-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center border border-slate-700 shadow-2xl">
-            <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 tracking-tighter">PF</span>
+      <div className="relative z-10 flex w-full">
+        {/* Left column - Brand & Copy */}
+        <div className="hidden lg:flex flex-col justify-between w-1/2 p-16 border-r border-zinc-800 bg-[#0a0a0a]/50 backdrop-blur-sm">
+          <div>
+            <div className="w-12 h-12 bg-emerald-500 flex items-center justify-center mb-8">
+              <span className="text-xl font-bold text-white tracking-tight">PF</span>
+            </div>
+            <h1 className="text-6xl font-light tracking-tight leading-tight text-zinc-100 mt-24">
+              Private<br/><span className="font-semibold">Finance.</span>
+            </h1>
+            <p className="mt-8 text-lg text-zinc-400 max-w-md font-light leading-relaxed">
+              Gestão patrimonial rigorosa. Precisão absoluta em cada centavo. O controle do seu capital no mais alto nível de exigência.
+            </p>
+          </div>
+          
+          <div className="text-xs text-slate-400 font-mono tracking-widest uppercase">
+            Autenticação Segura • Criptografia Fim-a-Fim
           </div>
         </div>
-        
-        <div className="w-full max-w-[440px] bg-[#161922]/80 backdrop-blur-xl border border-slate-700/50 rounded-[2rem] p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
-          <div className={`transition-transform duration-500 w-full ${etapaLogin === 1 ? 'translate-x-0' : 'translate-x-[150%] absolute top-8 left-0 px-8'}`}>
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-3"><div className="bg-[#d4af37]/10 p-3 rounded-full text-[#d4af37]"><ShieldCheck size={30} /></div></div>
-              <h1 className="text-xl font-semibold mb-1">{t.twoFactor}</h1>
-              <p className="text-slate-400 text-xs leading-relaxed">{t.subTwoFactor}</p>
-            </div>
-            {qrCodeUrl ? (
-              <div className="flex flex-col items-center justify-center mb-6 bg-[#090b10] p-4 rounded-2xl border border-slate-800">
-                <img src={qrCodeUrl} alt="QR Code 2FA" className="w-40 h-40 rounded-lg shadow-md mb-2" />
-                <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Chave de Backup:</span>
-                <span className="text-xs text-[#d4af37] font-mono select-all font-bold">{chaveSecreta2FA}</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center mb-6 bg-[#090b10] p-6 rounded-2xl border border-slate-800 text-center">
-                <ShieldCheck size={48} className="text-[#d4af37] mb-4" />
-                <p className="text-sm text-slate-400">Gerando QR Code...</p>
-              </div>
-            )}
-            <form onSubmit={handleSubmeter2FA} className="flex flex-col gap-5">
-              <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-[#d4af37] transition-colors">
-                <Smartphone className="text-slate-500 shrink-0" size={20} />
-                <div className="flex flex-col w-full">
-                  <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Código do Aplicativo</span>
-                  <input type="text" value={codigo2FA} onChange={(e) => setCodigo2FA(e.target.value)} maxLength={6} placeholder="000000" className="bg-transparent text-white text-lg font-mono tracking-[0.4em] outline-none w-full text-center" />
-                </div>
-              </div>
-              <button type="submit" className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl shadow-lg transition-all">{t.verify}</button>
-              <button type="button" onClick={() => setEtapaLogin(0)} className="text-slate-500 text-xs hover:text-white transition-colors">{t.backToLogin}</button>
-            </form>
-          </div>
 
-          <div className={`transition-transform duration-500 w-full ${etapaLogin === 0 ? 'translate-x-0' : '-translate-x-[150%] absolute top-8 left-0 px-8'}`}>
-            <div className="text-center mb-8"><h1 className="text-3xl font-semibold mb-2">{isLoginMode ? t.welcome : t.create}<span className="text-[#d4af37]">{isLoginMode ? t.back : t.account}</span></h1><p className="text-slate-400 text-sm">{isLoginMode ? t.subIn : t.subUp}</p></div>
-            <form className="flex flex-col gap-4" onSubmit={handleSubmeterLogin}>
-              {!isLoginMode && (
-                <div className="flex gap-3">
-                  <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center w-full focus-within:border-slate-600 transition-colors">
-                    <User className="text-slate-500 shrink-0" size={20} />
-                    <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Nome</span><input type="text" value={nomeRegistro} onChange={(e) => setNomeRegistro(e.target.value)} placeholder="Seu nome" className="bg-transparent text-white text-sm outline-none w-full" /></div>
-                  </div>
-                  <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center w-full focus-within:border-slate-600 transition-colors">
-                    <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Sobrenome</span><input type="text" value={sobrenomeRegistro} onChange={(e) => setSobrenomeRegistro(e.target.value)} placeholder="Seu sobrenome" className="bg-transparent text-white text-sm outline-none w-full" /></div>
-                  </div>
-                </div>
-              )}
-              <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
-                <Mail className="text-slate-500 shrink-0" size={20} />
-                <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">E-mail</span><input type="email" value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)} placeholder="Digite seu e-mail" className="bg-transparent text-white text-sm outline-none w-full" /></div>
+        {/* Right column - Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#0a0a0a]">
+          <MotionWrapper className="w-full max-w-md">
+            
+            <div className="lg:hidden mb-12 flex flex-col items-center">
+              <div className="w-12 h-12 bg-emerald-500 flex items-center justify-center mb-6">
+                <span className="text-xl font-bold text-white tracking-tight">PF</span>
               </div>
-              {!isLoginMode && (
-                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
-                  <Mail className="text-slate-500 shrink-0" size={20} />
-                  <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Confirmar E-mail</span><input type="email" value={emailConfirma} onChange={(e) => setEmailConfirma(e.target.value)} placeholder="Repita seu e-mail" className="bg-transparent text-white text-sm outline-none w-full" /></div>
-                </div>
-              )}
-              <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
-                <Lock className="text-slate-500 shrink-0" size={20} />
-                <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Senha</span><input type={mostrarSenha ? "text" : "password"} value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)} placeholder="Sua senha" className="bg-transparent text-white text-sm outline-none w-full" /></div>
-                <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="text-slate-500 hover:text-slate-300">{mostrarSenha ? <Eye size={18}/> : <EyeOff size={18}/>}</button>
+              <h2 className="text-3xl font-light tracking-tight text-zinc-100">Private <span className="font-semibold">Finance</span></h2>
+            </div>
+
+            <div className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${etapaLogin === 1 ? 'opacity-0 translate-x-[-20px] pointer-events-none hidden' : 'opacity-100 translate-x-0'}`}>
+              <div className="mb-10">
+                <h3 className="text-2xl font-semibold tracking-tight text-zinc-100 mb-2">
+                  {isLoginMode ? "Acesso ao Sistema" : "Abertura de Conta"}
+                </h3>
+                <p className="text-zinc-400 text-sm">
+                  {isLoginMode ? "Insira suas credenciais para continuar." : "Preencha seus dados para começar."}
+                </p>
               </div>
-              {!isLoginMode && (
-                <div className="bg-[#1c1f26] border border-slate-800 rounded-2xl px-4 py-3 flex gap-3 items-center focus-within:border-slate-600 transition-colors">
-                  <Lock className="text-slate-500 shrink-0" size={20} />
-                  <div className="flex flex-col w-full"><span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Confirmar Senha</span><input type={mostrarSenha ? "text" : "password"} value={senhaConfirma} onChange={(e) => setSenhaConfirma(e.target.value)} placeholder="Repita sua senha" className="bg-transparent text-white text-sm outline-none w-full" /></div>
+
+              <form onSubmit={handleSubmeterLogin} className="space-y-6">
+                {!isLoginMode && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Nome</label>
+                      <input type="text" value={nomeRegistro} onChange={(e) => setNomeRegistro(e.target.value)}
+                        className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                        placeholder="Nome" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sobrenome</label>
+                      <input type="text" value={sobrenomeRegistro} onChange={(e) => setSobrenomeRegistro(e.target.value)}
+                        className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                        placeholder="Sobrenome" />
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Endereço de E-mail</label>
+                  <input type="email" value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)}
+                    className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                    placeholder="usuario@email.com" />
+                </div>
+
+                {!isLoginMode && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Confirmar E-mail</label>
+                    <input type="email" value={emailConfirma} onChange={(e) => setEmailConfirma(e.target.value)}
+                      className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                      placeholder="usuario@email.com" />
+                  </div>
+                )}
+
+                <div className="space-y-2 relative">
+                  <div className="flex justify-between items-end">
+                    <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Senha de Acesso</label>
+                  </div>
+                  <div className="relative">
+                    <input type={mostrarSenha ? "text" : "password"} value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)}
+                      className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition-colors pr-10"
+                      placeholder="••••••••" />
+                    <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 hover:text-zinc-100 transition-colors">
+                      {mostrarSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {!isLoginMode && (
+                  <div className="space-y-2 relative">
+                    <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Confirmar Senha</label>
+                    <input type={mostrarSenha ? "text" : "password"} value={senhaConfirma} onChange={(e) => setSenhaConfirma(e.target.value)}
+                      className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-3 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                      placeholder="••••••••" />
+                  </div>
+                )}
+
+                <div className="pt-4">
+                  <button type="submit" className="w-full bg-emerald-500 text-emerald-950 font-medium py-4 px-6 hover:bg-emerald-400 transition-all flex items-center justify-between group">
+                    <span>{isLoginMode ? "Autenticar" : "Abrir Conta"}</span>
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-8 pt-8 border-t border-zinc-800 text-center">
+                <button onClick={() => setIsLoginMode(!isLoginMode)} className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors">
+                  {isLoginMode ? "Não possui conta? Solicite abertura." : "Já possui conta? Autenticar."}
+                </button>
+              </div>
+            </div>
+
+            {/* 2FA Step */}
+            <div className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${etapaLogin === 0 ? 'opacity-0 translate-x-[20px] pointer-events-none absolute inset-0' : 'opacity-100 translate-x-0 relative'}`}>
+              <div className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <button onClick={() => setEtapaLogin(0)} className="text-slate-400 hover:text-zinc-100 transition-colors">
+                    <ArrowRight size={20} className="rotate-180" />
+                  </button>
+                  <h3 className="text-2xl font-semibold tracking-tight text-zinc-100">
+                    Segurança 2FA
+                  </h3>
+                </div>
+                <p className="text-zinc-400 text-sm">
+                  Utilize seu aplicativo autenticador (Google/Microsoft) para ler o código QR ou insira a chave manualmente.
+                </p>
+              </div>
+
+              {!isLoginMode && qrCodeUrl && (
+                <div className="mb-8 flex flex-col items-center justify-center p-6 bg-zinc-900 border border-zinc-800">
+                  <img src={qrCodeUrl} alt="QR Code 2FA" className="w-40 h-40 mix-blend-multiply" />
+                  <p className="mt-4 text-xs font-mono text-zinc-400 break-all text-center">{chaveSecreta2FA}</p>
                 </div>
               )}
-              {isLoginMode && (
-                <div className="flex justify-end mt-[-8px]">
-                  <button type="button" onClick={() => mostrarNotificacao("A recuperação de senha foi ativada!", "sucesso")} className="text-xs text-[#d4af37] hover:text-[#f3cd57] transition-colors">Esqueceu a Senha?</button>
+
+              <form onSubmit={handleSubmeter2FA} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Código de 6 dígitos</label>
+                  <input type="text" maxLength="6" value={codigo2FA} onChange={(e) => setCodigo2FA(e.target.value.replace(/\D/g, ''))}
+                    className="w-full bg-[#0a0a0a] border-b border-zinc-700 py-4 text-3xl font-mono text-center tracking-[0.5em] text-zinc-100 placeholder-zinc-700 focus:outline-none focus:border-emerald-500 transition-colors"
+                    placeholder="000000" />
                 </div>
-              )}
-              <button type="submit" className="mt-2 w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-medium py-4 rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg">
-                {isLoginMode ? "Entrar" : "Criar Conta"} <ArrowRight size={18} />
-              </button>
-            </form>
-            <div className="mt-6 flex justify-center text-sm text-slate-400">
-              {isLoginMode ? (
-                <span>Não tem uma conta? <button type="button" onClick={() => setIsLoginMode(false)} className="text-[#d4af37] hover:underline font-semibold ml-1">Cadastre-se</button></span>
-              ) : (
-                <span>Já tem uma conta? <button type="button" onClick={() => setIsLoginMode(true)} className="text-[#d4af37] hover:underline font-semibold ml-1">Fazer Login</button></span>
-              )}
+
+                <div className="pt-4">
+                  <button type="submit" className="w-full bg-emerald-500 text-emerald-950 font-medium py-4 px-6 hover:bg-emerald-400 transition-all flex items-center justify-between group">
+                    <span>Verificar Identidade</span>
+                    <CornerDownRight size={18} className="group-hover:translate-x-1 group-hover:translate-y-1 transition-transform" />
+                  </button>
+                </div>
+              </form>
             </div>
-            <div className="mt-8 flex justify-center items-center gap-3 text-xs font-medium uppercase tracking-widest">
-              <button onClick={() => setIdioma('en')} className={`transition-colors ${idioma === 'en' ? 'text-[#d4af37]' : 'text-slate-600 hover:text-slate-400'}`}>EN</button><span className="text-slate-800">|</span><button onClick={() => setIdioma('pt')} className={`transition-colors ${idioma === 'pt' ? 'text-[#d4af37]' : 'text-slate-600 hover:text-slate-400'}`}>PT</button>
-            </div>
-          </div>
+
+          </MotionWrapper>
         </div>
-      </MotionWrapper>
+      </div>
     </div>
   );
 }

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Home, CreditCard, ArrowRightLeft, Target, Settings, Wallet, Plus, TrendingUp, TrendingDown, Zap, ShoppingBag, Calendar, ChevronDown, X, CheckCircle, AlertCircle, BrainCircuit, Trash2, Download, Eraser, Pencil, User, Mail, Lock, EyeOff, Eye, ArrowRight, ChevronLeft, ChevronRight, Smartphone, ShieldCheck, Search, Filter, TrendingUp as Speed, LogOut, CalendarClock, CheckSquare, QrCode, ClipboardList, MessageCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-import { auth } from './firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { MotionWrapper } from '../components/ui/MotionWrapper';
 import HomeView from './dashboard/HomeView';
@@ -119,7 +118,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         .then(data => { setIdContaReal(data.id_conta); carregarDadosDaTela(data.id_conta); })
         .catch(err => console.error("Erro na configuração", err));
     }
-  }, [isAutenticado, emailLogin]);
+  }, [emailLogin]);
 
   const toggleCategoria = (nomeDaCategoria) => { categoriaExpandida === nomeDaCategoria ? setCategoriaExpandida(null) : setCategoriaExpandida(nomeDaCategoria); };
   const toggleExtratoCartao = (idCartao) => { cartaoExpandidoExtrato === idCartao ? setCartaoExpandidoExtrato(null) : setCartaoExpandidoExtrato(idCartao); };
@@ -132,7 +131,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       });
       if (resposta.ok) { 
         setModalPerfilAberto(false); 
-        setNomeUsuario(editNomeUsuario); 
+        useFinanceStore.setState({ nomeUsuario: editNomeUsuario }); 
         mostrarNotificacao("Perfil atualizado com sucesso!"); 
       }
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
@@ -176,7 +175,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const emailAtual = auth.currentUser ? auth.currentUser.email : emailLogin;
+          const emailAtual = emailLogin;
           const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/auth/reset-2fa/${encodeURIComponent(emailAtual)}`, { method: 'DELETE' });
           if (resposta.ok) { mostrarNotificacao("2FA resetado! O QR Code voltará a aparecer no próximo login."); }
           else { mostrarNotificacao("Erro ao resetar no servidor.", "erro"); }
@@ -375,38 +374,46 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   // 6. RENDERIZAÇÃO DO APLICATIVO INTERNO
   // ==============================================================================
   return (
-    <div className="flex h-screen bg-[#090b10] text-white font-sans overflow-hidden relative">
+    <div className="flex h-screen bg-[#0a0a0a] text-zinc-100 font-sans overflow-hidden relative">
       
       
 
       {dialogoConfirmacao.aberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-4"><h2 className={`text-xl font-bold flex items-center gap-2 ${dialogoConfirmacao.corIcone}`}><AlertCircle size={24} /> {dialogoConfirmacao.titulo}</h2></div>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed">{dialogoConfirmacao.mensagem}</p>
+            <p className="text-zinc-400 text-sm mb-8 leading-relaxed">{dialogoConfirmacao.mensagem}</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDialogoConfirmacao({...dialogoConfirmacao, aberto: false})} className="px-5 py-2.5 rounded-lg text-slate-300 font-medium hover:bg-white/5 transition-colors border border-slate-700">Cancelar</button>
-              <button onClick={dialogoConfirmacao.onConfirm} className={`px-5 py-2.5 rounded-lg text-white font-bold transition-colors shadow-lg ${dialogoConfirmacao.corAcao}`}>{dialogoConfirmacao.textoAcao}</button>
+              <button onClick={() => setDialogoConfirmacao({...dialogoConfirmacao, aberto: false})} className="px-5 py-2.5 rounded-xl text-zinc-400 font-medium hover:bg-zinc-800 transition-colors border border-zinc-700">Cancelar</button>
+              <button onClick={dialogoConfirmacao.onConfirm} className={`px-5 py-2.5 rounded-xl text-zinc-100 font-bold transition-colors shadow-none ${dialogoConfirmacao.corAcao}`}>{dialogoConfirmacao.textoAcao}</button>
             </div>
           </div>
         </div>
       )}
 
-      <aside className="w-20 border-r border-slate-800/50 flex flex-col items-center py-8 gap-8 shrink-0 bg-[#090b10]">
-        <div className="bg-[#d4af37]/10 p-3 rounded-xl text-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.15)]"><Wallet size={24} /></div>
-        <nav className="flex flex-col gap-6 text-slate-500 mt-4">
-          <button onClick={() => setTelaAtiva('home')} className={`p-3 rounded-xl transition-colors ${telaAtiva === 'home' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Visão Geral"><Home size={24} /></button>
-          <button onClick={() => setTelaAtiva('cartoes')} className={`p-3 rounded-xl transition-colors ${telaAtiva === 'cartoes' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Cartões"><CreditCard size={24} /></button>
-          <button onClick={() => setTelaAtiva('extrato')} className={`p-3 rounded-xl transition-colors ${telaAtiva === 'extrato' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Extrato Completo"><ArrowRightLeft size={24} /></button>
-          <button onClick={() => setTelaAtiva('metas')} className={`p-3 rounded-xl transition-colors ${telaAtiva === 'metas' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Cofres"><Target size={24} /></button>
-          <button onClick={() => setTelaAtiva('planilha')} className={`p-3 rounded-xl transition-colors ${telaAtiva === 'planilha' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Planilha Fantasma"><ClipboardList size={24} /></button>
-          <button onClick={() => setTelaAtiva('configuracoes')} className={`p-3 rounded-xl transition-colors mt-auto ${telaAtiva === 'configuracoes' ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20' : 'hover:text-[#d4af37]'}`} title="Configurações"><Settings size={24} /></button>
+      <aside className="w-20 border-r border-zinc-800 flex flex-col items-center py-8 gap-8 shrink-0 bg-[#0a0a0a]/50 backdrop-blur-sm z-10">
+        <div className="bg-zinc-800 p-3 rounded-2xl text-zinc-100 shadow-none"><Wallet size={24} /></div>
+        <nav className="flex flex-col gap-6 text-zinc-400 mt-4">
+          <button onClick={() => setTelaAtiva('home')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'home' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Visão Geral"><Home size={24} /></button>
+          <button onClick={() => setTelaAtiva('cartoes')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'cartoes' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Cartões"><CreditCard size={24} /></button>
+          <button onClick={() => setTelaAtiva('extrato')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'extrato' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Extrato Completo"><ArrowRightLeft size={24} /></button>
+          <button onClick={() => setTelaAtiva('metas')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'metas' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Cofres"><Target size={24} /></button>
+          <button onClick={() => setTelaAtiva('planilha')} className={`p-3 rounded-2xl transition-colors ${telaAtiva === 'planilha' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Planilha Fantasma"><ClipboardList size={24} /></button>
+          <button onClick={() => setTelaAtiva('configuracoes')} className={`p-3 rounded-2xl transition-colors mt-auto ${telaAtiva === 'configuracoes' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'hover:text-zinc-100'}`} title="Configurações"><Settings size={24} /></button>
         </nav>
       </aside>
 
-      <main className="flex-1 p-10 overflow-y-auto">
-        
-        {telaAtiva === 'home' && (
+      <main className="flex-1 p-10 overflow-y-auto overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={telaAtiva}
+            initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="h-full"
+          >
+            {telaAtiva === 'home' && (
           <HomeView
             dataSelecionada={dataSelecionada}
             saldoReal={saldoReal}
@@ -473,7 +480,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           <ConfiguracoesView
             nomeUsuario={nomeUsuario}
             emailLogin={emailLogin}
-            auth={auth}
+
             setEditNomeUsuario={setEditNomeUsuario}
             setModalPerfilAberto={setModalPerfilAberto}
             mostrarNotificacao={mostrarNotificacao}
@@ -493,6 +500,8 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             cartaoExpandidoExtrato={cartaoExpandidoExtrato}
           />
         )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* ==============================================================================
@@ -500,18 +509,18 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           ============================================================================== */}
 
       {modalPerfilAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2"><User size={24} className="text-[#d4af37]"/> Editar Perfil</h2>
-              <button onClick={() => setModalPerfilAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button>
+              <h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><User size={24} className="text-zinc-100"/> Editar Perfil</h2>
+              <button onClick={() => setModalPerfilAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button>
             </div>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Como quer ser chamado?</label>
-                <input type="text" value={editNomeUsuario} onChange={(e) => setEditNomeUsuario(e.target.value)} placeholder="Ex: Luan, João, Maria..." className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" />
+                <label className="text-zinc-400 text-sm mb-1 block">Como quer ser chamado?</label>
+                <input type="text" value={editNomeUsuario} onChange={(e) => setEditNomeUsuario(e.target.value)} placeholder="Ex: Luan, João, Maria..." className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" />
               </div>
-              <button onClick={handleSalvarPerfil} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">
+              <button onClick={handleSalvarPerfil} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">
                 Salvar Alterações
               </button>
             </div>
@@ -520,155 +529,155 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       )}
 
       {modalPlanilhaAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><ClipboardList className="text-[#d4af37]"/> Adicionar à Planilha</h2><button onClick={() => setModalPlanilhaAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><ClipboardList className="text-zinc-100"/> Adicionar à Planilha</h2><button onClick={() => setModalPlanilhaAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">Descrição do Item</label><input type="text" value={tituloPlanilha} onChange={(e) => setTituloPlanilha(e.target.value)} placeholder="Ex: Conserto, Presente..." className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Descrição do Item</label><input type="text" value={tituloPlanilha} onChange={(e) => setTituloPlanilha(e.target.value)} placeholder="Ex: Conserto, Presente..." className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorPlanilha} onChange={(e) => setValorPlanilha(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Data de Vencimento</label><input type="date" value={dataPlanilha} onChange={(e) => setDataPlanilha(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37] [color-scheme:dark]" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorPlanilha} onChange={(e) => setValorPlanilha(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Data de Vencimento</label><input type="date" value={dataPlanilha} onChange={(e) => setDataPlanilha(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500 " /></div>
               </div>
-              <button onClick={handleSalvarPlanilha} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Adicionar Item</button>
+              <button onClick={handleSalvarPlanilha} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Adicionar Item</button>
             </div>
           </div>
         </div>
       )}
 
       {modalAgendamentoAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-indigo-400 flex items-center gap-2"><CalendarClock size={24}/> Agendar Conta</h2><button onClick={() => setModalAgendamentoAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><CalendarClock size={24}/> Agendar Conta</h2><button onClick={() => setModalAgendamentoAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">O que vai pagar?</label><input type="text" value={tituloAgendamento} onChange={(e) => setTituloAgendamento(e.target.value)} placeholder="Ex: Netflix, Conta de Luz" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">O que vai pagar?</label><input type="text" value={tituloAgendamento} onChange={(e) => setTituloAgendamento(e.target.value)} placeholder="Ex: Netflix, Conta de Luz" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorAgendamento} onChange={(e) => setValorAgendamento(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Data de Vencimento</label><input type="date" value={dataAgendamento} onChange={(e) => setDataAgendamento(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500 [color-scheme:dark]" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorAgendamento} onChange={(e) => setValorAgendamento(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Data de Vencimento</label><input type="date" value={dataAgendamento} onChange={(e) => setDataAgendamento(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500 " /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Categoria</label><select value={categoriaAgendamento} onChange={(e) => setCategoriaAgendamento(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500"><option value="Moradia">Moradia</option><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Assinaturas">Assinaturas</option><option value="Outros">Outros</option></select></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Tipo no Gráfico</label><select value={classificacaoAgendamento} onChange={(e) => setClassificacaoAgendamento(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-indigo-500"><option value="essencial">Gasto Essencial</option><option value="estilo_vida">Estilo de Vida (Lazer)</option></select></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Categoria</label><select value={categoriaAgendamento} onChange={(e) => setCategoriaAgendamento(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500"><option value="Moradia">Moradia</option><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Saúde">Saúde</option><option value="Educação">Educação</option><option value="Assinaturas">Assinaturas</option><option value="Outros">Outros</option></select></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Tipo no Gráfico</label><select value={classificacaoAgendamento} onChange={(e) => setClassificacaoAgendamento(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500"><option value="essencial">Gasto Essencial</option><option value="estilo_vida">Estilo de Vida (Lazer)</option></select></div>
               </div>
-              <button onClick={handleSalvarAgendamento} className="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Agendar Conta</button>
+              <button onClick={handleSalvarAgendamento} className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Agendar Conta</button>
             </div>
           </div>
         </div>
       )}
       
       {modalEditSaldoAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><Pencil size={24} className="text-[#d4af37]"/> Ajustar Saldo Livre</h2><button onClick={() => setModalEditSaldoAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Pencil size={24} className="text-zinc-100"/> Ajustar Saldo Livre</h2><button onClick={() => setModalEditSaldoAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <p className="text-slate-400 text-sm">Use isto para corrigir pequenas diferenças no saldo sem apagar o histórico.</p>
-              <div><label className="text-slate-400 text-sm mb-1 block">Novo Saldo Atual (R$)</label><input type="number" value={editSaldoValor} onChange={(e) => setEditSaldoValor(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-              <button onClick={handleSalvarEditSaldo} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Novo Saldo</button>
+              <p className="text-zinc-400 text-sm">Use isto para corrigir pequenas diferenças no saldo sem apagar o histórico.</p>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Novo Saldo Atual (R$)</label><input type="number" value={editSaldoValor} onChange={(e) => setEditSaldoValor(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <button onClick={handleSalvarEditSaldo} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Novo Saldo</button>
             </div>
           </div>
         </div>
       )}
 
       {modalEditTxAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><Pencil size={24} className="text-[#d4af37]"/> Editar {txEditTipo}</h2><button onClick={() => setModalEditTxAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Pencil size={24} className="text-zinc-100"/> Editar {txEditTipo}</h2><button onClick={() => setModalEditTxAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">Título</label><input type="text" value={txEditTitulo} onChange={(e) => setTxEditTitulo(e.target.value)} placeholder="Título" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Título</label><input type="text" value={txEditTitulo} onChange={(e) => setTxEditTitulo(e.target.value)} placeholder="Título" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={txEditValor} onChange={(e) => setTxEditValor(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <div>{txEditTipo === 'Despesa' ? (<><label className="text-slate-400 text-sm mb-1 block">Classificação</label><select value={txEditCat} onChange={(e) => setTxEditCat(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-rose-500"><option value="essencial">Essencial</option><option value="estilo_vida">Estilo de Vida</option></select></>) : (<><label className="text-slate-400 text-sm mb-1 block">Categoria</label><select value={txEditCat} onChange={(e) => setTxEditCat(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-emerald-500"><option value="Salário">Salário</option><option value="Vendas">Vendas</option><option value="Rendimento">Rendimento</option><option value="Outros">Outros</option></select></>)}</div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={txEditValor} onChange={(e) => setTxEditValor(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div>{txEditTipo === 'Despesa' ? (<><label className="text-zinc-400 text-sm mb-1 block">Classificação</label><select value={txEditCat} onChange={(e) => setTxEditCat(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-rose-500"><option value="essencial">Essencial</option><option value="estilo_vida">Estilo de Vida</option></select></>) : (<><label className="text-zinc-400 text-sm mb-1 block">Categoria</label><select value={txEditCat} onChange={(e) => setTxEditCat(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500"><option value="Salário">Salário</option><option value="Vendas">Vendas</option><option value="Rendimento">Rendimento</option><option value="Outros">Outros</option></select></>)}</div>
               </div>
-              <button onClick={handleSalvarEditTx} className={`w-full text-white font-bold py-3.5 rounded-xl mt-4 transition-colors ${txEditTipo === 'Receita' ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-rose-500 hover:bg-rose-400'}`}>Salvar Alterações</button>
+              <button onClick={handleSalvarEditTx} className={`w-full text-zinc-100 font-bold py-3.5 rounded-2xl mt-4 transition-colors ${txEditTipo === 'Receita' ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-rose-500 hover:bg-rose-400'}`}>Salvar Alterações</button>
             </div>
           </div>
         </div>
       )}
 
       {modalEditMetaAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><Pencil size={24} className="text-[#d4af37]"/> Editar Cofre</h2><button onClick={() => setModalEditMetaAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Pencil size={24} className="text-zinc-100"/> Editar Cofre</h2><button onClick={() => setModalEditMetaAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">Nome do Objetivo</label><input type="text" value={metaEditTitulo} onChange={(e) => setMetaEditTitulo(e.target.value)} placeholder="Ex: Reserva de Emergência" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Nome do Objetivo</label><input type="text" value={metaEditTitulo} onChange={(e) => setMetaEditTitulo(e.target.value)} placeholder="Ex: Reserva de Emergência" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={metaEditObjetivo} onChange={(e) => setMetaEditObjetivo(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={metaEditPrazo} onChange={(e) => setMetaEditPrazo(e.target.value)} placeholder="Ex: 12" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={metaEditObjetivo} onChange={(e) => setMetaEditObjetivo(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={metaEditPrazo} onChange={(e) => setMetaEditPrazo(e.target.value)} placeholder="Ex: 12" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               </div>
-              {parseFloat(metaEditObjetivo.toString().replace(',','.')) > 0 && parseInt(metaEditPrazo) > 0 && (<div className="bg-[#d4af37]/10 border border-[#d4af37]/30 rounded-xl p-3 text-center mt-1"><p className="text-[#d4af37] text-sm">💡 Meta: Guarde <strong>{(parseFloat(metaEditObjetivo.toString().replace(',','.')) / parseInt(metaEditPrazo)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês.</p></div>)}
-              <div><label className="text-slate-400 text-sm mb-1 block">Dinheiro Guardado (R$)</label><input type="number" value={metaEditGuardado} onChange={(e) => setMetaEditGuardado(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /><p className="text-xs text-slate-500 mt-1">Atenção: Alterar este valor não afeta o Saldo Livre. Para resgatar saldo real, use o botão "Resgatar".</p></div>
-              <button onClick={handleSalvarEditMeta} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Alterações</button>
+              {parseFloat(metaEditObjetivo.toString().replace(',','.')) > 0 && parseInt(metaEditPrazo) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-2xl p-3 text-center mt-1"><p className="text-zinc-100 text-sm">💡 Meta: Guarde <strong>{(parseFloat(metaEditObjetivo.toString().replace(',','.')) / parseInt(metaEditPrazo)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês.</p></div>)}
+              <div><label className="text-zinc-400 text-sm mb-1 block">Dinheiro Guardado (R$)</label><input type="number" value={metaEditGuardado} onChange={(e) => setMetaEditGuardado(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /><p className="text-xs text-zinc-400 mt-1">Atenção: Alterar este valor não afeta o Saldo Livre. Para resgatar saldo real, use o botão "Resgatar".</p></div>
+              <button onClick={handleSalvarEditMeta} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Alterações</button>
             </div>
           </div>
         </div>
       )}
 
       {modalReceitaAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-emerald-400 flex items-center gap-2"><TrendingUp size={24}/> Nova Receita</h2><button onClick={() => setModalReceitaAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-emerald-400 flex items-center gap-2"><TrendingUp size={24}/> Nova Receita</h2><button onClick={() => setModalReceitaAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">O que recebeu?</label><input type="text" value={tituloReceita} onChange={(e) => setTituloReceita(e.target.value)} placeholder="Ex: Pagamento de Trabalho" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-emerald-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">O que recebeu?</label><input type="text" value={tituloReceita} onChange={(e) => setTituloReceita(e.target.value)} placeholder="Ex: Pagamento de Trabalho" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorReceita} onChange={(e) => setValorReceita(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-emerald-500" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Categoria</label><select value={categoriaReceita} onChange={(e) => setCategoriaReceita(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-emerald-500"><option value="Salário">Salário</option><option value="Vendas">Vendas</option><option value="Rendimento">Rendimento</option><option value="Outros">Outros</option></select></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorReceita} onChange={(e) => setValorReceita(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Categoria</label><select value={categoriaReceita} onChange={(e) => setCategoriaReceita(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500"><option value="Salário">Salário</option><option value="Vendas">Vendas</option><option value="Rendimento">Rendimento</option><option value="Outros">Outros</option></select></div>
               </div>
-              <button onClick={handleSalvarReceita} className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Receita</button>
+              <button onClick={handleSalvarReceita} className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-100 font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Receita</button>
             </div>
           </div>
         </div>
       )}
 
       {modalDespesaAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-rose-400 flex items-center gap-2"><TrendingDown size={24}/> Nova Despesa</h2><button onClick={() => setModalDespesaAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-rose-400 flex items-center gap-2"><TrendingDown size={24}/> Nova Despesa</h2><button onClick={() => setModalDespesaAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">O que pagou?</label><input type="text" value={tituloDespesa} onChange={(e) => setTituloDespesa(e.target.value)} placeholder="Ex: Conta de Luz, Faculdade" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-rose-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">O que pagou?</label><input type="text" value={tituloDespesa} onChange={(e) => setTituloDespesa(e.target.value)} placeholder="Ex: Conta de Luz, Faculdade" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-rose-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorDespesa} onChange={(e) => setValorDespesa(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-rose-500" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Tipo de Gasto</label><select value={classificacaoDespesa} onChange={(e) => setClassificacaoDespesa(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-rose-500"><option value="essencial">Gasto Essencial</option><option value="estilo_vida">Estilo de Vida (Lazer)</option></select></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorDespesa} onChange={(e) => setValorDespesa(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-rose-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Tipo de Gasto</label><select value={classificacaoDespesa} onChange={(e) => setClassificacaoDespesa(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-rose-500"><option value="essencial">Gasto Essencial</option><option value="estilo_vida">Estilo de Vida (Lazer)</option></select></div>
               </div>
-              <div><label className="text-slate-400 text-sm mb-1 block">Categoria da Despesa</label><select value={categoriaDespesa} onChange={(e) => setCategoriaDespesa(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-rose-500"><option value="Alimentação">Alimentação (Comida, Mercado)</option><option value="Moradia">Moradia (Aluguel, Luz, Água)</option><option value="Transporte">Transporte (Combustível, Uber)</option><option value="Lazer">Lazer (Restaurantes, Cinema)</option><option value="Saúde">Saúde (Farmácia, Convênio)</option><option value="Educação">Educação (Faculdade, Cursos)</option><option value="Outros">Outros</option></select></div>
-              <button onClick={handleSalvarDespesa} className="w-full bg-rose-500 hover:bg-rose-400 text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Despesa</button>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Categoria da Despesa</label><select value={categoriaDespesa} onChange={(e) => setCategoriaDespesa(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-rose-500"><option value="Alimentação">Alimentação (Comida, Mercado)</option><option value="Moradia">Moradia (Aluguel, Luz, Água)</option><option value="Transporte">Transporte (Combustível, Uber)</option><option value="Lazer">Lazer (Restaurantes, Cinema)</option><option value="Saúde">Saúde (Farmácia, Convênio)</option><option value="Educação">Educação (Faculdade, Cursos)</option><option value="Outros">Outros</option></select></div>
+              <button onClick={handleSalvarDespesa} className="w-full bg-rose-500 hover:bg-rose-400 text-zinc-100 font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Despesa</button>
             </div>
           </div>
         </div>
       )}
 
       {modalCofreAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-[#d4af37] flex items-center gap-2"><Target size={24}/> Criar Novo Cofre</h2><button onClick={() => setModalCofreAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Target size={24}/> Criar Novo Cofre</h2><button onClick={() => setModalCofreAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">Nome do Objetivo</label><input type="text" value={tituloMeta} onChange={(e) => setTituloMeta(e.target.value)} placeholder="Ex: Reserva de Emergência" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Nome do Objetivo</label><input type="text" value={tituloMeta} onChange={(e) => setTituloMeta(e.target.value)} placeholder="Ex: Reserva de Emergência" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={objetivoMeta} onChange={(e) => setObjetivoMeta(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={mesesMeta} onChange={(e) => setMesesMeta(e.target.value)} placeholder="Ex: 12" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={objetivoMeta} onChange={(e) => setObjetivoMeta(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={mesesMeta} onChange={(e) => setMesesMeta(e.target.value)} placeholder="Ex: 12" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               </div>
-              {parseFloat(objetivoMeta.replace(',','.')) > 0 && parseInt(mesesMeta) > 0 && (<div className="bg-[#d4af37]/10 border border-[#d4af37]/30 rounded-xl p-3 text-center mt-1"><p className="text-[#d4af37] text-sm">💡 Dica: Guarde <strong>{(parseFloat(objetivoMeta.replace(',','.')) / parseInt(mesesMeta)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês para atingir a meta.</p></div>)}
-              <button onClick={handleSalvarMeta} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Criar Cofre</button>
+              {parseFloat(objetivoMeta.replace(',','.')) > 0 && parseInt(mesesMeta) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-2xl p-3 text-center mt-1"><p className="text-zinc-100 text-sm">💡 Dica: Guarde <strong>{(parseFloat(objetivoMeta.replace(',','.')) / parseInt(mesesMeta)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês para atingir a meta.</p></div>)}
+              <button onClick={handleSalvarMeta} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Criar Cofre</button>
             </div>
           </div>
         </div>
       )}
 
       {modalAporteAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><ArrowRightLeft size={24} className="text-[#d4af37]"/> Guardar Dinheiro</h2><button onClick={() => setModalAporteAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><ArrowRightLeft size={24} className="text-zinc-100"/> Guardar Dinheiro</h2><button onClick={() => setModalAporteAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             {(metasReais || []).length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-8 border border-dashed border-slate-700/60 rounded-xl bg-[#090b10] mb-2">
-                 <Target size={40} className="text-slate-600 mb-4" /><h3 className="text-white font-medium mb-2">Nenhum cofre disponível</h3><p className="text-slate-400 text-sm text-center mb-6">Precisa de criar um cofre antes de guardar dinheiro.</p>
-                 <button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="bg-[#d4af37]/10 text-[#d4af37] hover:bg-[#d4af37]/20 border border-[#d4af37]/30 px-6 py-2.5 rounded-lg text-sm font-bold transition-colors">Criar Primeiro Cofre</button>
+              <div className="flex flex-col items-center justify-center p-8 border border-dashed border-zinc-700 rounded-2xl bg-[#0a0a0a] mb-2">
+                 <Target size={40} className="text-zinc-400 mb-4" /><h3 className="text-zinc-100 font-medium mb-2">Nenhum cofre disponível</h3><p className="text-zinc-400 text-sm text-center mb-6">Precisa de criar um cofre antes de guardar dinheiro.</p>
+                 <button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="bg-zinc-800 text-zinc-100 hover:bg-[#d4af37]/20 border border-emerald-500/30 px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">Criar Primeiro Cofre</button>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <div>
-                  <div className="flex justify-between items-center mb-1"><label className="text-slate-400 text-sm block">Escolha o Cofre</label><button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="text-[#d4af37] text-xs font-medium hover:underline">+ Criar novo cofre</button></div>
-                  <select value={metaSelecionada} onChange={(e) => setMetaSelecionada(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo}</option>))}</select>
+                  <div className="flex justify-between items-center mb-1"><label className="text-zinc-400 text-sm block">Escolha o Cofre</label><button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="text-zinc-100 text-xs font-medium hover:underline">+ Criar novo cofre</button></div>
+                  <select value={metaSelecionada} onChange={(e) => setMetaSelecionada(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo}</option>))}</select>
                 </div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Valor a Guardar (R$)</label><input type="number" value={valorAporte} onChange={(e) => setValorAporte(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <button onClick={handleSalvarAporte} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Confirmar Transferência</button>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Valor a Guardar (R$)</label><input type="number" value={valorAporte} onChange={(e) => setValorAporte(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <button onClick={handleSalvarAporte} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Confirmar Transferência</button>
               </div>
             )}
           </div>
@@ -676,46 +685,46 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       )}
 
       {modalResgateAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><Download size={24} className="text-slate-400"/> Tirar do Cofre</h2><button onClick={() => setModalResgateAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Download size={24} className="text-zinc-400"/> Tirar do Cofre</h2><button onClick={() => setModalResgateAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Escolha o Cofre</label>
-                <select value={metaResgateSelecionada} onChange={(e) => setMetaResgateSelecionada(e.target.value)} className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-slate-500"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo} (Disponível: R$ {meta.guardado})</option>))}</select>
+                <label className="text-zinc-400 text-sm mb-1 block">Escolha o Cofre</label>
+                <select value={metaResgateSelecionada} onChange={(e) => setMetaResgateSelecionada(e.target.value)} className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-slate-500"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo} (Disponível: R$ {meta.guardado})</option>))}</select>
               </div>
-              <div><label className="text-slate-400 text-sm mb-1 block">Valor a Resgatar (R$)</label><input type="number" value={valorResgate} onChange={(e) => setValorResgate(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-slate-500" /></div>
-              <button onClick={handleSalvarResgate} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Confirmar Resgate</button>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Valor a Resgatar (R$)</label><input type="number" value={valorResgate} onChange={(e) => setValorResgate(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-slate-500" /></div>
+              <button onClick={handleSalvarResgate} className="w-full bg-slate-700 hover:bg-slate-600 text-zinc-100 font-bold py-3.5 rounded-2xl mt-4 transition-colors">Confirmar Resgate</button>
             </div>
           </div>
         </div>
       )}
 
       {modalCartaoAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><CreditCard size={24} className="text-[#d4af37]"/> Adicionar Cartão</h2><button onClick={() => setModalCartaoAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><CreditCard size={24} className="text-zinc-100"/> Adicionar Cartão</h2><button onClick={() => setModalCartaoAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">Nome do Cartão (Ex: Nubank, Itaú)</label><input type="text" value={nomeCartao} onChange={(e) => setNomeCartao(e.target.value)} placeholder="Nome do Cartão" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-              <div><label className="text-slate-400 text-sm mb-1 block">Limite Total (R$)</label><input type="number" value={limiteCartao} onChange={(e) => setLimiteCartao(e.target.value)} placeholder="Ex: 5000,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Nome do Cartão (Ex: Nubank, Itaú)</label><input type="text" value={nomeCartao} onChange={(e) => setNomeCartao(e.target.value)} placeholder="Nome do Cartão" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Limite Total (R$)</label><input type="number" value={limiteCartao} onChange={(e) => setLimiteCartao(e.target.value)} placeholder="Ex: 5000,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-slate-400 text-sm mb-1 block">Dia de Fechamento</label><input type="number" value={diaFechamento} onChange={(e) => setDiaFechamento(e.target.value)} placeholder="Ex: 25" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-                <div><label className="text-slate-400 text-sm mb-1 block">Dia de Vencimento</label><input type="number" value={diaVencimento} onChange={(e) => setDiaVencimento(e.target.value)} placeholder="Ex: 05" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Dia de Fechamento</label><input type="number" value={diaFechamento} onChange={(e) => setDiaFechamento(e.target.value)} placeholder="Ex: 25" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+                <div><label className="text-zinc-400 text-sm mb-1 block">Dia de Vencimento</label><input type="number" value={diaVencimento} onChange={(e) => setDiaVencimento(e.target.value)} placeholder="Ex: 05" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
               </div>
-              <button onClick={handleSalvarCartao} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Cartão</button>
+              <button onClick={handleSalvarCartao} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Salvar Cartão</button>
             </div>
           </div>
         </div>
       )}
 
       {modalCompraCartaoAberto && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-white flex items-center gap-2"><CreditCard size={24} className="text-[#d4af37]"/> Lançar Compra</h2><button onClick={() => setModalCompraCartaoAberto(false)} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+        <div className="fixed inset-0 bg-emerald-500/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><CreditCard size={24} className="text-zinc-100"/> Lançar Compra</h2><button onClick={() => setModalCompraCartaoAberto(false)} className="text-zinc-400 hover:text-zinc-100"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <div><label className="text-slate-400 text-sm mb-1 block">O que comprou?</label><input type="text" value={descricaoCompraCartao} onChange={(e) => setDescricaoCompraCartao(e.target.value)} placeholder="Ex: Restaurante, Celular novo" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-              <div><label className="text-slate-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorCompraCartao} onChange={(e) => setValorCompraCartao(e.target.value)} placeholder="0,00" className="w-full bg-[#090b10] border border-slate-700/60 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#d4af37]" /></div>
-              <button onClick={handleLancarCompraCartao} className="w-full bg-gradient-to-r from-[#2a2d35] to-[#8c6b4a] hover:from-[#323640] hover:to-[#a37d57] text-white font-bold py-3.5 rounded-xl mt-4 transition-colors">Confirmar Compra</button>
+              <div><label className="text-zinc-400 text-sm mb-1 block">O que comprou?</label><input type="text" value={descricaoCompraCartao} onChange={(e) => setDescricaoCompraCartao(e.target.value)} placeholder="Ex: Restaurante, Celular novo" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <div><label className="text-zinc-400 text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorCompraCartao} onChange={(e) => setValorCompraCartao(e.target.value)} placeholder="0,00" className="w-full bg-[#0a0a0a] border border-zinc-700 rounded-2xl px-4 py-3.5 text-zinc-100 focus:outline-none focus:border-emerald-500" /></div>
+              <button onClick={handleLancarCompraCartao} className="w-full  bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-2xl mt-4 transition-colors">Confirmar Compra</button>
             </div>
           </div>
         </div>
