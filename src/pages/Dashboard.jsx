@@ -8,34 +8,42 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { MotionWrapper } from '../components/ui/MotionWrapper';
 import HomeView from './dashboard/HomeView';
 import ExtratoView from './dashboard/ExtratoView';
-import ExtratoView from './dashboard/ExtratoView';
 import MetasView from './dashboard/MetasView';
 import PlanilhaView from './dashboard/PlanilhaView';
 import CartoesView from './dashboard/CartoesView';
 import ConfiguracoesView from './dashboard/ConfiguracoesView';
+import { useFinanceStore } from '../store/useFinanceStore';
 
 export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) {
-  const [dataSelecionada, setDataSelecionada] = useState(new Date());
+
+  const {
+    idContaReal, setIdContaReal,
+    telaAtiva, setTelaAtiva,
+    dataSelecionada, setDataSelecionada,
+    mesAnterior, proximoMes,
+    nomeUsuario, saldoReal, transacoesReais, categoriasReais, metasReais, balancoReal, evolucaoReal, cartoesReais, agendamentosReais, planilhaReal, inteligenciaReal,
+    modalReceitaAberto, setModalReceitaAberto,
+    modalDespesaAberto, setModalDespesaAberto,
+    modalCofreAberto, setModalCofreAberto,
+    modalAporteAberto, setModalAporteAberto,
+    modalResgateAberto, setModalResgateAberto,
+    modalCartaoAberto, setModalCartaoAberto,
+    modalCompraCartaoAberto, setModalCompraCartaoAberto,
+    modalAgendamentoAberto, setModalAgendamentoAberto,
+    modalPlanilhaAberto, setModalPlanilhaAberto,
+    modalPerfilAberto, setModalPerfilAberto,
+    modalEditSaldoAberto, setModalEditSaldoAberto,
+    carregarDadosDaTela
+  } = useFinanceStore();
+
   const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: 'sucesso' });
   
   const [dialogoConfirmacao, setDialogoConfirmacao] = useState({
     aberto: false, titulo: '', mensagem: '', textoAcao: '', corAcao: '', corIcone: '', onConfirm: () => {}
   });
   
-  const [modalReceitaAberto, setModalReceitaAberto] = useState(false);
-  const [modalDespesaAberto, setModalDespesaAberto] = useState(false);
-  const [modalCofreAberto, setModalCofreAberto] = useState(false);
-  const [modalAporteAberto, setModalAporteAberto] = useState(false);
-  const [modalResgateAberto, setModalResgateAberto] = useState(false);
-  const [modalCartaoAberto, setModalCartaoAberto] = useState(false);
-  const [modalCompraCartaoAberto, setModalCompraCartaoAberto] = useState(false);
-  const [modalAgendamentoAberto, setModalAgendamentoAberto] = useState(false);
-
-  const [nomeUsuario, setNomeUsuario] = useState('Usuário');
-  const [modalPerfilAberto, setModalPerfilAberto] = useState(false);
   const [editNomeUsuario, setEditNomeUsuario] = useState('');
 
-  const [modalEditSaldoAberto, setModalEditSaldoAberto] = useState(false);
   const [editSaldoValor, setEditSaldoValor] = useState('');
 
   const [modalEditTxAberto, setModalEditTxAberto] = useState(false);
@@ -52,9 +60,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [metaEditGuardado, setMetaEditGuardado] = useState('');
   const [metaEditPrazo, setMetaEditPrazo] = useState('');
 
-  const [telaAtiva, setTelaAtiva] = useState('home');
-  const [buscaExtrato, setBuscaExtrato] = useState('');
-  const [filtroTipoExtrato, setFiltroTipoExtrato] = useState('Todos'); 
+ 
 
   const [tituloReceita, setTituloReceita] = useState('');
   const [valorReceita, setValorReceita] = useState('');
@@ -88,162 +94,26 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [descricaoCompraCartao, setDescricaoCompraCartao] = useState('');
   const [valorCompraCartao, setValorCompraCartao] = useState('');
 
-  const [planilhaReal, setPlanilhaReal] = useState([]);
-  const [modalPlanilhaAberto, setModalPlanilhaAberto] = useState(false);
   const [tituloPlanilha, setTituloPlanilha] = useState('');
   const [valorPlanilha, setValorPlanilha] = useState('');
   const [dataPlanilha, setDataPlanilha] = useState('');
 
-  const [idContaReal, setIdContaReal] = useState('');
-  const [saldoReal, setSaldoReal] = useState(0);
-  const [transacoesReais, setTransacoesReais] = useState([]);
-  const [categoriasReais, setCategoriasReais] = useState([]);
-  const [metasReais, setMetasReais] = useState([]);
-  const [balancoReal, setBalancoReal] = useState({ receitas: 0, despesas: 0, guardado: 0, balanco: 0 });
-  const [evolucaoReal, setEvolucaoReal] = useState([]);
-  const [cartoesReais, setCartoesReais] = useState([]);
-  const [agendamentosReais, setAgendamentosReais] = useState([]);
-
-  const [inteligenciaReal, setInteligenciaReal] = useState({
-    total_receitas: 0,
-    essenciais: { valor: 0, porcentagem: 0, limite_ideal: 50, itens: [] },
-    estilo_vida: { valor: 0, porcentagem: 0, limite_ideal: 30, itens: [] },
-    futuro: { valor: 0, porcentagem: 0, limite_ideal: 20, itens: [] }
-  });
-
   const [categoriaExpandida, setCategoriaExpandida] = useState(null);
   const [cartaoExpandidoExtrato, setCartaoExpandidoExtrato] = useState(null);
-
-  const traducoes = {
-    en: { welcome: "Welcome ", back: "Back", create: "Create ", account: "Account", subIn: "Sign in to continue your financial journey", subUp: "Sign up to start your financial journey", fName: "First Name", lName: "Last Name", email: "Email Address", pass: "Password", forgot: "Forgot Password?", signIn: "Sign In", signUp: "Create Account", or: "or continue with", dontHave: "Don't have an account? ", alreadyHave: "Already have an account? ", toSignUp: "Sign Up", toSignIn: "Sign In", placeEmail: "Enter your email", placePass: "Enter your password", twoFactor: "Two-Factor Auth", subTwoFactor: "Scan the QR Code with Google Authenticator and enter the 6-digit code", verify: "Verify Code", backToLogin: "Back to Login" },
-    pt: { welcome: "Bem-vindo de ", back: "Volta", create: "Criar ", account: "Conta", subIn: "Entre para continuar sua jornada financeira", subUp: "Cadastre-se para iniciar sua jornada financeira", fName: "Nome", lName: "Sobrenome", email: "Endereço de E-mail", pass: "Senha", forgot: "Esqueceu a Senha?", signIn: "Entrar", signUp: "Criar Conta", or: "ou continue com", dontHave: "Não tem uma conta? ", alreadyHave: "Já tem uma conta? ", toSignUp: "Cadastre-se", toSignIn: "Entrar", placeEmail: "Digite seu e-mail", placePass: "Digite sua senha", twoFactor: "Autenticação 2FA", subTwoFactor: "Escaneie o QR Code com o Google Authenticator e digite o código de 6 dígitos", verify: "Verificar Código", backToLogin: "Voltar para Login" }
-  };
-  const t = traducoes[idioma] || traducoes['en'];
 
   // ==============================================================================
   // FUNCIONALIDADES E INTEGRAÇÕES 
   // ==============================================================================
   
-  const carregarSetup2FA = async (email) => {
-    try {
-      const res = await fetch(`https://app-financeiro-10tz.onrender.com/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
-      const dados = await res.json();
-      
-      if (res.ok) {
-        const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
-        setChaveSecreta2FA(chave);
-        
-        const linkTotp = dados.link_qrcode || `otpauth://totp/PF:${email}?secret=${chave}&issuer=PF`;
-        const urlImage = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(linkTotp)}`;
-        
-        setQrCodeUrl(urlImage);
-      }
-    } catch (e) {
-      console.error("Erro ao carregar QR Code do 2FA", e);
-    }
-  };
-
-  const handleSubmeterLogin = async (e) => {
-    e.preventDefault();
-    
-    if (!isLoginMode) {
-      if (!nomeRegistro || !sobrenomeRegistro) return mostrarNotificacao("Preencha nome e sobrenome.", "erro");
-      if (!emailLogin || !emailConfirma) return mostrarNotificacao("Preencha o e-mail.", "erro");
-      if (emailLogin !== emailConfirma) return mostrarNotificacao("Os e-mails não coincidem.", "erro");
-      if (senhaLogin !== senhaConfirma) return mostrarNotificacao("As senhas não coincidem.", "erro");
-    } else {
-      if (!emailLogin || !senhaLogin) return mostrarNotificacao("Preencha e-mail e senha.", "erro");
-    }
-
-    try {
-      if (isLoginMode) {
-        await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      } else {
-        await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      }
-      
-      await carregarSetup2FA(emailLogin);
-      mostrarNotificacao(isLoginMode ? "Acesso liberado!" : "Conta criada com sucesso!", "sucesso");
-      setEtapaLogin(1); 
-    } catch (error) {
-      let mensagem = "Erro ao conectar com a conta.";
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "E-mail ou senha incorretos.";
-      if (error.code === 'auth/email-already-in-use') mensagem = "Este e-mail já está em uso.";
-      if (error.code === 'auth/weak-password') mensagem = "A senha deve ter pelo menos 6 caracteres.";
-      mostrarNotificacao(mensagem, "erro");
-    }
-  };
-
-  const handleSubmeter2FA = async (e) => {
-    e.preventDefault();
-    if (codigo2FA.length !== 6) return mostrarNotificacao("O código deve ter 6 dígitos.", "erro");
-
-    try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ email: emailLogin, codigo_2fa: codigo2FA }) 
-      });
-      const dados = await resposta.json();
-      if (resposta.ok) { setIsAutenticado(true); mostrarNotificacao(dados.mensagem, "sucesso"); } 
-      else { mostrarNotificacao(dados.detail, "erro"); }
-    } catch (erro) { mostrarNotificacao("Erro ao validar 2FA no servidor.", "erro"); }
-  };
-
   const nomeMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   const mesFormatadoExibicao = `${nomeMeses[dataSelecionada.getMonth()]} de ${dataSelecionada.getFullYear()}`;
   const mesParametroAPI = telaAtiva === 'extrato' ? "todos" : `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
 
-  const mesAnterior = () => setDataSelecionada(new Date(dataSelecionada.setMonth(dataSelecionada.getMonth() - 1)));
-  const proximoMes = () => setDataSelecionada(new Date(dataSelecionada.setMonth(dataSelecionada.getMonth() + 1)));
-
   
-  const carregarDadosDaTela = async (idConta) => {
-    try {
-      const resPerfil = await fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idConta}`);
-      if (resPerfil.ok) { setNomeUsuario((await resPerfil.json()).nome_usuario); }
-
-      const resSaldo = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idConta}`);
-      setSaldoReal((await resSaldo.json()).saldo_atual || 0);
-
-      const resTx = await fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idConta}?mes=${mesParametroAPI}`);
-      setTransacoesReais((await resTx.json()).transacoes || []);
-
-      const paramMesAtual = `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
-      
-      const resGraficos = await fetch(`https://app-financeiro-10tz.onrender.com/graficos/${idConta}?mes=${paramMesAtual}`);
-      setCategoriasReais((await resGraficos.json()).categorias || []);
-
-      const resMetas = await fetch(`https://app-financeiro-10tz.onrender.com/listar_metas/${idConta}`);
-      setMetasReais((await resMetas.json()).metas || []);
-
-      const resBalanco = await fetch(`https://app-financeiro-10tz.onrender.com/balanco/${idConta}?mes=${paramMesAtual}`);
-      setBalancoReal(await resBalanco.json());
-
-      const resEvolucao = await fetch(`https://app-financeiro-10tz.onrender.com/evolucao/${idConta}?mes=${paramMesAtual}`);
-      setEvolucaoReal((await resEvolucao.json()).evolucao || []);
-
-      const resInteligencia = await fetch(`https://app-financeiro-10tz.onrender.com/inteligencia/${idConta}?mes=${paramMesAtual}`);
-      setInteligenciaReal(await resInteligencia.json());
-
-      const resCartoes = await fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idConta}`);
-      setCartoesReais((await resCartoes.json()).cartoes || []);
-
-      const resAgendamentos = await fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idConta}?mes=${paramMesAtual}`);
-      setAgendamentosReais((await resAgendamentos.json()).agendamentos || []);
-
-      const resPlanilha = await fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idConta}`);
-      setPlanilhaReal((await resPlanilha.json()).planilha || []);
-
-    } catch (erro) {
-      console.error("Erro de conexão:", erro);
-    }
-  };
-
-  useEffect(() => { if (isAutenticado && idContaReal) { carregarDadosDaTela(idContaReal); } }, [dataSelecionada, telaAtiva]); 
+  useEffect(() => { if (idContaReal) { carregarDadosDaTela(idContaReal); } }, [dataSelecionada, telaAtiva]); 
 
   useEffect(() => {
-    if (isAutenticado && emailLogin) {
+    if (emailLogin) {
       fetch(`https://app-financeiro-10tz.onrender.com/configurar/?email=${encodeURIComponent(emailLogin)}`)
         .then(res => res.json())
         .then(data => { setIdContaReal(data.id_conta); carregarDadosDaTela(data.id_conta); })
@@ -419,12 +289,6 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const totalGuardado = (metasReais || []).reduce((acc, meta) => acc + (meta.guardado || 0), 0);
   const totalObjetivoGlobal = (metasReais || []).reduce((acc, meta) => acc + (meta.objetivo || 0), 0);
   const progressoGlobal = totalObjetivoGlobal > 0 ? Math.min(100, Math.round((totalGuardado / totalObjetivoGlobal) * 100)) : 0;
-
-  const transacoesFiltradas = (transacoesReais || []).filter(tx => {
-    const bateuBusca = tx.categoria.toLowerCase().includes(buscaExtrato.toLowerCase());
-    const bateuTipo = filtroTipoExtrato === 'Todos' || tx.tipo === filtroTipoExtrato;
-    return bateuBusca && bateuTipo;
-  });
 
   const handleSalvarMeta = async () => {
     if (!tituloMeta || !objetivoMeta || !mesesMeta) return mostrarNotificacao("Preencha todos os campos.", "erro");

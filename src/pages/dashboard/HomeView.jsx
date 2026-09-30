@@ -1,9 +1,9 @@
-import { ChevronLeft, ChevronRight, CalendarClock, TrendingUp, TrendingDown, ArrowRightLeft, Wallet, Pencil, Target, BrainCircuit, ChevronDown, Calendar, CheckSquare, Trash2, Zap, CreditCard, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarClock, TrendingUp, TrendingDown, ArrowRightLeft, Wallet, Pencil, Target, BrainCircuit, ChevronDown, Calendar, CheckSquare, Trash2, Zap, CreditCard, ShoppingBag, Plus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function HomeView({
   // Variáveis
-  dataSelecionada,
+  // Variáveis
   saldoReal,
   totalGuardado,
   balancoReal,
