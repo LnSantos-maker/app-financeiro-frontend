@@ -5,6 +5,7 @@ export function TransactionIcon({ categoria, tipo, size = 20, className = '' }) 
   const [imgError, setImgError] = useState(false);
 
   const getBrandDomain = (catString) => {
+    if (!catString) return null;
     const cat = catString.toLowerCase();
     if (cat.includes('vivo')) return 'vivo.com.br';
     if (cat.includes('tim')) return 'tim.com.br';
@@ -16,11 +17,12 @@ export function TransactionIcon({ categoria, tipo, size = 20, className = '' }) 
     if (cat.includes('uber')) return 'uber.com';
     if (cat.includes('99')) return '99app.com';
     if (cat.includes('nubank') || cat.includes('nu')) return 'nubank.com.br';
-    if (cat.includes('itau')) return 'itau.com.br';
+    if (cat.includes('itaú') || cat.includes('itau')) return 'itau.com.br';
     if (cat.includes('bradesco')) return 'bradesco.com.br';
     if (cat.includes('santander')) return 'santander.com.br';
     if (cat.includes('inter')) return 'bancointer.com.br';
     if (cat.includes('c6')) return 'c6bank.com.br';
+    if (cat.includes('banco do brasil') || cat.includes('bb')) return 'bb.com.br';
     if (cat.includes('xp')) return 'xpi.com.br';
     if (cat.includes('mercado livre')) return 'mercadolivre.com.br';
     if (cat.includes('amazon')) return 'amazon.com';
@@ -45,6 +47,7 @@ export function TransactionIcon({ categoria, tipo, size = 20, className = '' }) 
     if (tipo === 'Receita') return <Zap size={size} />;
     if (tipo === 'Cartao') return <CreditCard size={size} />;
     
+    if (!catString) return <ShoppingBag size={size} />;
     const cat = catString.toLowerCase();
     if (cat.includes('celular') || cat.includes('telefone')) return <Smartphone size={size} />;
     if (cat.includes('faculdade') || cat.includes('escola') || cat.includes('curso') || cat.includes('educacao')) return <GraduationCap size={size} />;

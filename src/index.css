@@ -1,31 +1,81 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", "Outfit", system-ui, sans-serif;
+  --color-zinc-950: #141416;
+  --color-zinc-900: #1f1f23;
+  --color-zinc-800: #2c2c31;
+  --color-zinc-700: #404047;
+  --color-zinc-400: #9ba0a6;
+  --color-zinc-100: #f1f2f4;
+  
+  --color-emerald-500: #296066; 
+  --color-emerald-400: #1f4b50; 
+  --color-emerald-300: #36818a;
+  
+  --color-rose-500: #ba6060;
+  --color-rose-400: #d06d6d;
 }
 
 @layer base {
-  html {
-    font-size: 95%; /* Reduz a escala geral em 5% */
-  }
-  body {
-    background-color: #09090b;
-    color: #f4f4f5;
+  :root {
+    --bg-main: #0f1115;
+    --bg-card: #181a20;
+    --accent: #0d9488;
+    --text-main: #f8fafc;
+    --text-sec: #94a3b8;
+    --border-card: rgba(255, 255, 255, 0.05);
   }
 
-  /* Custom Premium Scrollbar - Hidden */
+  html {
+    font-size: 95%;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.01) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+  }
+
   ::-webkit-scrollbar {
     display: none;
     width: 0px;
     height: 0px;
   }
+
   * {
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  .shadow-premium {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  .input-premium {
+    @apply w-full bg-[#0a0c10] border border-white/5 rounded-xl px-4 py-3 text-[var(--text-main)] focus:outline-none focus:border-teal-500 transition-colors shadow-inner;
+  }
+
+  .btn-premium {
+    @apply bg-gradient-to-r from-teal-500 to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_20px_rgba(13,148,136,0.3)] disabled:opacity-50 flex items-center justify-between;
   }
 }
 
 @layer utilities {
   .font-mono {
     font-variant-numeric: tabular-nums;
+  }
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+  }
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
   }
 }

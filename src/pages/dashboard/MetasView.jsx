@@ -1,4 +1,5 @@
-import { Target, Plus, Calendar, Pencil, Download, TrendingUp as Speed } from 'lucide-react';
+import { Target, Plus, Calendar, Pencil, Download, TrendingUp as Speed, ArrowUpCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function MetasView({
   totalGuardado,
@@ -11,99 +12,132 @@ export default function MetasView({
   abrirModalAporte
 }) {
   return (
-    <div className="animate-in fade-in duration-300">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pb-24">
       <header className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Meus Cofres e Metas</h1>
-          <p className="text-zinc-400 text-sm">Planeje, invista e acompanhe a realização dos seus sonhos.</p>
+          <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)] mb-1 flex items-center gap-2">Cofres Inteligentes</h1>
+          <p className="text-slate-500 text-sm">Proteja o seu patrimônio e acelere a realização dos seus sonhos.</p>
         </div>
-        <button onClick={() => setModalCofreAberto(true)} className=" bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(212,175,55,0.15)]">
-          <Plus size={20} /> Novo Cofre
+        <button onClick={() => setModalCofreAberto(true)} className="bg-[var(--accent)] hover:bg-teal-400 text-[#0f1115] font-bold px-6 py-3 rounded-2xl flex items-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(45,212,191,0.2)]">
+          <Plus size={20} /> Novo Objetivo
         </button>
       </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div className="bg-gradient-to-br from-[#161922] to-[#090b10] border border-emerald-500/30 rounded-2xl p-6 shadow-none relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10 text-zinc-100">
-            <Target size={64} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-[var(--bg-card)] border border-teal-500/20 rounded-3xl p-8 shadow-premium relative overflow-hidden group hover:border-teal-500/40 transition-colors">
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-teal-500/20 transition-all duration-500"></div>
+          <div className="absolute top-6 right-6 opacity-20 text-teal-500">
+            <Target size={48} />
           </div>
-          <h3 className="text-zinc-400 text-sm mb-2">Total Guardado Hoje</h3>
-          <p className="text-4xl font-bold text-zinc-100 mb-1">
+          <h3 className="text-teal-500 text-xs font-semibold tracking-widest uppercase mb-4">Total Acumulado</h3>
+          <p className="text-4xl font-light text-white mb-2">
             {totalGuardado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </p>
-          <p className="text-zinc-100 text-xs font-medium tracking-wide uppercase mt-4">Liquidez Imediata</p>
+          <p className="text-slate-500 text-xs mt-2">Patrimônio protegido e alocado</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-none">
-          <h3 className="text-zinc-400 text-sm mb-2">Meta Global</h3>
-          <p className="text-3xl font-bold text-zinc-400 mb-1">
+        
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-3xl p-8 shadow-premium">
+          <h3 className="text-slate-500 text-xs font-semibold tracking-widest uppercase mb-4">Meta Global</h3>
+          <p className="text-3xl font-light text-slate-300 mb-2">
             {totalObjetivoGlobal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </p>
-          <p className="text-zinc-400 text-xs mt-4">Soma de todos os objetivos</p>
+          <p className="text-slate-500 text-xs mt-2">Soma do alvo de todos os cofres</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-none flex flex-col justify-center">
-          <h3 className="text-zinc-400 text-sm mb-4">Progresso Médio Geral</h3>
+
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-3xl p-8 shadow-premium flex flex-col justify-center">
+          <h3 className="text-slate-500 text-xs font-semibold tracking-widest uppercase mb-4">Jornada Concluída</h3>
           <div className="flex items-center gap-4">
-            <div className="text-4xl font-bold text-zinc-100">{progressoGlobal}%</div>
-            <div className="flex-1 h-3 bg-zinc-800 rounded-2xl overflow-hidden">
-              <div className="h-full  from-[#8c6b4a] to-[#d4af37] rounded-2xl transition-all duration-1000" style={{ width: `${progressoGlobal}%` }}></div>
+            <div className="text-4xl font-light text-teal-400">{progressoGlobal}%</div>
+            <div className="flex-1 h-3 bg-[#0a0c10] rounded-full overflow-hidden border border-white/5 shadow-inner">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${progressoGlobal}%` }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="h-full bg-teal-500 rounded-full relative overflow-hidden"
+              >
+                 <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer"></div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
       
       {(metasReais || []).length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center bg-zinc-900 border border-dashed border-zinc-700 rounded-2xl p-8 shadow-none">
-          <Target size={48} className="text-zinc-400 mb-4" />
-          <h2 className="text-xl font-bold text-zinc-100 mb-2">Sua lista de sonhos está vazia!</h2>
-          <p className="text-zinc-400 text-sm">Crie seu primeiro cofre para começar a guardar dinheiro de forma organizada.</p>
+        <div className="flex flex-col items-center justify-center h-80 text-center bg-[var(--bg-card)] border border-white/5 rounded-3xl p-8 shadow-premium backdrop-blur-xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--bg-main)] opacity-50 z-0 pointer-events-none"></div>
+          <div className="relative z-10 bg-[#0a0c10] p-6 rounded-2xl text-teal-500 mb-6 border border-teal-500/20 shadow-[0_0_30px_rgba(45,212,191,0.15)]">
+            <ArrowUpCircle size={48} />
+          </div>
+          <h2 className="text-2xl font-light tracking-tight text-white mb-2 relative z-10">Você ainda não definiu um norte.</h2>
+          <p className="text-slate-500 max-w-sm text-sm mb-8 relative z-10">Pressione <kbd className="px-2 py-1 bg-white/5 rounded border border-white/10 mx-1 font-mono text-xs">Ctrl+K</kbd> e pesquise "Novo Cofre" para construir a sua Reserva de Emergência.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
-          {(metasReais || []).map((cofre) => (
-            <div key={cofre.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-none hover:border-emerald-500/30 transition-all group flex flex-col">
-              <div className="flex justify-between items-start mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {(metasReais || []).map((cofre, i) => (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+              key={cofre.id} 
+              className="bg-[var(--bg-card)] border border-white/5 rounded-3xl p-6 shadow-premium hover:border-teal-500/20 transition-all group flex flex-col relative overflow-hidden"
+            >
+              <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-teal-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-teal-500/10 transition-colors"></div>
+
+              <div className="flex justify-between items-start mb-6 relative z-10">
                 <div>
-                  <h3 className="text-xl font-bold text-zinc-100 mb-1">{cofre.titulo}</h3>
-                  <p className="text-zinc-400 text-xs flex items-center gap-1">
-                    <Calendar size={12} /> {cofre.dias_restantes} dias restantes para o alvo
+                  <h3 className="text-xl font-medium text-white mb-1">{cofre.titulo}</h3>
+                  <p className="text-slate-500 text-xs flex items-center gap-1">
+                    <Calendar size={12} /> {cofre.dias_restantes} dias para a meta
                   </p>
                 </div>
-                <button onClick={() => abrirModalEditMeta(cofre)} className="text-zinc-400 hover:text-zinc-100 opacity-0 group-hover:opacity-100 transition-all p-2 rounded-xl bg-[#0a0a0a] border border-zinc-800" title="Editar Cofre">
+                <button onClick={() => abrirModalEditMeta(cofre)} className="text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all p-2 rounded-xl bg-[#0a0c10] border border-white/5 shadow-inner" title="Editar Cofre">
                   <Pencil size={16} />
                 </button>
               </div>
               
-              <div className="bg-[#0a0a0a] rounded-2xl p-5 mb-6 border border-zinc-800 flex-1">
-                <div className="flex justify-between items-end mb-2">
+              <div className="bg-[#0a0c10] rounded-2xl p-5 mb-6 border border-white/5 flex-1 relative z-10 shadow-inner">
+                <div className="flex justify-between items-end mb-4">
                   <div>
-                    <p className="text-zinc-400 text-xs mb-1 uppercase tracking-wider font-semibold">Guardado</p>
-                    <p className="text-2xl font-bold text-zinc-100">R$ {(cofre.guardado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-slate-500 text-[10px] uppercase tracking-widest font-semibold mb-1">Acumulado</p>
+                    <p className="text-2xl font-light text-teal-400">R$ {(cofre.guardado || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-zinc-400 text-xs mb-1 uppercase tracking-wider font-semibold">Objetivo</p>
-                    <p className="text-lg font-bold text-zinc-400">R$ {(cofre.objetivo || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-slate-500 text-[10px] uppercase tracking-widest font-semibold mb-1">Alvo final</p>
+                    <p className="text-sm font-medium text-slate-300">R$ {(cofre.objetivo || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
-                <div className="h-3 w-full bg-zinc-800 rounded-2xl mt-4 mb-2 overflow-hidden">
-                  <div className="h-full  from-[#8c6b4a] to-[#d4af37] rounded-2xl transition-all duration-1000" style={{ width: `${cofre.progresso}%` }}></div>
+
+                {/* Barra de Progresso Líquida */}
+                <div className="h-4 w-full bg-[#111318] rounded-full overflow-hidden border border-white/5 shadow-inner relative">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${cofre.progresso}%` }}
+                    transition={{ duration: 1.5, type: "spring" }}
+                    className="h-full bg-teal-500 rounded-full relative overflow-hidden"
+                  >
+                     <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.2) 4px, rgba(255,255,255,0.2) 8px)" }}></div>
+                     <div className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer"></div>
+                  </motion.div>
                 </div>
-                <div className="flex justify-end">
-                  <span className="text-xs font-bold text-zinc-100 bg-zinc-800 px-2 py-1 rounded">{cofre.progresso}% concluído</span>
+
+                <div className="flex justify-between items-center mt-3">
+                  <span className="text-[10px] text-slate-500 font-mono tracking-widest">PROGRESSO</span>
+                  <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2 py-1 rounded-md border border-teal-500/20">{cofre.progresso}% concluído</span>
                 </div>
               </div>
               
-              <div className="flex gap-3">
-                <button onClick={() => abrirModalResgate(cofre.id)} className="flex-1 bg-zinc-800 hover:bg-slate-700 text-zinc-100 font-medium py-3 rounded-2xl transition-colors text-sm flex justify-center items-center gap-2 border border-zinc-700">
-                  <Download size={16} /> Resgatar
+              <div className="flex gap-3 relative z-10">
+                <button onClick={() => abrirModalResgate(cofre.id)} className="flex-1 bg-[#0a0c10] hover:bg-[#111318] text-slate-300 hover:text-white font-medium py-3 rounded-2xl transition-colors text-sm flex justify-center items-center gap-2 border border-white/5 shadow-inner group/btn">
+                  <Download size={16} className="text-slate-500 group-hover/btn:text-white transition-colors" /> Resgatar
                 </button>
-                <button onClick={() => abrirModalAporte(cofre.id)} className="flex-1 bg-zinc-800 hover:bg-[#d4af37]/20 text-zinc-100 font-bold py-3 rounded-2xl transition-colors text-sm flex justify-center items-center gap-2 border border-emerald-500/30">
-                  <Speed size={16} /> Aportar
+                <button onClick={() => abrirModalAporte(cofre.id)} className="flex-1 bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 font-medium py-3 rounded-2xl transition-colors text-sm flex justify-center items-center gap-2 border border-teal-500/20 shadow-inner group/btn">
+                  <Speed size={16} className="text-teal-400 group-hover/btn:scale-110 transition-transform" /> Aportar
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

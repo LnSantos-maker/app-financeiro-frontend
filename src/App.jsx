@@ -6,8 +6,8 @@ const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 export default function App() {
-  const [isAutenticado, setIsAutenticado] = useState(false);
-  const [emailLogin, setEmailLogin] = useState('');
+  const [isAutenticado, setIsAutenticado] = useState(() => localStorage.getItem('isAutenticado') === 'true');
+  const [emailLogin, setEmailLogin] = useState(() => localStorage.getItem('emailLogin') || '');
   const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: 'sucesso' });
 
   const mostrarNotificacao = (mensagem, tipo = 'sucesso') => {
@@ -27,13 +27,23 @@ export default function App() {
       <Suspense fallback={<DashboardSkeleton />}>
         {!isAutenticado ? (
           <Login 
-            onLoginSuccess={(email) => { setEmailLogin(email); setIsAutenticado(true); }} 
+            onLoginSuccess={(email) => { 
+              setEmailLogin(email); 
+              setIsAutenticado(true); 
+              localStorage.setItem('emailLogin', email);
+              localStorage.setItem('isAutenticado', 'true');
+            }} 
             mostrarNotificacao={mostrarNotificacao} 
           />
         ) : (
           <Dashboard 
             emailLogin={emailLogin} 
-            onLogout={() => { setIsAutenticado(false); setEmailLogin(''); }} 
+            onLogout={() => { 
+              setIsAutenticado(false); 
+              setEmailLogin(''); 
+              localStorage.removeItem('emailLogin');
+              localStorage.removeItem('isAutenticado');
+            }} 
             mostrarNotificacao={mostrarNotificacao} 
           />
         )}

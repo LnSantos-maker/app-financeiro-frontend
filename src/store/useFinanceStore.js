@@ -23,6 +23,7 @@ export const useFinanceStore = create((set, get) => ({
   cartoesReais: [],
   agendamentosReais: [],
   planilhaReal: [],
+  orcamentosReais: [],
   inteligenciaReal: {
     total_receitas: 0,
     essenciais: { valor: 0, porcentagem: 0, limite_ideal: 50, itens: [] },
@@ -42,6 +43,8 @@ export const useFinanceStore = create((set, get) => ({
   modalPlanilhaAberto: false, setModalPlanilhaAberto: (val) => set({ modalPlanilhaAberto: val }),
   modalPerfilAberto: false, setModalPerfilAberto: (val) => set({ modalPerfilAberto: val }),
   modalEditSaldoAberto: false, setModalEditSaldoAberto: (val) => set({ modalEditSaldoAberto: val }),
+  modalOrcamentoAberto: false, setModalOrcamentoAberto: (val) => set({ modalOrcamentoAberto: val }),
+  modalCommandPaletteAberto: false, setModalCommandPaletteAberto: (val) => set({ modalCommandPaletteAberto: val }),
 
   // 4. Ação Principal de Carregamento Assíncrono (Busca de Dados)
   carregarDadosDaTela: async () => {
@@ -53,7 +56,7 @@ export const useFinanceStore = create((set, get) => ({
 
     try {
       // Faz fetch em paralelo para otimizar velocidade
-      const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha] = await Promise.all([
+      const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha, dOrcamentos] = await Promise.all([
         fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
@@ -64,7 +67,8 @@ export const useFinanceStore = create((set, get) => ({
         fetch(`https://app-financeiro-10tz.onrender.com/inteligencia/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({}))
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({}))
       ]);
 
       set({
@@ -78,7 +82,8 @@ export const useFinanceStore = create((set, get) => ({
         inteligenciaReal: dIntel || get().inteligenciaReal,
         cartoesReais: dCartoes.cartoes || [],
         agendamentosReais: dAgenda.agendamentos || [],
-        planilhaReal: dPlanilha.planilha || []
+        planilhaReal: dPlanilha.planilha || [],
+        orcamentosReais: dOrcamentos.orcamentos || []
       });
 
     } catch (e) {
