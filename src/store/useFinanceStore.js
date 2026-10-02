@@ -57,18 +57,18 @@ export const useFinanceStore = create((set, get) => ({
     try {
       // Faz fetch em paralelo para otimizar velocidade
       const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha, dOrcamentos] = await Promise.all([
-        fetch(`http://localhost:8000/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/graficos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/listar_metas/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/balanco/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/evolucao/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/inteligencia/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`http://localhost:8000/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({}))
+        fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/graficos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_metas/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/balanco/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/evolucao/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/inteligencia/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({}))
       ]);
 
       set({
