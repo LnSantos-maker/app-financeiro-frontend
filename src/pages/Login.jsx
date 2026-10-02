@@ -110,7 +110,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       <header className="flex justify-between items-center px-6 lg:px-16 py-6 relative z-20">
          <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-[#23272b] rounded-[10px] flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_8px_rgba(0,0,0,0.4)] border border-[#30363d]">
-               <img src="/img/nexus_logo.jpg" alt="Logo" className="w-7 h-7 rounded-md" />
+               <img src="/favicon.svg" alt="Logo" className="w-6 h-6 object-contain" />
             </div>
             <span className="text-xl font-bold tracking-[0.2em] text-[#e6f0ed]">NEXUS</span>
          </div>
@@ -213,7 +213,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090b10]/80 backdrop-blur-md p-4">
             <MotionWrapper className="w-full max-w-md bg-[#23272b] rounded-[2rem] p-8 border border-[#30363d] shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden">
                
-               <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)]">
+               <button type="button" onClick={() => setShowModal(false)} className="absolute z-50 top-6 right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)]">
                   <X size={16}/>
                </button>
 
