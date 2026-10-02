@@ -123,7 +123,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   useEffect(() => {
     if (emailLogin) {
-      fetch(`https://app-financeiro-10tz.onrender.com/configurar/?email=${encodeURIComponent(emailLogin)}`)
+      fetch(`http://localhost:8000/configurar/?email=${encodeURIComponent(emailLogin)}`)
         .then(res => res.json())
         .then(data => { setIdContaReal(data.id_conta); carregarDadosDaTela(data.id_conta); })
         .catch(err => console.error("Erro na configuração", err));
@@ -136,7 +136,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarPerfil = async () => {
     if (!editNomeUsuario.trim()) return mostrarNotificacao("O nome não pode ficar vazio.", "erro");
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`, { 
+      const resposta = await fetch(`http://localhost:8000/perfil/${idContaReal}`, { 
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome_usuario: editNomeUsuario }) 
       });
       if (resposta.ok) { 
@@ -153,7 +153,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${idTransacao}`, { method: 'DELETE' });
+          const resposta = await fetch(`http://localhost:8000/transacoes/${idContaReal}/${idTransacao}`, { method: 'DELETE' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação apagada com sucesso!"); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
       }
@@ -166,7 +166,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/zerar_saldo/${idContaReal}`, { method: 'PUT' });
+          const resposta = await fetch(`http://localhost:8000/zerar_saldo/${idContaReal}`, { method: 'PUT' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta formatada! Ficha limpa."); setTelaAtiva('home'); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
       }
@@ -186,7 +186,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const emailAtual = emailLogin;
-          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/auth/reset-2fa/${encodeURIComponent(emailAtual)}`, { method: 'DELETE' });
+          const resposta = await fetch(`http://localhost:8000/auth/reset-2fa/${encodeURIComponent(emailAtual)}`, { method: 'DELETE' });
           if (resposta.ok) { mostrarNotificacao("2FA resetado! O QR Code voltará a aparecer no próximo login."); }
           else { mostrarNotificacao("Erro ao resetar no servidor.", "erro"); }
         } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
@@ -201,7 +201,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
-          const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/pagar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: idCartao, valor: valorFaturaAtual }) });
+          const resposta = await fetch('http://localhost:8000/cartoes/pagar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: idCartao, valor: valorFaturaAtual }) });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Fatura paga com sucesso!"); } 
           else { const erro = await resposta.json(); mostrarNotificacao(erro.detail, "erro"); }
         } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
@@ -216,7 +216,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarEditSaldo = async () => {
     if (editSaldoValor === '') return mostrarNotificacao("Preencha um valor", "erro");
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_saldo: parseFloat(editSaldoValor.replace(',', '.')) }) });
+      const resposta = await fetch(`http://localhost:8000/saldo/${idContaReal}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_saldo: parseFloat(editSaldoValor.replace(',', '.')) }) });
       if (resposta.ok) { setModalEditSaldoAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Saldo ajustado!"); }
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -231,7 +231,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     if (!txEditTitulo || !txEditValor) return mostrarNotificacao("Preencha título e valor.", "erro");
     const txAtualizada = { id_conta: idContaReal, tipo: txEditTipo, valor: parseFloat(txEditValor.replace(',', '.')), categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo, data: new Date().toISOString().split('T')[0], classificacao: txEditCat };
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${txEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txAtualizada) });
+      const resposta = await fetch(`http://localhost:8000/transacoes/${idContaReal}/${txEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txAtualizada) });
       if (resposta.ok) { setModalEditTxAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação editada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -242,7 +242,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     if (!metaEditTitulo || !metaEditObjetivo || !metaEditGuardado) return mostrarNotificacao("Preencha os campos essenciais.", "erro");
     const metaAtualizada = { id_conta: idContaReal, titulo: metaEditTitulo, objetivo: parseFloat(metaEditObjetivo.toString().replace(',', '.')), guardado: parseFloat(metaEditGuardado.toString().replace(',', '.')), dias_restantes: parseInt(metaEditPrazo || 1) * 30 };
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/metas/${idContaReal}/${metaEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metaAtualizada) });
+      const resposta = await fetch(`http://localhost:8000/metas/${idContaReal}/${metaEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metaAtualizada) });
       if (resposta.ok) { setModalEditMetaAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre editado!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -251,7 +251,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     if (!tituloReceita || !valorReceita) return mostrarNotificacao("Preencha título e valor.", "erro");
     const novaTransacao = { id_conta: idContaReal, tipo: 'Receita', valor: parseFloat(valorReceita.replace(',', '.')), categoria: `${categoriaReceita}: ${tituloReceita}`, data: new Date().toISOString().split('T')[0], classificacao: 'receita' };
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
+      const resposta = await fetch('http://localhost:8000/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
       if (resposta.ok) { setModalReceitaAberto(false); setTituloReceita(''); setValorReceita(''); setCategoriaReceita('Salário'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Receita registrada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -259,7 +259,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const processarSalvamentoDespesa = async () => {
     const novaTransacao = { id_conta: idContaReal, tipo: 'Despesa', valor: parseFloat(valorDespesa.replace(',', '.')), categoria: `${categoriaDespesa}: ${tituloDespesa}`, data: new Date().toISOString().split('T')[0], classificacao: classificacaoDespesa };
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
+      const resposta = await fetch('http://localhost:8000/transacoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(novaTransacao) });
       if (resposta.ok) { setModalDespesaAberto(false); setTituloDespesa(''); setValorDespesa(''); setCategoriaDespesa('Alimentação'); setClassificacaoDespesa('essencial'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Despesa registrada!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -276,7 +276,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarAgendamento = async () => {
     if (!tituloAgendamento || !valorAgendamento || !dataAgendamento) return mostrarNotificacao("Preencha todos os campos do agendamento.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/agendamentos/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloAgendamento, valor: parseFloat(valorAgendamento.replace(',', '.')), data_vencimento: dataAgendamento, categoria: categoriaAgendamento, classificacao: classificacaoAgendamento, recorrente: isRecorrenteAgendamento }) });
+      const resposta = await fetch('http://localhost:8000/agendamentos/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloAgendamento, valor: parseFloat(valorAgendamento.replace(',', '.')), data_vencimento: dataAgendamento, categoria: categoriaAgendamento, classificacao: classificacaoAgendamento, recorrente: isRecorrenteAgendamento }) });
       if (resposta.ok) { 
         setModalAgendamentoAberto(false); 
         setTituloAgendamento(''); 
@@ -294,14 +294,14 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   const handlePagarAgendamento = async (idAgendamento) => {
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/agendamentos/pagar/${idAgendamento}`, { method: 'POST' });
+      const resposta = await fetch(`http://localhost:8000/agendamentos/pagar/${idAgendamento}`, { method: 'POST' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta paga e registrada com sucesso!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
   const handleExcluirAgendamento = async (idAgendamento) => {
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/agendamentos/${idAgendamento}`, { method: 'DELETE' });
+      const resposta = await fetch(`http://localhost:8000/agendamentos/${idAgendamento}`, { method: 'DELETE' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Agendamento cancelado!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -313,7 +313,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarMeta = async () => {
     if (!tituloMeta || !objetivoMeta || !mesesMeta) return mostrarNotificacao("Preencha todos os campos.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/metas/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, titulo: tituloMeta, objetivo: parseFloat(objetivoMeta.toString().replace(',', '.')), dias_restantes: parseInt(mesesMeta) * 30 }) });
+      const resposta = await fetch('http://localhost:8000/metas/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, titulo: tituloMeta, objetivo: parseFloat(objetivoMeta.toString().replace(',', '.')), dias_restantes: parseInt(mesesMeta) * 30 }) });
       if (resposta.ok) { setModalCofreAberto(false); setTituloMeta(''); setObjetivoMeta(''); setMesesMeta(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre criado com sucesso!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -321,7 +321,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarAporte = async () => {
     if (!metaSelecionada || !valorAporte) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/aportes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaSelecionada, valor_aporte: parseFloat(valorAporte.replace(',', '.')) }) });
+      const resposta = await fetch('http://localhost:8000/aportes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaSelecionada, valor_aporte: parseFloat(valorAporte.replace(',', '.')) }) });
       if (resposta.ok) { setModalAporteAberto(false); setValorAporte(''); setMetaSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro guardado!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -329,7 +329,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarResgate = async () => {
     if (!metaResgateSelecionada || !valorResgate) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/resgatar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaResgateSelecionada, valor_resgate: parseFloat(valorResgate.replace(',', '.')) }) });
+      const resposta = await fetch('http://localhost:8000/resgatar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaResgateSelecionada, valor_resgate: parseFloat(valorResgate.replace(',', '.')) }) });
       if (resposta.ok) { setModalResgateAberto(false); setValorResgate(''); setMetaResgateSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro resgatado para o Saldo Livre!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -337,7 +337,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarCartao = async () => {
     if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
+      const resposta = await fetch('http://localhost:8000/cartoes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
       if (resposta.ok) { setModalCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão adicionado!"); } 
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -355,7 +355,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleEditarCartao = async () => {
     if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/${idContaReal}/${cartaoEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
+      const resposta = await fetch(`http://localhost:8000/cartoes/${idContaReal}/${cartaoEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
       if (resposta.ok) { setModalEditCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão atualizado!"); } 
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -370,11 +370,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           const cartaoAlvo = cartoesReais.find(c => c.id === idCartao);
           if (cartaoAlvo && cartaoAlvo.extrato && cartaoAlvo.extrato.length > 0) {
             for (const compra of cartaoAlvo.extrato) {
-              await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${compra.id}`, { method: 'DELETE' }).catch(() => {});
+              await fetch(`http://localhost:8000/transacoes/${idContaReal}/${compra.id}`, { method: 'DELETE' }).catch(() => {});
             }
           }
           // Tenta apagar o cartão em si
-          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/${idContaReal}/${idCartao}`, { method: 'DELETE' });
+          const resposta = await fetch(`http://localhost:8000/cartoes/${idContaReal}/${idCartao}`, { method: 'DELETE' });
           if (resposta.ok) { 
             carregarDadosDaTela(idContaReal); 
             mostrarNotificacao("Cartão apagado com sucesso!"); 
@@ -392,7 +392,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleLancarCompraCartao = async () => {
     if (!descricaoCompraCartao || !valorCompraCartao) return mostrarNotificacao("Preencha a descrição e o valor.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')) }) });
+      const resposta = await fetch('http://localhost:8000/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')) }) });
       if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -400,14 +400,14 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarPlanilha = async () => {
     if (!tituloPlanilha || !valorPlanilha || !dataPlanilha) return mostrarNotificacao("Preencha todos os campos.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/planilha/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloPlanilha, valor: parseFloat(valorPlanilha.replace(',', '.')), vencimento: dataPlanilha }) });
+      const resposta = await fetch('http://localhost:8000/planilha/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloPlanilha, valor: parseFloat(valorPlanilha.replace(',', '.')), vencimento: dataPlanilha }) });
       if (resposta.ok) { setModalPlanilhaAberto(false); setTituloPlanilha(''); setValorPlanilha(''); setDataPlanilha(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Item adicionado à planilha!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
   const handleExcluirPlanilha = async (idItem) => {
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/planilha/${idItem}`, { method: 'DELETE' });
+      const resposta = await fetch(`http://localhost:8000/planilha/${idItem}`, { method: 'DELETE' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Item removido!"); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -415,7 +415,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleAlternarStatusPlanilha = async (idItem, statusAtual) => {
     const novoStatus = statusAtual === 'pendente' ? 'pago' : 'pendente';
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/planilha/${idItem}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: novoStatus }) });
+      const resposta = await fetch(`http://localhost:8000/planilha/${idItem}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: novoStatus }) });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -423,7 +423,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarOrcamento = async () => {
     if (!valorLimiteOrcamento) return mostrarNotificacao("Preencha o valor limite.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/orcamentos/', {
+      const resposta = await fetch('http://localhost:8000/orcamentos/', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_conta: idContaReal, categoria: categoriaOrcamento, valor_limite: parseFloat(valorLimiteOrcamento.replace(',', '.')) })
       });

@@ -4,42 +4,94 @@ import { Smartphone, GraduationCap, MonitorPlay, Wifi, Car, Utensils, Home, Tv, 
 export function TransactionIcon({ categoria, tipo, size = 20, className = '' }) {
   const [imgError, setImgError] = useState(false);
 
-  const getBrandDomain = (catString) => {
+  const getSvgBankLogo = (catString) => {
+    if (!catString) return null;
+    const b = catString.toLowerCase();
+    
+    if (b.includes('nu')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#8A05BE"/>
+        <text x="50" y="65" fontFamily="Arial, sans-serif" fontSize="45" fontWeight="bold" fill="white" textAnchor="middle">nu</text>
+      </svg>
+    );
+
+    if (b.includes('inter')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#FF7A00"/>
+        <text x="50" y="62" fontFamily="Arial, sans-serif" fontSize="32" fontWeight="900" fill="white" textAnchor="middle">inter</text>
+      </svg>
+    );
+
+    if (b.includes('ita')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#EC7000"/>
+        <rect x="10" y="10" width="80" height="80" rx="20" fill="#003399"/>
+        <text x="50" y="62" fontFamily="Arial, sans-serif" fontSize="36" fontWeight="bold" fill="#FFCC00" textAnchor="middle">Itaú</text>
+      </svg>
+    );
+
+    if (b.includes('bradesco')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#CC092F"/>
+        <circle cx="50" cy="40" r="15" fill="white"/>
+        <rect x="35" y="60" width="30" height="8" rx="4" fill="white"/>
+      </svg>
+    );
+
+    if (b.includes('santander')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#EC0000"/>
+        <path d="M50 30 C 65 30, 70 50, 70 50 L 30 50 C 30 50, 35 30, 50 30 Z" fill="white"/>
+        <circle cx="50" cy="65" r="10" fill="white"/>
+      </svg>
+    );
+
+    if (b.includes('c6')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#242424"/>
+        <text x="50" y="65" fontFamily="Arial, sans-serif" fontSize="50" fontWeight="bold" fill="white" textAnchor="middle">C6</text>
+      </svg>
+    );
+
+    if (b.includes('brasil') || b.includes('bb')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#003DA5"/>
+        <text x="50" y="65" fontFamily="Arial, sans-serif" fontSize="50" fontWeight="900" fill="#FAEA00" textAnchor="middle">bb</text>
+      </svg>
+    );
+
+    if (b.includes('caixa')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#005CA9"/>
+        <text x="50" y="65" fontFamily="Arial, sans-serif" fontSize="60" fontWeight="bold" fill="#F39200" textAnchor="middle">X</text>
+      </svg>
+    );
+
+    if (b.includes('xp')) return (
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="100" rx="25" fill="#000000"/>
+        <text x="50" y="65" fontFamily="Arial, sans-serif" fontSize="45" fontWeight="bold" fill="#FFC800" textAnchor="middle">XP</text>
+      </svg>
+    );
+
+    return null;
+  };
+
+  const getBrandLogoUrl = (catString) => {
     if (!catString) return null;
     const cat = catString.toLowerCase();
-    if (cat.includes('vivo')) return 'vivo.com.br';
-    if (cat.includes('tim')) return 'tim.com.br';
-    if (cat.includes('claro')) return 'claro.com.br';
-    if (cat.includes('netflix')) return 'netflix.com';
-    if (cat.includes('prime')) return 'amazon.com';
-    if (cat.includes('spotify')) return 'spotify.com';
-    if (cat.includes('ifood')) return 'ifood.com.br';
-    if (cat.includes('uber')) return 'uber.com';
-    if (cat.includes('99')) return '99app.com';
-    if (cat.includes('nubank') || cat.includes('nu')) return 'nubank.com.br';
-    if (cat.includes('itaú') || cat.includes('itau')) return 'itau.com.br';
-    if (cat.includes('bradesco')) return 'bradesco.com.br';
-    if (cat.includes('santander')) return 'santander.com.br';
-    if (cat.includes('inter')) return 'bancointer.com.br';
-    if (cat.includes('c6')) return 'c6bank.com.br';
-    if (cat.includes('banco do brasil') || cat.includes('bb')) return 'bb.com.br';
-    if (cat.includes('xp')) return 'xpi.com.br';
-    if (cat.includes('mercado livre')) return 'mercadolivre.com.br';
-    if (cat.includes('amazon')) return 'amazon.com';
-    if (cat.includes('shopee')) return 'shopee.com.br';
-    if (cat.includes('aliexpress')) return 'aliexpress.com';
-    if (cat.includes('apple')) return 'apple.com';
-    if (cat.includes('google')) return 'google.com';
-    if (cat.includes('playstation') || cat.includes('psn')) return 'playstation.com';
-    if (cat.includes('xbox')) return 'xbox.com';
-    if (cat.includes('mcdonalds') || cat.includes('mc donald')) return 'mcdonalds.com';
-    if (cat.includes('burger king') || cat.includes('bk')) return 'burgerking.com.br';
-    if (cat.includes('smartfit') || cat.includes('smart fit')) return 'smartfit.com.br';
-    if (cat.includes('gympass')) return 'gympass.com';
-    if (cat.includes('azul')) return 'voeazul.com.br';
-    if (cat.includes('gol')) return 'voegol.com.br';
-    if (cat.includes('latam')) return 'latamairlines.com';
-    if (cat.includes('steam')) return 'steampowered.com';
+    // Other common brands using clearbit fallback
+    if (cat.includes('netflix')) return 'https://logo.clearbit.com/netflix.com';
+    if (cat.includes('prime') || cat.includes('amazon')) return 'https://logo.clearbit.com/amazon.com';
+    if (cat.includes('spotify')) return 'https://logo.clearbit.com/spotify.com';
+    if (cat.includes('ifood')) return 'https://logo.clearbit.com/ifood.com.br';
+    if (cat.includes('uber')) return 'https://logo.clearbit.com/uber.com';
+    if (cat.includes('mercado livre')) return 'https://logo.clearbit.com/mercadolivre.com.br';
+    if (cat.includes('shopee')) return 'https://logo.clearbit.com/shopee.com.br';
+    if (cat.includes('apple')) return 'https://logo.clearbit.com/apple.com';
+    if (cat.includes('google')) return 'https://logo.clearbit.com/google.com';
+    if (cat.includes('mcdonalds')) return 'https://logo.clearbit.com/mcdonalds.com';
+    if (cat.includes('smartfit')) return 'https://logo.clearbit.com/smartfit.com.br';
     return null;
   };
 
@@ -63,12 +115,17 @@ export function TransactionIcon({ categoria, tipo, size = 20, className = '' }) 
     return <ShoppingBag size={size} />;
   };
 
-  const brandDomain = getBrandDomain(categoria);
+  const svgLogo = getSvgBankLogo(categoria);
+  if (svgLogo) {
+    return svgLogo;
+  }
 
-  if (brandDomain && !imgError) {
+  const brandLogoUrl = getBrandLogoUrl(categoria);
+
+  if (brandLogoUrl && !imgError) {
     return (
       <img 
-        src={`https://logo.clearbit.com/${brandDomain}`} 
+        src={brandLogoUrl} 
         alt={categoria} 
         style={{ width: size, height: size }}
         className={`object-contain rounded-sm ${className}`}

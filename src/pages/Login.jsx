@@ -27,7 +27,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
 
   const carregarSetup2FA = async (email) => {
     try {
-      const res = await fetch(`https://app-financeiro-10tz.onrender.com/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`http://localhost:8000/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
       const dados = await res.json();
       if (res.ok) {
         const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
@@ -84,7 +84,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
     
     setIsLoading(true);
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
+      const resposta = await fetch('http://localhost:8000/auth/verificar-2fa/', { 
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailLogin, codigo_2fa: codigo2FA }) 
       });
       const dados = await resposta.json();
