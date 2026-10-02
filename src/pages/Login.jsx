@@ -12,9 +12,9 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   // Auth Form State
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [etapaLogin, setEtapaLogin] = useState(0); 
-  const [emailLogin, setEmailLogin] = useState('luam@admin.com');
-  const [senhaLogin, setSenhaLogin] = useState('12345678');
-  const [codigo2FA, setCodigo2FA] = useState('123456');
+  const [emailLogin, setEmailLogin] = useState('');
+  const [senhaLogin, setSenhaLogin] = useState('');
+  const [codigo2FA, setCodigo2FA] = useState('');
 
   const [nomeRegistro, setNomeRegistro] = useState('');
   const [sobrenomeRegistro, setSobrenomeRegistro] = useState('');
@@ -56,12 +56,6 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
     try {
       if (isLoginMode) await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
       else await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      
-      if (emailLogin === 'luam@admin.com' && senhaLogin === '12345678') {
-        mostrarNotificacao("Acesso Bypass Autorizado", "sucesso");
-        onLoginSuccess(emailLogin);
-        return;
-      }
       
       await carregarSetup2FA(emailLogin);
       mostrarNotificacao(isLoginMode ? "Acesso liberado" : "Conta criada", "sucesso");
