@@ -17,25 +17,25 @@ export default function HomeView({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-24 w-full text-slate-200" style={{ fontFamily: 'Inter, sans-serif' }}>
       
       {/* Header Neumorphic */}
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         
         {/* Placeholder para alinhar com a imagem caso o logo esteja na sidebar */}
-        <div className="w-10"></div> 
+        <div className="hidden md:block w-10"></div> 
 
         <div className="flex items-center gap-4 bg-[#23272b] rounded-full px-4 py-2 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.4),inset_-4px_-4px_8px_rgba(255,255,255,0.05)] border border-[#30363d]">
-          <button onClick={mesAnterior} className="p-1 text-slate-400 hover:text-white transition-colors"><ChevronLeft size={16} /></button>
-          <div className="flex flex-col items-center min-w-[160px]">
-            <span className="text-base font-bold text-slate-200 capitalize tracking-wide">{mesFormatadoExibicao}</span>
-            <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Período Selecionado</span>
+          <button onClick={mesAnterior} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors"><ChevronLeft size={16} /></button>
+          <div className="flex flex-col items-center min-w-[120px] md:min-w-[160px]">
+            <span className="text-sm md:text-base font-bold text-slate-200 capitalize tracking-wide">{mesFormatadoExibicao}</span>
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Período</span>
           </div>
-          <button onClick={proximoMes} className="p-1 text-slate-400 hover:text-white transition-colors"><ChevronRight size={16} /></button>
+          <button onClick={proximoMes} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors"><ChevronRight size={16} /></button>
         </div>
 
-        <div className="flex gap-4">
-          <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#292e33] text-slate-300 hover:bg-[#32383e] px-5 py-2.5 rounded-2xl flex items-center gap-2 font-medium transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3),-2px_-2px_10px_rgba(255,255,255,0.05)] text-sm border border-[#383f45]"><CalendarClock size={16} /> Agendar</button>
-          <button onClick={() => setModalReceitaAberto(true)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-5 py-2.5 rounded-2xl flex items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-sm"><TrendingUp size={16} /> Receita</button>
-          <button onClick={() => setModalDespesaAberto(true)} className="bg-[#e69894] text-[#4a1c1a] hover:bg-[#f7a5a1] px-5 py-2.5 rounded-2xl flex items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-sm"><TrendingDown size={16} /> Despesa</button>
-          <button onClick={() => abrirModalAporte('')} className="bg-[#14535c] text-white hover:bg-[#1a6b77] px-5 py-2.5 rounded-2xl flex items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-sm"><ArrowRightLeft size={16} /> Guardar</button>
+        <div className="flex flex-wrap justify-center md:justify-end gap-2 md:gap-4 w-full md:w-auto">
+          <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#292e33] text-slate-300 hover:bg-[#32383e] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-medium transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3),-2px_-2px_10px_rgba(255,255,255,0.05)] text-xs md:text-sm border border-[#383f45]"><CalendarClock size={16} /> Agendar</button>
+          <button onClick={() => setModalReceitaAberto(true)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingUp size={16} /> Receita</button>
+          <button onClick={() => setModalDespesaAberto(true)} className="bg-[#e69894] text-[#4a1c1a] hover:bg-[#f7a5a1] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingDown size={16} /> Despesa</button>
+          <button onClick={() => abrirModalAporte('')} className="bg-[#14535c] text-white hover:bg-[#1a6b77] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><ArrowRightLeft size={16} /> Guardar</button>
         </div>
       </header>
 
@@ -132,8 +132,8 @@ export default function HomeView({
           </div>
         </div>
 
-        <div className="flex gap-6">
-          <div className="flex-1 grid grid-cols-3 gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Essenciais */}
             <div onClick={() => toggleCategoria('essenciais')} className="bg-[#2a2e33] rounded-2xl p-5 border border-[#353a40] shadow-[6px_6px_12px_rgba(0,0,0,0.3),-4px_-4px_10px_rgba(255,255,255,0.03)] cursor-pointer hover:bg-[#2d3238] transition-colors relative overflow-hidden">
@@ -189,7 +189,7 @@ export default function HomeView({
           </div>
 
           {/* Assistente IA NEXUS */}
-          <div className="w-[280px] bg-[#24282c] border border-[#30363d] rounded-2xl p-6 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),4px_4px_10px_rgba(0,0,0,0.2)] flex flex-col justify-center relative mt-6">
+          <div className="w-full lg:w-[280px] bg-[#24282c] border border-[#30363d] rounded-2xl p-6 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),4px_4px_10px_rgba(0,0,0,0.2)] flex flex-col justify-center relative mt-10 lg:mt-6">
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#343a40] p-1 rounded-full shadow-[0_4px_15px_rgba(149,191,166,0.3)]">
                <div className="w-12 h-12 bg-[#1b3b40] rounded-full overflow-hidden border-2 border-[#2a5056] flex items-center justify-center">
                  <img src="/img/nexus_ai.jpg" alt="NEXUS AI" className="w-full h-full object-cover" />
@@ -234,8 +234,8 @@ export default function HomeView({
           {(categoriasReais || []).length === 0 ? (
             <div className="flex h-48 items-center justify-center text-[#8e98a3] text-sm">Nenhuma despesa no período.</div>
           ) : (
-            <div className="flex items-center justify-between h-48">
-              <div className="w-1/2 h-full">
+            <div className="flex flex-col sm:flex-row items-center justify-between min-h-[192px]">
+              <div className="w-full sm:w-1/2 h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={categoriasReais} cx="50%" cy="50%" innerRadius={45} outerRadius={65} paddingAngle={2} dataKey="value" stroke="none">
@@ -244,12 +244,12 @@ export default function HomeView({
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="w-1/2 flex flex-col gap-3 pl-4 overflow-y-auto max-h-48">
+              <div className="w-full sm:w-1/2 flex flex-col gap-3 sm:pl-4 overflow-y-auto max-h-48 mt-4 sm:mt-0">
                 {(categoriasReais || []).map((item, index) => (
                   <div key={index} className="flex flex-col text-xs bg-[#24282c] p-2 rounded-xl border border-[#30363d]">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-2.5 h-2.5 rounded-2xl" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-[#8e98a3] truncate w-16 font-semibold">{item.name}</span>
+                      <span className="text-[#8e98a3] truncate font-semibold flex-1">{item.name}</span>
                     </div>
                     <span className="font-bold text-[#e2e8f0]">R$ {item.value}</span>
                   </div>

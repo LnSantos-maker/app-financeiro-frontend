@@ -508,22 +508,22 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         </div>
       )}
 
-      <aside className="w-[80px] border-r border-[#26282d] flex flex-col items-center py-6 gap-8 shrink-0 bg-[#16171b] z-10 relative">
-        <div className="w-12 h-12 rounded-[12px] bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.2)]">
+      <aside className="w-full md:w-[80px] h-[70px] md:h-auto border-t md:border-t-0 md:border-r border-[#26282d] flex flex-row md:flex-col items-center justify-around md:justify-start py-2 md:py-6 shrink-0 bg-[#16171b] z-50 fixed bottom-0 left-0 md:relative md:bottom-auto md:left-auto">
+        <div className="hidden md:flex w-12 h-12 rounded-[12px] bg-[#0a0c10] items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.2)] md:mb-8">
           <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
         </div>
-        <nav className="flex flex-col gap-6 text-[#757982] mt-4">
-          <button onClick={() => setTelaAtiva('home')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'home' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Visão Geral"><Home size={22} /></button>
-          <button onClick={() => setTelaAtiva('cartoes')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'cartoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cartões"><CreditCard size={22} /></button>
-          <button onClick={() => setTelaAtiva('extrato')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'extrato' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Extrato Completo"><ArrowRightLeft size={22} /></button>
-          <button onClick={() => setTelaAtiva('metas')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'metas' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cofres"><Target size={22} /></button>
-          <button onClick={() => setTelaAtiva('planilha')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'planilha' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Planilha Fantasma"><ClipboardList size={22} /></button>
-          <button onClick={() => setTelaAtiva('utilitarios')} className={`p-3 rounded-[12px] transition-colors ${telaAtiva === 'utilitarios' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Utilitários"><Calculator size={22} /></button>
-          <button onClick={() => setTelaAtiva('configuracoes')} className={`p-3 rounded-[12px] transition-colors mt-auto ${telaAtiva === 'configuracoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Configurações"><Settings size={22} /></button>
+        <nav className="flex flex-row md:flex-col gap-2 md:gap-6 text-[#757982] w-full md:w-auto justify-around px-2 md:px-0">
+          <button onClick={() => setTelaAtiva('home')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'home' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Visão Geral"><Home size={22} /></button>
+          <button onClick={() => setTelaAtiva('cartoes')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'cartoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cartões"><CreditCard size={22} /></button>
+          <button onClick={() => setTelaAtiva('extrato')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'extrato' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Extrato Completo"><ArrowRightLeft size={22} /></button>
+          <button onClick={() => setTelaAtiva('metas')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'metas' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cofres"><Target size={22} /></button>
+          <button onClick={() => setTelaAtiva('planilha')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] hidden sm:flex items-center justify-center transition-colors ${telaAtiva === 'planilha' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Planilha Fantasma"><ClipboardList size={22} /></button>
+          <button onClick={() => setTelaAtiva('utilitarios')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] hidden md:flex items-center justify-center transition-colors ${telaAtiva === 'utilitarios' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Utilitários"><Calculator size={22} /></button>
+          <button onClick={() => setTelaAtiva('configuracoes')} className={`p-2 md:p-3 rounded-[12px] min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors md:mt-auto ${telaAtiva === 'configuracoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Configurações"><Settings size={22} /></button>
         </nav>
       </aside>
 
-      <main className="flex-1 p-10 overflow-y-auto overflow-x-hidden relative">
+      <main className="flex-1 p-4 md:p-10 pb-24 md:pb-10 overflow-y-auto overflow-x-hidden relative">
         <div className="absolute top-8 left-10 flex items-center gap-2 pointer-events-none z-0 opacity-80">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 6L10 10L14 14" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

@@ -121,9 +121,9 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
             <a href="#" className="hover:text-[#e6f0ed] transition-colors">Sobre Nós</a>
             <a href="#" className="hover:text-[#e6f0ed] transition-colors">Blog</a>
          </nav>
-         <div className="flex items-center gap-6">
-            <button onClick={() => openAuthModal(true)} className="text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors">Login</button>
-            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-6 py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-sm">
+         <div className="flex items-center gap-2 sm:gap-6">
+            <button onClick={() => openAuthModal(true)} className="text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors min-h-[44px] px-2 md:px-0">Login</button>
+            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-4 md:px-6 py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-sm min-h-[44px]">
                Cadastrar-se
             </button>
          </div>
@@ -134,18 +134,18 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
          <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-16">
             
             {/* Left Content */}
-            <div className="flex-1 flex flex-col items-start text-left z-10">
-               <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] text-[#e6f0ed] mb-6 tracking-tight">
+            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left z-10 w-full">
+               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] text-[#e6f0ed] mb-6 tracking-tight">
                   UNA SUAS FINANÇAS.<br />CONSTRUA SEU FUTURO.
                </h1>
-               <p className="text-lg text-[#8baaa6] mb-10 max-w-lg leading-relaxed font-light">
+               <p className="text-base sm:text-lg text-[#8baaa6] mb-10 max-w-lg leading-relaxed font-light">
                   Nexus: A Plataforma de Planejamento Financeiro Inteligente que Centraliza Contas, Otimiza Orçamentos e Traça Caminhos para suas Metas.
                </p>
                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <button onClick={() => openAuthModal(false)} className="bg-gradient-to-r from-[#14535c] to-[#1b3b40] border border-[#2a5056] text-[#e6f0ed] hover:from-[#1a6b77] hover:to-[#244b52] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_15px_rgba(0,0,0,0.4),inset_1px_1px_2px_rgba(255,255,255,0.1)] transition-all flex items-center justify-center gap-2">
+                  <button onClick={() => openAuthModal(false)} className="bg-gradient-to-r from-[#14535c] to-[#1b3b40] border border-[#2a5056] text-[#e6f0ed] hover:from-[#1a6b77] hover:to-[#244b52] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_15px_rgba(0,0,0,0.4),inset_1px_1px_2px_rgba(255,255,255,0.1)] transition-all flex items-center justify-center gap-2 min-h-[44px]">
                      COMEÇAR AGORA <ArrowRight size={18} />
                   </button>
-                  <button className="bg-[#23272b] border border-[#30363d] text-[#8baaa6] hover:text-[#e6f0ed] hover:bg-[#2d3238] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.2)] transition-all flex items-center justify-center">
+                  <button className="bg-[#23272b] border border-[#30363d] text-[#8baaa6] hover:text-[#e6f0ed] hover:bg-[#2d3238] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.2)] transition-all flex items-center justify-center min-h-[44px]">
                      VEJA OS PLANOS
                   </button>
                </div>
@@ -213,7 +213,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090b10]/80 backdrop-blur-md p-4">
             <MotionWrapper className="w-full max-w-md bg-[#23272b] rounded-[2rem] p-8 border border-[#30363d] shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden">
                
-               <button type="button" onClick={() => setShowModal(false)} className="absolute z-50 top-6 right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)]">
+               <button type="button" onClick={() => setShowModal(false)} className="absolute z-50 top-4 right-4 md:top-6 md:right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)] min-h-[44px] min-w-[44px] flex items-center justify-center">
                   <X size={16}/>
                </button>
 
@@ -267,7 +267,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
                        <input type={mostrarSenha ? "text" : "password"} value={senhaLogin} onChange={(e) => setSenhaLogin(e.target.value)}
                          className="w-full bg-[#1e2226] text-[#e6f0ed] px-4 py-3 rounded-xl border border-[#30363d] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.3)] focus:outline-none focus:border-[#95bfa6]"
                          placeholder="••••••••" />
-                       <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8baaa6] hover:text-[#e6f0ed] transition-colors">
+                       <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8baaa6] hover:text-[#e6f0ed] transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
                          {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                        </button>
                      </div>
