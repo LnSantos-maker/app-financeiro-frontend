@@ -21,6 +21,7 @@ export const useFinanceStore = create((set, get) => ({
   balancoReal: { receitas: 0, despesas: 0, guardado: 0, balanco: 0 },
   evolucaoReal: [],
   cartoesReais: [],
+  beneficiosReais: [],
   agendamentosReais: [],
   planilhaReal: [],
   orcamentosReais: [],
@@ -55,8 +56,7 @@ export const useFinanceStore = create((set, get) => ({
     const mesParametroAPI = telaAtiva === 'extrato' ? "todos" : mesFormatado;
 
     try {
-      // Faz fetch em paralelo para otimizar velocidade
-      const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha, dOrcamentos] = await Promise.all([
+      const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha, dOrcamentos, dBeneficios] = await Promise.all([
         fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
@@ -68,7 +68,8 @@ export const useFinanceStore = create((set, get) => ({
         fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
         fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({}))
+        fetch(`https://app-financeiro-10tz.onrender.com/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`https://app-financeiro-10tz.onrender.com/listar_beneficios/${idContaReal}`).then(r => r.json()).catch(() => ({}))
       ]);
 
       set({
@@ -81,6 +82,7 @@ export const useFinanceStore = create((set, get) => ({
         evolucaoReal: dEvo.evolucao || [],
         inteligenciaReal: dIntel || get().inteligenciaReal,
         cartoesReais: dCartoes.cartoes || [],
+        beneficiosReais: dBeneficios.beneficios || [],
         agendamentosReais: dAgenda.agendamentos || [],
         planilhaReal: dPlanilha.planilha || [],
         orcamentosReais: dOrcamentos.orcamentos || []
