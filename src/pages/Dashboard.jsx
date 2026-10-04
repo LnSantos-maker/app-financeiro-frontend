@@ -101,6 +101,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [valorCompraCartao, setValorCompraCartao] = useState('');
   const [parcelasCompraCartao, setParcelasCompraCartao] = useState('1');
 
+  const [modalEditCompraCartaoAberto, setModalEditCompraCartaoAberto] = useState(false);
+  const [compraCartaoEditId, setCompraCartaoEditId] = useState('');
+  const [compraCartaoEditDescricao, setCompraCartaoEditDescricao] = useState('');
+  const [compraCartaoEditValor, setCompraCartaoEditValor] = useState('');
+
   const [tituloPlanilha, setTituloPlanilha] = useState('');
   const [valorPlanilha, setValorPlanilha] = useState('');
   const [dataPlanilha, setDataPlanilha] = useState('');
@@ -398,6 +403,37 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
+  const abrirModalEditCompraCartao = (compra) => {
+    setCompraCartaoEditId(compra.id);
+    setCompraCartaoEditDescricao(compra.descricao);
+    setCompraCartaoEditValor(compra.valor.toString());
+    setModalEditCompraCartaoAberto(true);
+  };
+
+  const handleSalvarEditCompraCartao = async () => {
+    if (!compraCartaoEditDescricao || !compraCartaoEditValor) return mostrarNotificacao("Preencha todos os dados.", "erro");
+    try {
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/transacoes/${idContaReal}/${compraCartaoEditId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ descricao: compraCartaoEditDescricao, valor: parseFloat(compraCartaoEditValor.replace(',', '.')) })
+      });
+      if (resposta.ok) { setModalEditCompraCartaoAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra atualizada!"); }
+    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+  };
+
+  const handleExcluirCompraCartao = (idCompra) => {
+    setDialogoConfirmacao({
+      aberto: true, titulo: 'Excluir Compra do Cartão', mensagem: 'Deseja excluir esta compra? O limite ocupado será liberado.', textoAcao: 'Sim, Excluir', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      onConfirm: async () => {
+        setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
+        try {
+          const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/cartoes/transacoes/${idContaReal}/${idCompra}`, { method: 'DELETE' });
+          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra excluída e limite restaurado!"); }
+        } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      }
+    });
+  };
+
   const handleSalvarPlanilha = async () => {
     if (!tituloPlanilha || !valorPlanilha || !dataPlanilha) return mostrarNotificacao("Preencha todos os campos.", "erro");
     try {
@@ -627,7 +663,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         )}
         
         {telaAtiva === 'cartoes' && (
-          <CartoesView
+            <CartoesView
             cartoesReais={cartoesReais}
             setModalCartaoAberto={(val) => {
               if (val) { setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); }
@@ -639,6 +675,8 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             cartaoExpandidoExtrato={cartaoExpandidoExtrato}
             abrirModalEdicaoCartao={abrirModalEdicaoCartao}
             handleExcluirCartao={handleExcluirCartao}
+            abrirModalEditCompraCartao={abrirModalEditCompraCartao}
+            handleExcluirCompraCartao={handleExcluirCompraCartao}
           />
         )}
           </motion.div>
@@ -913,6 +951,19 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                 </div>
               </div>
               <button onClick={handleLancarCompraCartao} className="w-full  bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-[12px] mt-4 transition-colors">Confirmar Compra</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalEditCompraCartaoAberto && (
+        <div className="fixed inset-0 bg-[var(--accent)]/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-[12px] w-full max-w-md p-6 shadow-2xl shadow-black/50 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2"><Pencil size={24} className="text-[var(--text-main)]"/> Editar Compra</h2><button onClick={() => setModalEditCompraCartaoAberto(false)} className="text-[var(--text-sec)] hover:text-[var(--text-main)]"><X size={24} /></button></div>
+            <div className="flex flex-col gap-4">
+              <div><label className="text-[var(--text-sec)] text-sm mb-1 block">O que comprou?</label><input type="text" value={compraCartaoEditDescricao} onChange={(e) => setCompraCartaoEditDescricao(e.target.value)} placeholder="Ex: Restaurante" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
+              <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor Total (R$)</label><input type="number" value={compraCartaoEditValor} onChange={(e) => setCompraCartaoEditValor(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
+              <button onClick={handleSalvarEditCompraCartao} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-[12px] mt-4 transition-colors">Salvar Alterações</button>
             </div>
           </div>
         </div>

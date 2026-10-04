@@ -126,7 +126,9 @@ export default function CartoesView({
   toggleExtratoCartao,
   cartaoExpandidoExtrato,
   abrirModalEdicaoCartao,
-  handleExcluirCartao
+  handleExcluirCartao,
+  abrirModalEditCompraCartao,
+  handleExcluirCompraCartao
 }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pb-24">
@@ -196,16 +198,29 @@ export default function CartoesView({
                     >
                       <div className="pt-4 flex flex-col gap-3">
                         {(cartao.extrato || []).map(compra => (
-                          <div key={compra.id} className="flex justify-between items-center text-sm bg-[#0a0c10] p-4 rounded-2xl border border-white/5">
-                            <span className="text-slate-300">
-                              {compra.descricao}
-                              {compra.parcelas && compra.parcelas > 1 ? (
-                                <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">Em {compra.parcelas}x</span>
-                              ) : (
-                                <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">À vista</span>
-                              )}
-                            </span>
-                            <span className="text-white font-medium">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          <div key={compra.id} className="flex justify-between items-center text-sm bg-[#0a0c10] p-4 rounded-2xl border border-white/5 group/item">
+                            <div className="flex flex-col">
+                              <span className="text-slate-300">
+                                {compra.descricao}
+                                {compra.parcelas && compra.parcelas > 1 ? (
+                                  <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">Em {compra.parcelas}x (Pg: {compra.parcelas_pagas || 1})</span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">À vista</span>
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                <span className="text-white font-medium block">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                {compra.parcelas && compra.parcelas > 1 && (
+                                  <span className="text-[10px] text-slate-500 block">R$ {(compra.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês</span>
+                                )}
+                              </div>
+                              <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity">
+                                <button onClick={() => abrirModalEditCompraCartao(compra)} className="text-slate-500 hover:text-white" title="Editar Compra"><Pencil size={14} /></button>
+                                <button onClick={() => handleExcluirCompraCartao(compra.id)} className="text-slate-500 hover:text-rose-400" title="Excluir Compra"><Trash2 size={14} /></button>
+                              </div>
+                            </div>
                           </div>
                         ))}
                         {(cartao.extrato || []).length === 0 && <div className="text-center py-6 text-sm text-slate-500 bg-[#0a0c10] rounded-2xl border border-white/5">Nenhuma compra nesta fatura.</div>}
