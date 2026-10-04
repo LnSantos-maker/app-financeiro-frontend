@@ -99,6 +99,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [cartaoSelecionadoId, setCartaoSelecionadoId] = useState('');
   const [descricaoCompraCartao, setDescricaoCompraCartao] = useState('');
   const [valorCompraCartao, setValorCompraCartao] = useState('');
+  const [parcelasCompraCartao, setParcelasCompraCartao] = useState('1');
 
   const [tituloPlanilha, setTituloPlanilha] = useState('');
   const [valorPlanilha, setValorPlanilha] = useState('');
@@ -387,13 +388,13 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     });
   };
 
-  const abrirModalCompraCartao = (idCartao) => { setCartaoSelecionadoId(idCartao); setModalCompraCartaoAberto(true); };
+  const abrirModalCompraCartao = (idCartao) => { setCartaoSelecionadoId(idCartao); setParcelasCompraCartao('1'); setModalCompraCartaoAberto(true); };
   
   const handleLancarCompraCartao = async () => {
     if (!descricaoCompraCartao || !valorCompraCartao) return mostrarNotificacao("Preencha a descrição e o valor.", "erro");
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')) }) });
-      if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); } 
+      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/cartoes/comprar/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')), parcelas: parseInt(parcelasCompraCartao) || 1 }) });
+      if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); setParcelasCompraCartao('1'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); } 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
@@ -899,7 +900,18 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2"><CreditCard size={24} className="text-[var(--text-main)]"/> Lançar Compra</h2><button onClick={() => setModalCompraCartaoAberto(false)} className="text-[var(--text-sec)] hover:text-[var(--text-main)]"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
               <div><label className="text-[var(--text-sec)] text-sm mb-1 block">O que comprou?</label><input type="text" value={descricaoCompraCartao} onChange={(e) => setDescricaoCompraCartao(e.target.value)} placeholder="Ex: Restaurante, Celular novo" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
-              <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorCompraCartao} onChange={(e) => setValorCompraCartao(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor Total (R$)</label><input type="number" value={valorCompraCartao} onChange={(e) => setValorCompraCartao(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
+                <div>
+                  <label className="text-[var(--text-sec)] text-sm mb-1 block">Parcelas</label>
+                  <select value={parcelasCompraCartao} onChange={(e) => setParcelasCompraCartao(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-[12px] px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500">
+                    <option value="1">À vista</option>
+                    {[2,3,4,5,6,7,8,9,10,11,12].map(num => (
+                      <option key={num} value={num}>{num}x s/ juros</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <button onClick={handleLancarCompraCartao} className="w-full  bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold font-bold py-3.5 rounded-[12px] mt-4 transition-colors">Confirmar Compra</button>
             </div>
           </div>

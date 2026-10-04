@@ -197,7 +197,14 @@ export default function CartoesView({
                       <div className="pt-4 flex flex-col gap-3">
                         {(cartao.extrato || []).map(compra => (
                           <div key={compra.id} className="flex justify-between items-center text-sm bg-[#0a0c10] p-4 rounded-2xl border border-white/5">
-                            <span className="text-slate-300">{compra.descricao}</span>
+                            <span className="text-slate-300">
+                              {compra.descricao}
+                              {compra.parcelas && compra.parcelas > 1 ? (
+                                <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">Em {compra.parcelas}x</span>
+                              ) : (
+                                <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">À vista</span>
+                              )}
+                            </span>
                             <span className="text-white font-medium">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
                         ))}
