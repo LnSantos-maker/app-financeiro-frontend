@@ -119,14 +119,14 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#1b3b40] opacity-50 blur-[150px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
       
       {/* Navbar */}
-      <header className="flex justify-between items-center px-4 sm:px-8 lg:px-16 py-5 sm:py-6 relative z-20">
+      <header className="flex justify-between items-center px-4 sm:px-8 lg:px-16 py-4 sm:py-6 relative z-20">
          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-10 h-10 bg-[#23272b] rounded-xl flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_8px_rgba(0,0,0,0.4)] border border-[#30363d] overflow-hidden">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#23272b] rounded-xl flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_8px_rgba(0,0,0,0.4)] border border-[#30363d] overflow-hidden shrink-0">
                <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
             </div>
-            <span className="text-xl font-bold tracking-[0.2em] text-[#e6f0ed]">NEXUS</span>
+            <span className="text-lg sm:text-xl font-bold tracking-[0.2em] text-[#e6f0ed]">NEXUS</span>
          </div>
-         <nav className="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold text-[#8baaa6]">
+         <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs sm:text-sm font-semibold text-[#8baaa6]">
             <button type="button" onClick={() => setShowModalRecursos(true)} className="hover:text-[#e6f0ed] transition-colors py-1 cursor-pointer">
               Recursos
             </button>
@@ -135,64 +135,95 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
             </button>
          </nav>
          <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={() => openAuthModal(true)} className="text-xs sm:text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors min-h-[40px] px-2 sm:px-3">Login</button>
-            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-xs sm:text-sm min-h-[40px]">
+            <button onClick={() => openAuthModal(true)} className="text-xs sm:text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors min-h-[40px] px-2.5 sm:px-3">Login</button>
+            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-xs sm:text-sm min-h-[40px] whitespace-nowrap">
                Cadastrar-se
             </button>
          </div>
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col justify-center pt-8 sm:pt-10 pb-16 sm:pb-20 px-4 sm:px-8 lg:px-16 relative z-10 w-full max-w-[1400px] mx-auto">
-         <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-12 lg:gap-16">
+      <main className="flex-1 flex flex-col justify-center pt-4 sm:pt-10 pb-16 sm:pb-20 px-4 sm:px-8 lg:px-16 relative z-10 w-full max-w-[1400px] mx-auto">
+         <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-8 lg:gap-14">
             
             {/* Left Content */}
-            <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left z-10 w-full">
-               <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] text-[#e6f0ed] mb-6 tracking-tight">
+            <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left z-10 w-full">
+               <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-[1.12] text-[#e6f0ed] mb-4 sm:mb-6 tracking-tight">
                   UNA SUAS FINANÇAS.<br />CONSTRUA SEU FUTURO.
                </h1>
-               <p className="text-sm sm:text-lg text-[#8baaa6] mb-8 sm:mb-10 max-w-lg leading-relaxed font-light">
+               <p className="text-xs sm:text-base lg:text-lg text-[#8baaa6] mb-6 sm:mb-8 max-w-lg leading-relaxed font-light">
                   Nexus: A Plataforma de Planejamento Financeiro Inteligente que Centraliza Contas, Otimiza Orçamentos e Traça Caminhos para suas Metas.
                </p>
                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <button onClick={() => openAuthModal(false)} className="bg-gradient-to-r from-[#14535c] to-[#1b3b40] border border-[#2a5056] text-[#e6f0ed] hover:from-[#1a6b77] hover:to-[#244b52] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_15px_rgba(0,0,0,0.4),inset_1px_1px_2px_rgba(255,255,255,0.1)] transition-all flex items-center justify-center gap-2 min-h-[44px]">
+                  <button onClick={() => openAuthModal(false)} className="bg-gradient-to-r from-[#14535c] to-[#1b3b40] border border-[#2a5056] text-[#e6f0ed] hover:from-[#1a6b77] hover:to-[#244b52] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_15px_rgba(0,0,0,0.4),inset_1px_1px_2px_rgba(255,255,255,0.1)] transition-all flex items-center justify-center gap-2 min-h-[48px] w-full sm:w-auto text-sm sm:text-base">
                      COMEÇAR AGORA <ArrowRight size={18} />
                   </button>
                </div>
             </div>
 
-            {/* Right Mockup */}
-            <div className="flex-1 relative w-full max-w-[600px] hidden md:block perspective-[1000px]">
-               {/* Mockup Window Neumorphic */}
-               <div className="relative z-10 bg-[#2a2e33] border border-[#353a40] rounded-[2rem] p-4 shadow-[15px_20px_40px_rgba(0,0,0,0.5),-5px_-5px_15px_rgba(255,255,255,0.02)] transform rotate-2 hover:rotate-0 transition-transform duration-700 ease-out">
-                  {/* Browser Header */}
-                  <div className="flex gap-2 mb-4 px-2">
-                     <div className="w-3 h-3 rounded-full bg-[#e69894]"></div>
-                     <div className="w-3 h-3 rounded-full bg-[#d4af37]"></div>
-                     <div className="w-3 h-3 rounded-full bg-[#95bfa6]"></div>
-                  </div>
-                  {/* Dashboard Graphic Representation */}
-                  <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] rounded-2xl p-6 border border-[#2a5056] shadow-[inset_4px_4px_10px_rgba(0,0,0,0.3)]">
-                     <div className="flex justify-between items-center mb-6">
-                        <div className="h-4 w-32 bg-[#2a5056] rounded-full"></div>
-                        <div className="h-4 w-20 bg-[#2a5056] rounded-full"></div>
+            {/* Mockup Card (Visível e Otimizado no Mobile e no PC) */}
+            <div className="w-full lg:flex-1 max-w-[440px] sm:max-w-[480px] lg:max-w-[560px] relative mx-auto lg:mx-0 mt-4 lg:mt-0 perspective-[1000px]">
+               {/* Sombra de brilho suave atrás da moldura */}
+               <div className="absolute inset-0 bg-[#1b3b40]/25 blur-3xl rounded-[2.5rem] -z-10 pointer-events-none"></div>
+
+               {/* Mockup Window Neumorphic & Impeccable */}
+               <div className="relative z-10 bg-[#161c20] border border-[#243339] rounded-[24px] sm:rounded-[28px] p-4 sm:p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_1px_1px_2px_rgba(255,255,255,0.05)] transform lg:rotate-2 lg:hover:rotate-0 transition-transform duration-700 ease-out">
+                  {/* Window Header com os 3 botões coloridos Mac Style */}
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#212d32]">
+                     <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+                        <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+                        <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
                      </div>
-                     {/* Chart Area */}
-                     <div className="h-40 bg-[#14535c]/30 rounded-xl mb-6 relative overflow-hidden border border-[#2a5056]/50">
-                        {/* Fake Line Chart */}
-                        <svg className="absolute bottom-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-                           <path d="M0,80 Q25,20 50,60 T100,10" fill="none" stroke="#95bfa6" strokeWidth="2" />
-                           <path d="M0,80 Q25,20 50,60 T100,10 L100,100 L0,100 Z" fill="#95bfa6" fillOpacity="0.1" />
+                     <div className="flex items-center gap-2">
+                        <div className="h-3 w-16 bg-[#1f3137] rounded-full"></div>
+                        <div className="h-3 w-8 bg-[#1a292e] rounded-full"></div>
+                     </div>
+                  </div>
+
+                  {/* Quadro Central do Gráfico (Onda Suave Idêntica ao Mockup) */}
+                  <div className="bg-gradient-to-b from-[#102428] to-[#0c1c1f] rounded-2xl p-4 sm:p-5 border border-[#1b3c43] shadow-inner mb-3 sm:mb-4 relative overflow-hidden">
+                     <div className="flex justify-between items-center mb-3 sm:mb-4 relative z-10">
+                        <div className="h-3.5 w-24 sm:w-28 bg-[#1e3940] rounded-full"></div>
+                        <div className="h-3.5 w-14 sm:w-16 bg-[#172e33] rounded-full"></div>
+                     </div>
+
+                     {/* Wave Chart Area */}
+                     <div className="h-32 sm:h-40 relative w-full overflow-hidden flex items-end">
+                        <svg className="w-full h-full" viewBox="0 0 400 160" fill="none" preserveAspectRatio="none">
+                           <defs>
+                              <linearGradient id="landingWaveGradient" x1="0" y1="0" x2="0" y2="1">
+                                 <stop offset="0%" stopColor="#95bfa6" stopOpacity="0.45" />
+                                 <stop offset="60%" stopColor="#5cb0b8" stopOpacity="0.12" />
+                                 <stop offset="100%" stopColor="#0c1c1f" stopOpacity="0.0" />
+                              </linearGradient>
+                           </defs>
+                           {/* Gradiente sob a onda */}
+                           <path d="M 0,110 C 60,60 140,40 200,90 C 260,140 320,130 400,30 L 400,160 L 0,160 Z" fill="url(#landingWaveGradient)" />
+                           {/* Linha fluida da onda em verde menta */}
+                           <path d="M 0,110 C 60,60 140,40 200,90 C 260,140 320,130 400,30" stroke="#95bfa6" strokeWidth="4" strokeLinecap="round" />
                         </svg>
                      </div>
-                     <div className="flex gap-4">
-                        <div className="w-1/2 h-20 bg-[#244b52] rounded-xl border border-[#316168] p-3 flex flex-col justify-between">
-                           <div className="w-6 h-6 rounded-md bg-[#95bfa6]/20"></div>
-                           <div className="h-2 w-16 bg-[#316168] rounded-full"></div>
+                  </div>
+
+                  {/* Dois cards inferiores simétricos (Lado a Lado) */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                     <div className="bg-[#102428]/90 rounded-xl border border-[#1b3c43] p-3 flex flex-col justify-between h-20 sm:h-22 shadow-sm">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#18363d] border border-[#244f57] flex items-center justify-center text-[#95bfa6]">
+                           <Wallet size={16} />
                         </div>
-                        <div className="w-1/2 h-20 bg-[#244b52] rounded-xl border border-[#316168] p-3 flex flex-col justify-between">
-                           <div className="w-6 h-6 rounded-md bg-[#d4af37]/20"></div>
-                           <div className="h-2 w-12 bg-[#316168] rounded-full"></div>
+                        <div className="space-y-1.5">
+                           <div className="h-1.5 w-12 bg-[#20434b] rounded-full"></div>
+                           <div className="h-2 w-16 bg-[#e6f0ed]/80 rounded-full"></div>
+                        </div>
+                     </div>
+                     <div className="bg-[#102428]/90 rounded-xl border border-[#1b3c43] p-3 flex flex-col justify-between h-20 sm:h-22 shadow-sm">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#1e3831] border border-[#294e43] flex items-center justify-center text-[#95bfa6]">
+                           <TrendingUp size={16} />
+                        </div>
+                        <div className="space-y-1.5">
+                           <div className="h-1.5 w-12 bg-[#20434b] rounded-full"></div>
+                           <div className="h-2 w-16 bg-[#e0e8cd]/80 rounded-full"></div>
                         </div>
                      </div>
                   </div>
@@ -200,19 +231,19 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
             </div>
          </div>
 
-         {/* Features 4 Cards Bottom */}
-         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-24">
+         {/* Features Symmetrical 2x2 Grid on Mobile, 4 cols on Desktop */}
+         <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-12 sm:mt-20">
             {[
-               { title: "Agregação Segura", icon: <Lock className="text-[#95bfa6]" size={28}/> },
-               { title: "Orçamento com IA", icon: <BrainCircuit className="text-[#d4af37]" size={28}/> },
-               { title: "Gestão de Portfólio", icon: <TrendingUp className="text-[#a4c5c1]" size={28}/> },
-               { title: "Planejamento de Metas", icon: <Target className="text-[#e69894]" size={28}/> }
+               { title: "Agregação Segura", icon: <Lock className="text-[#95bfa6]" size={24}/> },
+               { title: "Orçamento com IA", icon: <BrainCircuit className="text-[#d4af37]" size={24}/> },
+               { title: "Gestão de Portfólio", icon: <TrendingUp className="text-[#a4c5c1]" size={24}/> },
+               { title: "Planejamento de Metas", icon: <Target className="text-[#e69894]" size={24}/> }
             ].map((f, i) => (
-               <div key={i} className="bg-[#2a2e33] rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-[#353a40] shadow-[6px_6px_15px_rgba(0,0,0,0.3),-4px_-4px_10px_rgba(255,255,255,0.02)] hover:-translate-y-2 transition-transform duration-300 cursor-pointer group">
-                  <div className="w-16 h-16 bg-[#23272b] rounded-2xl flex items-center justify-center mb-6 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.05),4px_4px_10px_rgba(0,0,0,0.4)] border border-[#30363d] group-hover:scale-110 transition-transform">
+               <div key={i} className="bg-[#24292e] rounded-2xl sm:rounded-3xl p-4 sm:p-7 flex flex-col items-center justify-center text-center border border-[#30363d] shadow-[4px_4px_12px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 transition-transform duration-300 cursor-pointer group">
+                  <div className="w-11 h-11 sm:w-14 sm:h-14 bg-[#1b2024] rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 shadow-[inset_1px_1px_3px_rgba(255,255,255,0.05),2px_2px_6px_rgba(0,0,0,0.3)] border border-[#2b3137] group-hover:scale-110 transition-transform">
                      {f.icon}
                   </div>
-                  <h3 className="font-bold text-[#e2e8f0] tracking-wide">{f.title}</h3>
+                  <h3 className="font-bold text-[#e2e8f0] text-xs sm:text-sm tracking-wide">{f.title}</h3>
                </div>
             ))}
          </div>
