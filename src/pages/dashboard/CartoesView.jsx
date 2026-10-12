@@ -154,38 +154,46 @@ export default function CartoesView({
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {(cartoesReais || []).map(cartao => (
-            <div key={cartao.id} className="bg-[var(--bg-card)] border border-white/5 rounded-3xl p-8 shadow-premium backdrop-blur-md relative overflow-hidden group">
-              <div className="absolute -top-40 -right-40 w-80 h-80 bg-[var(--accent)] opacity-[0.02] rounded-full blur-3xl pointer-events-none transition-opacity group-hover:opacity-[0.05]"></div>
+            <div key={cartao.id} className="bg-[#141a1e] border border-[#233137] rounded-3xl p-5 sm:p-7 shadow-[0_16px_36px_rgba(0,0,0,0.5),inset_1px_1px_2px_rgba(255,255,255,0.05)] relative overflow-hidden group">
               
-              <div className="flex justify-between items-center relative z-10">
-                <div className="text-slate-400 text-xs font-semibold tracking-widest uppercase flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                  Cartão Físico
+              {/* Header da Janela estilo Mac */}
+              <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[#222f36] relative z-10">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+                  <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+                  <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+                  <span className="text-xs font-bold text-[#e6f0ed] ml-2 tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+                    <CreditCard size={14} className="text-[#a4c5c1]" /> NEXUS CARD • {cartao.instituicao !== 'Outros' ? cartao.instituicao : cartao.nome}
+                  </span>
                 </div>
-                <div className="flex gap-2">
-                   <button onClick={() => abrirModalEdicaoCartao(cartao)} className="text-slate-500 hover:text-white bg-[#0a0c10] p-2 rounded-xl transition-colors border border-white/5 shadow-inner" title="Editar"><Pencil size={16} /></button>
-                   <button onClick={() => handleExcluirCartao(cartao.id)} className="text-slate-500 hover:text-rose-400 bg-[#0a0c10] p-2 rounded-xl transition-colors border border-white/5 shadow-inner" title="Excluir"><Trash2 size={16} /></button>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase font-bold text-[#95bfa6] bg-[#1a3338] px-2.5 py-0.5 rounded-full border border-[#274c53] flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#95bfa6] animate-pulse"></span> Ativo
+                  </span>
+                  <button onClick={() => abrirModalEdicaoCartao(cartao)} className="text-[#8baaa6] hover:text-[#e6f0ed] bg-[#102428] p-1.5 rounded-xl transition-colors border border-[#1b3d45]" title="Editar"><Pencil size={13} /></button>
+                  <button onClick={() => handleExcluirCartao(cartao.id)} className="text-[#8baaa6] hover:text-[#e69894] bg-[#102428] p-1.5 rounded-xl transition-colors border border-[#1b3d45]" title="Excluir"><Trash2 size={13} /></button>
                 </div>
               </div>
 
-              {/* O Cartão 3D Brabo */}
+              {/* O Cartão 3D */}
               <CreditCard3D cartao={cartao} />
 
               {/* Ações do Cartão */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10">
-                <button onClick={() => abrirModalCompraCartao(cartao.id)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2 min-h-[44px]">
-                  <CreditCard size={16} /> Lançar Despesa
+                <button onClick={() => abrirModalCompraCartao(cartao.id)} className="flex-1 bg-[#102428] hover:bg-[#18363d] text-[#e6f0ed] font-medium py-3 rounded-2xl transition-colors text-sm border border-[#1b3d45] flex justify-center items-center gap-2 min-h-[44px]">
+                  <CreditCard size={16} className="text-[#95bfa6]" /> Lançar Despesa
                 </button>
-                <button onClick={() => handlePagarFatura(cartao.id, cartao.fatura_atual)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2 min-h-[44px]">
-                  <Plus size={16} /> Pagar Fatura
+                <button onClick={() => handlePagarFatura(cartao.id, cartao.fatura_atual)} className="flex-1 bg-[#102428] hover:bg-[#18363d] text-[#e6f0ed] font-medium py-3 rounded-2xl transition-colors text-sm border border-[#1b3d45] flex justify-center items-center gap-2 min-h-[44px]">
+                  <Plus size={16} className="text-[#95bfa6]" /> Pagar Fatura
                 </button>
               </div>
 
               {/* Extrato embutido com Shared Layout / AnimatePresence */}
-              <div className="relative z-10 mt-6 pt-4 border-t border-white/5">
+              <div className="relative z-10 mt-6 pt-4 border-t border-[#222f36]">
                 <div onClick={() => toggleExtratoCartao(cartao.id)} className="flex justify-between items-center cursor-pointer group/extrato py-2">
-                  <span className="text-sm font-medium text-slate-500 group-hover/extrato:text-slate-300 transition-colors">Transações Recentes</span>
-                  <ChevronDown size={18} className={`text-slate-500 transition-transform duration-300 ${cartaoExpandidoExtrato === cartao.id ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-medium text-[#8baaa6] group-hover/extrato:text-[#e6f0ed] transition-colors">Transações Recentes da Fatura</span>
+                  <ChevronDown size={18} className={`text-[#8baaa6] transition-transform duration-300 ${cartaoExpandidoExtrato === cartao.id ? 'rotate-180' : ''}`} />
                 </div>
 
                 <AnimatePresence>
@@ -198,32 +206,32 @@ export default function CartoesView({
                     >
                       <div className="pt-4 flex flex-col gap-3">
                         {(cartao.extrato || []).map(compra => (
-                          <div key={compra.id} className="flex justify-between items-center text-sm bg-[#0a0c10] p-4 rounded-2xl border border-white/5 group/item">
+                          <div key={compra.id} className="flex justify-between items-center text-sm bg-[#102428]/90 p-4 rounded-2xl border border-[#1b3d45] group/item">
                             <div className="flex flex-col">
-                              <span className="text-slate-300">
+                              <span className="text-[#e6f0ed]">
                                 {compra.descricao}
                                 {compra.parcelas && compra.parcelas > 1 ? (
-                                  <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">Em {compra.parcelas}x (Pg: {compra.parcelas_pagas || 1})</span>
+                                  <span className="text-[10px] text-[#8baaa6] ml-2 bg-[#18363d] px-2 py-0.5 rounded border border-[#274c53]">Em {compra.parcelas}x (Pg: {compra.parcelas_pagas || 1})</span>
                                 ) : (
-                                  <span className="text-[10px] text-slate-500 ml-2 bg-slate-800 px-2 py-0.5 rounded">À vista</span>
+                                  <span className="text-[10px] text-[#8baaa6] ml-2 bg-[#18363d] px-2 py-0.5 rounded border border-[#274c53]">À vista</span>
                                 )}
                               </span>
                             </div>
                             <div className="flex items-center gap-4">
                               <div className="text-right">
-                                <span className="text-white font-medium block">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                <span className="text-[#e6f0ed] font-medium block">R$ {(compra.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                 {compra.parcelas && compra.parcelas > 1 && (
-                                  <span className="text-[10px] text-slate-500 block">R$ {(compra.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês</span>
+                                  <span className="text-[10px] text-[#8baaa6] block">R$ {(compra.valor_parcela || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês</span>
                                 )}
                               </div>
                               <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover/item:opacity-100 transition-opacity">
-                                <button onClick={() => abrirModalEditCompraCartao(compra)} className="text-slate-500 hover:text-white" title="Editar Compra"><Pencil size={14} /></button>
-                                <button onClick={() => handleExcluirCompraCartao(compra.id)} className="text-slate-500 hover:text-rose-400" title="Excluir Compra"><Trash2 size={14} /></button>
+                                <button onClick={() => abrirModalEditCompraCartao(compra)} className="text-[#8baaa6] hover:text-[#e6f0ed]" title="Editar Compra"><Pencil size={14} /></button>
+                                <button onClick={() => handleExcluirCompraCartao(compra.id)} className="text-[#8baaa6] hover:text-[#e69894]" title="Excluir Compra"><Trash2 size={14} /></button>
                               </div>
                             </div>
                           </div>
                         ))}
-                        {(cartao.extrato || []).length === 0 && <div className="text-center py-6 text-sm text-slate-500 bg-[#0a0c10] rounded-2xl border border-white/5">Nenhuma compra nesta fatura.</div>}
+                        {(cartao.extrato || []).length === 0 && <div className="text-center py-6 text-sm text-[#8baaa6] bg-[#102428]/90 rounded-2xl border border-[#1b3d45]">Nenhuma compra nesta fatura.</div>}
                       </div>
                     </motion.div>
                   )}

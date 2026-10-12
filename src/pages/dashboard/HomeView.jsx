@@ -132,87 +132,105 @@ export default function HomeView({
         </div>
       </div>
 
-      {/* Diagnóstico Financeiro (Neumorphic Panel) */}
-      <div className="bg-[#2a2e33] rounded-3xl p-6 border border-[#353a40] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),8px_8px_20px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center gap-3 mb-8">
-          <BrainCircuit size={32} className="text-[#8e98a3]" strokeWidth={1.5} />
-          <div>
-            <h2 className="text-lg font-bold text-[#e2e8f0]">Diagnóstico Financeiro (50/30/20)</h2>
-            <p className="text-[#8e98a3] text-sm">Com base nas receitas do mês selecionado: {receitas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+      {/* Diagnóstico Financeiro (Window / Terminal Style) */}
+      <div className="bg-[#141a1e] rounded-3xl p-4 sm:p-6 border border-[#233137] shadow-[0_16px_36px_rgba(0,0,0,0.5),inset_1px_1px_2px_rgba(255,255,255,0.05)]">
+        {/* Header da Janela estilo Mac */}
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#222f36]">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+            <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+            <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+            <span className="text-xs font-bold text-[#e6f0ed] ml-2 tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+              <BrainCircuit size={14} className="text-[#95bfa6]" /> NEXUS DIAGNÓSTICO • 50/30/20
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase font-bold text-[#95bfa6] bg-[#1a3338] px-2.5 py-0.5 rounded-full border border-[#274c53] flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#95bfa6] animate-pulse"></span> Análise Mensal
+            </span>
           </div>
         </div>
 
-        <div className="flex flex-col lg:row gap-6">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mb-6">
+          <p className="text-[#8baaa6] text-xs">
+            Com base nas receitas do mês: <span className="font-bold text-[#e6f0ed]">{receitas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             
             {/* Essenciais */}
-            <div onClick={() => toggleCategoria('essenciais')} className="bg-[#2a2e33] rounded-2xl p-5 border border-[#353a40] shadow-[6px_6px_12px_rgba(0,0,0,0.3),-4px_-4px_10px_rgba(255,255,255,0.03)] cursor-pointer hover:bg-[#2d3238] transition-colors relative overflow-hidden">
-               <div className="absolute right-2 top-10 opacity-10 pointer-events-none">
+            <div onClick={() => toggleCategoria('essenciais')} className="bg-[#102428]/90 rounded-2xl p-4 sm:p-5 border border-[#1b3d45] shadow-sm cursor-pointer hover:border-[#2b5863] transition-colors relative overflow-hidden">
+               <div className="absolute right-2 top-8 opacity-10 pointer-events-none">
                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                </div>
-               <div className="flex justify-between items-center mb-4 relative z-10">
-                <h4 className="font-bold text-[#e2e8f0] flex items-center gap-1 text-sm">Essenciais <ChevronDown size={14} className="text-slate-500" /></h4>
+               <div className="flex justify-between items-center mb-3 relative z-10">
+                <h4 className="font-bold text-[#e6f0ed] flex items-center gap-1 text-sm">Essenciais <ChevronDown size={14} className="text-[#8baaa6]" /></h4>
               </div>
-              <p className="text-2xl font-bold text-[#e2e8f0] mb-6 relative z-10">{(inteligenciaReal?.essenciais?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p className="text-xl sm:text-2xl font-bold text-[#e6f0ed] mb-4 relative z-10">{(inteligenciaReal?.essenciais?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-slate-400 font-bold">{inteligenciaReal?.essenciais?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6] font-bold">{inteligenciaReal?.essenciais?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6]">Meta: 50%</span>
               </div>
-              <div className="h-1.5 w-full bg-[#1e2226] rounded-full overflow-hidden shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)]">
-                <div className="h-full bg-slate-400 rounded-full" style={{ width: `${Math.min(inteligenciaReal?.essenciais?.porcentagem || 0, 100)}%` }}></div>
+              <div className="h-1.5 w-full bg-[#18363d] rounded-full overflow-hidden shadow-inner">
+                <div className="h-full bg-[#95bfa6] rounded-full" style={{ width: `${Math.min(inteligenciaReal?.essenciais?.porcentagem || 0, 100)}%` }}></div>
               </div>
             </div>
 
             {/* Estilo de Vida */}
-            <div onClick={() => toggleCategoria('estilo_vida')} className="bg-[#2a2e33] rounded-2xl p-5 border border-[#353a40] shadow-[6px_6px_12px_rgba(0,0,0,0.3),-4px_-4px_10px_rgba(255,255,255,0.03)] cursor-pointer hover:bg-[#2d3238] transition-colors relative overflow-hidden">
-               <div className="absolute right-4 top-10 opacity-10 pointer-events-none">
+            <div onClick={() => toggleCategoria('estilo_vida')} className="bg-[#102428]/90 rounded-2xl p-4 sm:p-5 border border-[#1b3d45] shadow-sm cursor-pointer hover:border-[#2b5863] transition-colors relative overflow-hidden">
+               <div className="absolute right-3 top-8 opacity-10 pointer-events-none">
                  <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a8.2 8.2 0 0 0 7.8-5.3c1.3-3.6-1.5-7.7-5.8-7.7H10C5.7 2 2.9 6.1 4.2 9.7A8.2 8.2 0 0 0 12 15Z"/><path d="M12 2v3"/></svg>
                </div>
-               <div className="flex justify-between items-center mb-4 relative z-10">
-                <h4 className="font-bold text-[#e2e8f0] flex items-center gap-1 text-sm">Estilo de Vida <ChevronDown size={14} className="text-slate-500" /></h4>
+               <div className="flex justify-between items-center mb-3 relative z-10">
+                <h4 className="font-bold text-[#e6f0ed] flex items-center gap-1 text-sm">Estilo de Vida <ChevronDown size={14} className="text-[#8baaa6]" /></h4>
               </div>
-              <p className="text-2xl font-bold text-[#e2e8f0] mb-6 relative z-10">{(inteligenciaReal?.estilo_vida?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p className="text-xl sm:text-2xl font-bold text-[#e6f0ed] mb-4 relative z-10">{(inteligenciaReal?.estilo_vida?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-slate-400 font-bold">{inteligenciaReal?.estilo_vida?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6] font-bold">{inteligenciaReal?.estilo_vida?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6]">Meta: 30%</span>
               </div>
-              <div className="h-1.5 w-full bg-[#1e2226] rounded-full overflow-hidden shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)]">
-                <div className="h-full bg-slate-400 rounded-full" style={{ width: `${Math.min(inteligenciaReal?.estilo_vida?.porcentagem || 0, 100)}%` }}></div>
+              <div className="h-1.5 w-full bg-[#18363d] rounded-full overflow-hidden shadow-inner">
+                <div className="h-full bg-[#5cb0b8] rounded-full" style={{ width: `${Math.min(inteligenciaReal?.estilo_vida?.porcentagem || 0, 100)}%` }}></div>
               </div>
             </div>
 
             {/* Investimento */}
-            <div onClick={() => toggleCategoria('futuro')} className="bg-[#2a2e33] rounded-2xl p-5 border border-[#353a40] shadow-[6px_6px_12px_rgba(0,0,0,0.3),-4px_-4px_10px_rgba(255,255,255,0.03)] cursor-pointer hover:bg-[#2d3238] transition-colors relative overflow-hidden">
-               <div className="absolute right-4 top-10 opacity-10 pointer-events-none">
+            <div onClick={() => toggleCategoria('futuro')} className="bg-[#102428]/90 rounded-2xl p-4 sm:p-5 border border-[#1b3d45] shadow-sm cursor-pointer hover:border-[#2b5863] transition-colors relative overflow-hidden">
+               <div className="absolute right-3 top-8 opacity-10 pointer-events-none">
                  <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c4.97 0 9-4.03 9-9 0-4.97-4.03-9-9-9s-9 4.03-9 9c0 4.97 4.03 9 9 9Z"/><path d="M12 18v-8"/><path d="M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M16 13h-8"/></svg>
                </div>
-               <div className="flex justify-between items-center mb-4 relative z-10">
-                <h4 className="font-bold text-[#e2e8f0] flex items-center gap-1 text-sm">Investimento <ChevronDown size={14} className="text-slate-500" /></h4>
+               <div className="flex justify-between items-center mb-3 relative z-10">
+                <h4 className="font-bold text-[#e6f0ed] flex items-center gap-1 text-sm">Investimento <ChevronDown size={14} className="text-[#8baaa6]" /></h4>
               </div>
-              <p className="text-2xl font-bold text-[#e2e8f0] mb-6 relative z-10">{(inteligenciaReal?.futuro?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p className="text-xl sm:text-2xl font-bold text-[#e6f0ed] mb-4 relative z-10">{(inteligenciaReal?.futuro?.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-slate-400 font-bold">{inteligenciaReal?.futuro?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6] font-bold">{inteligenciaReal?.futuro?.porcentagem || 0}%</span>
+                <span className="text-[10px] text-[#8baaa6]">Meta: 20%</span>
               </div>
-              <div className="h-1.5 w-full bg-[#1e2226] rounded-full overflow-hidden shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)]">
-                <div className="h-full bg-slate-400 rounded-full" style={{ width: `${Math.min(inteligenciaReal?.futuro?.porcentagem || 0, 100)}%` }}></div>
+              <div className="h-1.5 w-full bg-[#18363d] rounded-full overflow-hidden shadow-inner">
+                <div className="h-full bg-[#e0e8cd] rounded-full" style={{ width: `${Math.min(inteligenciaReal?.futuro?.porcentagem || 0, 100)}%` }}></div>
               </div>
             </div>
 
           </div>
 
           {/* Assistente IA NEXUS */}
-          <div className="w-full lg:w-[280px] bg-[#24282c] border border-[#30363d] rounded-2xl p-6 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),4px_4px_10px_rgba(0,0,0,0.2)] flex flex-col justify-center relative mt-10 lg:mt-6">
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#343a40] p-1 rounded-full shadow-[0_4px_15px_rgba(149,191,166,0.3)]">
-               <div className="w-12 h-12 bg-[#1b3b40] rounded-full overflow-hidden border-2 border-[#2a5056] flex items-center justify-center">
+          <div className="w-full lg:w-[280px] bg-[#102428]/90 border border-[#1b3d45] rounded-2xl p-5 shadow-sm flex flex-col justify-center relative mt-6 lg:mt-0">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#141a1e] p-1 rounded-full border border-[#233137]">
+               <div className="w-10 h-10 bg-[#1b3b40] rounded-full overflow-hidden border border-[#2a5056] flex items-center justify-center">
                  <img src="/img/nexus_ai.jpg" alt="NEXUS AI" className="w-full h-full object-cover" />
                </div>
             </div>
-            <h4 className="font-bold text-[#e6f0ed] flex items-center gap-2 text-sm mb-2 mt-4">
+            <h4 className="font-bold text-[#e6f0ed] flex items-center justify-center gap-2 text-sm mb-2 mt-4">
                NEXUS AI
                <span className="relative flex h-2 w-2">
                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#95bfa6] opacity-75"></span>
                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#95bfa6]"></span>
                </span>
             </h4>
-            <p className="text-xs text-[#8baaa6] leading-relaxed italic">
+            <p className="text-xs text-[#8baaa6] leading-relaxed italic text-center">
               {inteligenciaReal?.essenciais?.valor === 0 ? "Seus gastos essenciais estão zerados? Comece definindo um orçamento realista!" : "Mantenha o foco nos seus objetivos para este mês. Você está no caminho certo!"}
             </p>
           </div>
@@ -315,10 +333,27 @@ export default function HomeView({
           </div>
         </div>
         
-        <div className="bg-[#2a2e33] rounded-3xl p-6 border border-[#353a40] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),8px_8px_20px_rgba(0,0,0,0.4)]">
-          <h2 className="text-lg font-bold text-[#e2e8f0] mb-6 flex items-center gap-2"><Target size={18} className="text-[#a4c5c1]" /> Distribuição</h2>
+        {/* Distribuição (Window / Terminal Style) */}
+        <div className="bg-[#141a1e] rounded-3xl p-4 sm:p-6 border border-[#233137] shadow-[0_16px_36px_rgba(0,0,0,0.5),inset_1px_1px_2px_rgba(255,255,255,0.05)] flex flex-col justify-between">
+          {/* Header da Janela estilo Mac */}
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#222f36]">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+              <span className="text-xs font-bold text-[#e6f0ed] ml-2 tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+                <Target size={14} className="text-[#a4c5c1]" /> NEXUS DISTRIBUIÇÃO
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold text-[#a4c5c1] bg-[#1a3338] px-2.5 py-0.5 rounded-full border border-[#274c53] flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#a4c5c1] animate-pulse"></span> Categorias
+              </span>
+            </div>
+          </div>
+
           {(categoriasReais || []).length === 0 ? (
-            <div className="flex h-48 items-center justify-center text-[#8e98a3] text-sm">Nenhuma despesa no período.</div>
+            <div className="flex h-48 items-center justify-center text-[#8baaa6] text-sm">Nenhuma despesa no período.</div>
           ) : (
             <div className="flex flex-col sm:flex-row items-center justify-between min-h-[192px]">
               <div className="w-full sm:w-1/2 h-48">
@@ -330,14 +365,14 @@ export default function HomeView({
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="w-full sm:w-1/2 flex flex-col gap-3 sm:pl-4 overflow-y-auto max-h-48 mt-4 sm:mt-0">
+              <div className="w-full sm:w-1/2 flex flex-col gap-2.5 sm:pl-4 overflow-y-auto max-h-48 mt-4 sm:mt-0">
                 {(categoriasReais || []).map((item, index) => (
-                  <div key={index} className="flex flex-col text-xs bg-[#24282c] p-2 rounded-xl border border-[#30363d]">
+                  <div key={index} className="flex flex-col text-xs bg-[#102428]/90 p-2.5 rounded-xl border border-[#1b3d45] hover:border-[#2b5863] transition-colors shadow-sm">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-2.5 h-2.5 rounded-2xl" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-[#8e98a3] truncate font-semibold flex-1">{item.name}</span>
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></div>
+                      <span className="text-[#8baaa6] truncate font-semibold flex-1">{item.name}</span>
                     </div>
-                    <span className="font-bold text-[#e2e8f0]">R$ {item.value}</span>
+                    <span className="font-bold text-[#e6f0ed]">R$ {Number(item.value).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -347,32 +382,42 @@ export default function HomeView({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Agenda */}
-        <div className="bg-[#2a2e33] rounded-3xl p-6 border border-[#353a40] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),8px_8px_20px_rgba(0,0,0,0.4)]">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-[#e2e8f0] flex items-center gap-2"><CalendarClock className="text-[#a4c5c1]" size={18}/> Agenda de Pagamentos</h2>
-            <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#1b3b40] hover:bg-[#2a5056] text-[#a4c5c1] text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#316168] shadow-[2px_2px_5px_rgba(0,0,0,0.2)] transition-colors">
-              <Zap size={12} /> NOVO
-            </button>
+        {/* Agenda de Pagamentos (Window / Terminal Style) */}
+        <div className="bg-[#141a1e] rounded-3xl p-4 sm:p-6 border border-[#233137] shadow-[0_16px_36px_rgba(0,0,0,0.5),inset_1px_1px_2px_rgba(255,255,255,0.05)] flex flex-col justify-between">
+          {/* Header da Janela estilo Mac */}
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#222f36]">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+              <span className="text-xs font-bold text-[#e6f0ed] ml-2 tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+                <CalendarClock size={14} className="text-[#e69894]" /> NEXUS AGENDAMENTOS
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#1b3b40] hover:bg-[#2a5056] text-[#a4c5c1] text-[10px] uppercase tracking-wider font-bold flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#316168] shadow-sm transition-colors">
+                <Zap size={11} /> NOVO
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-3">
             {(agendamentosReais || []).length === 0 ? (
-              <p className="text-[#8e98a3] text-sm text-center py-8">Nenhuma conta na fila.</p>
+              <p className="text-[#8baaa6] text-sm text-center py-8">Nenhuma conta na fila.</p>
             ) : (
               (agendamentosReais || []).map((agenda) => (
-                <div key={agenda.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)] gap-3">
+                <div key={agenda.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 bg-[#102428]/90 border border-[#1b3d45] rounded-2xl hover:border-[#2b5863] transition-colors group shadow-sm gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="p-2.5 sm:p-3 rounded-xl bg-[#e69894]/10 text-[#e69894] border border-[#e69894]/20 flex-shrink-0"><CalendarClock size={18} /></div>
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-bold text-[#e2e8f0] text-sm truncate">{agenda.descricao}</h4>
-                      <p className="text-[#8e98a3] text-[10px] mt-1 uppercase tracking-widest">Vence dia <span className="font-bold">{agenda.data_vencimento ? agenda.data_vencimento.split('-').reverse().join('/') : ''}</span></p>
+                      <h4 className="font-bold text-[#e6f0ed] text-sm truncate">{agenda.descricao}</h4>
+                      <p className="text-[#8baaa6] text-[10px] mt-1 uppercase tracking-widest">Vence dia <span className="font-bold text-[#e6f0ed]">{agenda.data_vencimento ? agenda.data_vencimento.split('-').reverse().join('/') : ''}</span></p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                     <span className="font-bold text-[#e69894] text-sm sm:text-base whitespace-nowrap">{(agenda.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => handlePagarAgendamento(agenda.id)} className="bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Pagar"><CheckSquare size={16} /></button>
-                      <button onClick={() => handleExcluirAgendamento(agenda.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Excluir"><Trash2 size={16} /></button>
+                      <button onClick={() => handlePagarAgendamento(agenda.id)} className="bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors font-bold shadow-sm" title="Pagar"><CheckSquare size={16} /></button>
+                      <button onClick={() => handleExcluirAgendamento(agenda.id)} className="bg-[#18363d] hover:bg-[#e69894] text-[#8baaa6] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors border border-[#244f59]" title="Excluir"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 </div>
@@ -381,21 +426,34 @@ export default function HomeView({
           </div>
         </div>
 
-        {/* Extrato */}
-        <div className="bg-[#2a2e33] rounded-3xl p-6 border border-[#353a40] shadow-[inset_2px_2px_5px_rgba(255,255,255,0.02),8px_8px_20px_rgba(0,0,0,0.4)]">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-[#e2e8f0] flex items-center gap-2"><ArrowRightLeft className="text-[#a4c5c1]" size={18}/> Transações Recentes</h2>
+        {/* Extrato / Transações Recentes (Window / Terminal Style) */}
+        <div className="bg-[#141a1e] rounded-3xl p-4 sm:p-6 border border-[#233137] shadow-[0_16px_36px_rgba(0,0,0,0.5),inset_1px_1px_2px_rgba(255,255,255,0.05)] flex flex-col justify-between">
+          {/* Header da Janela estilo Mac */}
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-[#222f36]">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#f87171] shadow-[0_0_8px_rgba(248,113,113,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_8px_rgba(251,191,36,0.5)]"></span>
+              <span className="w-3 h-3 rounded-full bg-[#34d399] shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+              <span className="text-xs font-bold text-[#e6f0ed] ml-2 tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+                <ArrowRightLeft size={14} className="text-[#95bfa6]" /> NEXUS TRANSAÇÕES
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold text-[#95bfa6] bg-[#1a3338] px-2.5 py-0.5 rounded-full border border-[#274c53] flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#95bfa6] animate-pulse"></span> Histórico
+              </span>
+            </div>
           </div>
           <div className="flex flex-col gap-3">
             {(transacoesReais || []).slice(0, 5).map((tx) => (
-              <div key={tx.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-3.5 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)] gap-3">
+              <div key={tx.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-3.5 bg-[#102428]/90 border border-[#1b3d45] rounded-2xl hover:border-[#2b5863] transition-colors group shadow-sm gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`p-2.5 sm:p-3 rounded-xl border flex-shrink-0 ${tx.tipo === 'Receita' ? 'bg-[#95bfa6]/10 text-[#95bfa6] border-[#95bfa6]/20' : tx.tipo === 'Cartao' ? 'bg-[#1b3b40] text-[#a4c5c1] border-[#2a5056]' : 'bg-[#e69894]/10 text-[#e69894] border-[#e69894]/20'}`}>
                      {tx.tipo === 'Receita' ? <TrendingUp size={16}/> : tx.tipo === 'Cartao' ? <Wallet size={16}/> : <TrendingDown size={16}/>}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-bold text-[#e2e8f0] text-sm truncate">{tx.categoria || tx.descricao}</h4>
-                    <p className="text-[#8e98a3] text-[10px] mt-1">{tx.data ? tx.data.split('-').reverse().join('/') : ''}</p>
+                    <h4 className="font-bold text-[#e6f0ed] text-sm truncate">{tx.categoria || tx.descricao}</h4>
+                    <p className="text-[#8baaa6] text-[10px] mt-1">{tx.data ? tx.data.split('-').reverse().join('/') : ''}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
@@ -403,12 +461,12 @@ export default function HomeView({
                     {tx.tipo === 'Receita' ? '+' : '-'}{(tx.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
                   <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors"><Trash2 size={16} /></button>
+                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#18363d] hover:bg-[#e69894] text-[#8baaa6] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors border border-[#244f59]" title="Excluir"><Trash2 size={16} /></button>
                   </div>
                 </div>
               </div>
             ))}
-            {(transacoesReais || []).length === 0 && <p className="text-[#8e98a3] text-sm text-center py-4">Nenhuma transação registrada.</p>}
+            {(transacoesReais || []).length === 0 && <p className="text-[#8baaa6] text-sm text-center py-4">Nenhuma transação registrada.</p>}
           </div>
         </div>
       </div>
