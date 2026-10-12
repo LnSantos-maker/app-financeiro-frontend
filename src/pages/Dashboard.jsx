@@ -255,9 +255,18 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   const handleSalvarEditSaldo = async () => {
     if (editSaldoValor === '') return mostrarNotificacao("Preencha um valor", "erro");
+    const valorNum = Math.max(0, parseFloat(editSaldoValor.toString().replace(',', '.')) || 0);
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ novo_saldo: parseFloat(editSaldoValor.replace(',', '.')) }) });
-      if (resposta.ok) { setModalEditSaldoAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Saldo ajustado!"); }
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`, { 
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ novo_saldo: valorNum }) 
+      });
+      if (resposta.ok) { 
+        setModalEditSaldoAberto(false); 
+        carregarDadosDaTela(idContaReal); 
+        mostrarNotificacao("Saldo ajustado com sucesso!"); 
+      }
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
@@ -269,10 +278,26 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   const handleSalvarEditTx = async () => {
     if (!txEditTitulo || !txEditValor) return mostrarNotificacao("Preencha título e valor.", "erro");
-    const txAtualizada = { id_conta: idContaReal, tipo: txEditTipo, valor: parseFloat(txEditValor.replace(',', '.')), categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo, data: new Date().toISOString().split('T')[0], classificacao: txEditCat };
+    const valorNum = Math.max(0, parseFloat(txEditValor.toString().replace(',', '.')) || 0);
+    const txAtualizada = { 
+      id_conta: idContaReal, 
+      tipo: txEditTipo, 
+      valor: valorNum, 
+      categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo, 
+      data: new Date().toISOString().split('T')[0], 
+      classificacao: txEditCat 
+    };
     try {
-      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${txEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(txAtualizada) });
-      if (resposta.ok) { setModalEditTxAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação editada!"); }
+      const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/transacoes/${idContaReal}/${txEditId}`, { 
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(txAtualizada) 
+      });
+      if (resposta.ok) { 
+        setModalEditTxAberto(false); 
+        carregarDadosDaTela(idContaReal); 
+        mostrarNotificacao("Transação editada com sucesso!"); 
+      }
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 

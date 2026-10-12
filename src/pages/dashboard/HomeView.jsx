@@ -461,7 +461,10 @@ export default function HomeView({
                     {tx.tipo === 'Receita' ? '+' : '-'}{(tx.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
                   <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#18363d] hover:bg-[#e69894] text-[#8baaa6] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors border border-[#244f59]" title="Excluir"><Trash2 size={16} /></button>
+                     {tx.tipo !== 'Cartao' && (
+                       <button onClick={() => abrirModalEditTx(tx)} className="bg-[#18363d] hover:bg-[#95bfa6] text-[#8baaa6] hover:text-[#1a2f24] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors border border-[#244f59]" title="Editar"><Pencil size={15} /></button>
+                     )}
+                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#18363d] hover:bg-[#e69894] text-[#8baaa6] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors border border-[#244f59]" title="Excluir"><Trash2 size={15} /></button>
                   </div>
                 </div>
               </div>
