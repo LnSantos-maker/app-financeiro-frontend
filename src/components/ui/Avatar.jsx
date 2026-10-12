@@ -16,13 +16,15 @@ export function AvatarBadge({ avatarId, nome, tamanho = 'md', className = '' }) 
   const Icone = av.icone;
   
   const dimensoes = {
-    sm: 'w-9 h-9 text-base',
-    md: 'w-14 h-14 text-xl',
-    lg: 'w-20 h-20 text-3xl'
-  }[tamanho] || 'w-14 h-14';
+    xs: 'w-7 h-7 text-xs rounded-xl',
+    sm: 'w-8 h-8 text-sm rounded-xl',
+    md: 'w-14 h-14 text-xl rounded-2xl',
+    lg: 'w-20 h-20 text-3xl rounded-2xl'
+  }[tamanho] || 'w-14 h-14 rounded-2xl';
 
   const iconSizes = {
-    sm: 18,
+    xs: 14,
+    sm: 16,
     md: 26,
     lg: 38
   }[tamanho] || 26;

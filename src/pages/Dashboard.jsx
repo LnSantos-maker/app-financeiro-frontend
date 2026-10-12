@@ -809,32 +809,53 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           <button onClick={() => setTelaAtiva('planilha')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] hidden sm:flex items-center justify-center transition-colors ${telaAtiva === 'planilha' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Planilha Fantasma"><ClipboardList size={22} /></button>
           <button onClick={() => setTelaAtiva('utilitarios')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] hidden md:flex items-center justify-center transition-colors ${telaAtiva === 'utilitarios' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Utilitários"><Calculator size={22} /></button>
           <button onClick={() => setTelaAtiva('configuracoes')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors md:mt-auto ${telaAtiva === 'configuracoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Configurações"><Settings size={22} /></button>
+          
+          {/* Avatar + Nome no Desktop Sidebar */}
+          <button 
+            onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }} 
+            className="hidden md:flex flex-col items-center gap-1 mt-2 pt-3 border-t border-[#26282d]/80 group cursor-pointer w-full px-1"
+            title={`Editar Perfil: ${nomeUsuario || 'Perfil'}`}
+          >
+            <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="xs" />
+            <span className="text-[10px] font-semibold text-[#8baaa6] group-hover:text-[#e6f0ed] truncate max-w-[64px] text-center capitalize">
+              {nomeUsuario || 'Perfil'}
+            </span>
+          </button>
         </nav>
       </aside>
 
       <main className="flex-1 p-3.5 sm:p-6 md:p-10 pb-24 md:pb-10 overflow-y-auto overflow-x-hidden relative">
-        {/* Header Mobile com Logo da NEXUS */}
-        <div className="flex md:hidden items-center justify-between pb-3.5 mb-4 border-b border-[#26282d]/80">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.25)]">
+        {/* Header Mobile com Logo da NEXUS e Perfil (Ícone + Nome) */}
+        <div className="flex md:hidden items-center justify-between pb-3.5 mb-4 border-b border-[#26282d]/80 gap-2">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.25)]">
               <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-[0.2em] text-[#e3e4e8]">NEXUS</span>
-              <span className="text-[9px] uppercase tracking-widest text-[#5cb0b8] font-semibold">Sistema Financeiro</span>
+              <span className="text-base font-bold tracking-[0.18em] text-[#e3e4e8]">NEXUS</span>
+              <span className="text-[8.5px] uppercase tracking-widest text-[#5cb0b8] font-semibold">Sistema Financeiro</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Botão de Perfil Mobile: Ícone + Nome/Apelido */}
             <button 
               onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }}
-              className="p-0.5 rounded-xl hover:ring-2 hover:ring-[#95bfa6]/40 transition-all flex items-center"
-              title="Meu Perfil e Avatar"
+              className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-xl bg-[#1c2024] hover:bg-[#252a30] border border-[#2e343b] transition-all min-w-0 max-w-[130px] sm:max-w-[160px] group cursor-pointer shadow-sm"
+              title="Editar Perfil"
             >
-              <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="sm" />
+              <div className="shrink-0">
+                <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="xs" />
+              </div>
+              <span className="text-xs font-semibold text-[#e6f0ed] group-hover:text-white truncate capitalize">
+                {nomeUsuario || emailLogin?.split('@')[0] || 'Perfil'}
+              </span>
             </button>
+
+            {/* Botão de Sair Mobile */}
             <button
               onClick={onLogout}
-              className="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition-colors shrink-0"
               title="Sair da Conta"
             >
               <LogOut size={14} />
