@@ -76,17 +76,27 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   const handleSubmeter2FA = async (e) => {
     e.preventDefault();
     if (isLoading) return;
-    if (codigo2FA.length !== 6) return mostrarNotificacao("Código inválido.", "erro");
+    const codigoLimpo = (codigo2FA || '').trim();
+    if (codigoLimpo.length !== 6) return mostrarNotificacao("Código inválido. Digite os 6 dígitos.", "erro");
     
     setIsLoading(true);
+    const emailNormalizado = (emailLogin || '').trim().toLowerCase();
     try {
       const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: emailLogin, codigo_2fa: codigo2FA }) 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ email: emailNormalizado, codigo_2fa: codigoLimpo }) 
       });
       const dados = await resposta.json();
-      if (resposta.ok) { mostrarNotificacao("Autenticado", "sucesso"); onLoginSuccess(emailLogin); } 
-      else { mostrarNotificacao(dados.detail, "erro"); }
-    } catch (erro) { mostrarNotificacao("Erro no servidor.", "erro"); } finally {
+      if (resposta.ok) { 
+        mostrarNotificacao("Autenticado com sucesso", "sucesso"); 
+        onLoginSuccess(emailNormalizado); 
+      } else { 
+        mostrarNotificacao(dados.detail || "Código 2FA incorreto ou expirado.", "erro"); 
+      }
+    } catch (erro) { 
+      mostrarNotificacao("Erro no servidor de autenticação.", "erro"); 
+    } finally {
       setIsLoading(false);
     }
   };

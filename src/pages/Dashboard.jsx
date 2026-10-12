@@ -13,6 +13,7 @@ import CartoesView from './dashboard/CartoesView';
 import BeneficiosView from './dashboard/BeneficiosView';
 import ConfiguracoesView from './dashboard/ConfiguracoesView';
 import UtilitariosView from './dashboard/UtilitariosView';
+import { AVATARES, AvatarBadge } from '../components/ui/Avatar';
 import CommandPalette from '../components/CommandPalette';
 import { useFinanceStore } from '../store/useFinanceStore';
 
@@ -23,7 +24,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     telaAtiva, setTelaAtiva,
     dataSelecionada, setDataSelecionada,
     mesAnterior, proximoMes,
-    nomeUsuario, saldoReal, transacoesReais, categoriasReais, metasReais, balancoReal, evolucaoReal, cartoesReais, beneficiosReais, agendamentosReais, planilhaReal, inteligenciaReal,
+    nomeUsuario, avatarUsuario, saldoReal, transacoesReais, categoriasReais, metasReais, balancoReal, evolucaoReal, cartoesReais, beneficiosReais, agendamentosReais, planilhaReal, inteligenciaReal,
     modalReceitaAberto, setModalReceitaAberto,
     modalDespesaAberto, setModalDespesaAberto,
     modalCofreAberto, setModalCofreAberto,
@@ -52,6 +53,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   });
   
   const [editNomeUsuario, setEditNomeUsuario] = useState('');
+  const [editAvatarUsuario, setEditAvatarUsuario] = useState('avatar-1');
 
   const [editSaldoValor, setEditSaldoValor] = useState('');
 
@@ -164,13 +166,23 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const handleSalvarPerfil = async () => {
     if (!editNomeUsuario.trim()) return mostrarNotificacao("O nome não pode ficar vazio.", "erro");
     try {
+      useFinanceStore.setState({ 
+        nomeUsuario: editNomeUsuario.trim(),
+        avatarUsuario: editAvatarUsuario 
+      });
+      setModalPerfilAberto(false);
+      mostrarNotificacao("Perfil atualizado com sucesso!");
+
       const resposta = await fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`, { 
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome_usuario: editNomeUsuario }) 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          nome_usuario: editNomeUsuario.trim(),
+          avatar_usuario: editAvatarUsuario 
+        }) 
       });
       if (resposta.ok) { 
-        setModalPerfilAberto(false); 
-        useFinanceStore.setState({ nomeUsuario: editNomeUsuario }); 
-        mostrarNotificacao("Perfil atualizado com sucesso!"); 
+        carregarDadosDaTela(idContaReal); 
       }
     } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
@@ -616,6 +628,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
   };
 
+
   const handleSalvarOrcamento = async () => {
     if (!valorLimiteOrcamento) return mostrarNotificacao("Preencha o valor limite.", "erro");
     try {
@@ -812,9 +825,20 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#95bfa6] bg-[#95bfa6]/10 px-2.5 py-1 rounded-full border border-[#95bfa6]/20 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#95bfa6] animate-pulse"></span> Ativo
-            </span>
+            <button 
+              onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }}
+              className="p-0.5 rounded-xl hover:ring-2 hover:ring-[#95bfa6]/40 transition-all flex items-center"
+              title="Meu Perfil e Avatar"
+            >
+              <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="sm" />
+            </button>
+            <button
+              onClick={onLogout}
+              className="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition-colors"
+              title="Sair da Conta"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         </div>
 
@@ -904,10 +928,17 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         {telaAtiva === 'configuracoes' && (
           <ConfiguracoesView
             nomeUsuario={nomeUsuario}
+            avatarUsuario={avatarUsuario}
             emailLogin={emailLogin}
 
             setEditNomeUsuario={setEditNomeUsuario}
-            setModalPerfilAberto={setModalPerfilAberto}
+            setModalPerfilAberto={(aberto) => {
+              if (aberto) {
+                setEditNomeUsuario(nomeUsuario);
+                setEditAvatarUsuario(avatarUsuario || 'avatar-1');
+              }
+              setModalPerfilAberto(aberto);
+            }}
             mostrarNotificacao={mostrarNotificacao}
             handleReset2FA={handleReset2FA}
             handleZerarSaldo={handleZerarSaldo}
@@ -961,25 +992,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           MODAIS E FORMULÁRIOS
           ============================================================================== */}
 
-      {modalPerfilAberto && (
-        <div className="fixed inset-0 bg-[var(--accent)]/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50 animate-in fade-in duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2"><User size={24} className="text-[var(--text-main)]"/> Editar Perfil</h2>
-              <button onClick={() => setModalPerfilAberto(false)} className="text-[var(--text-sec)] hover:text-[var(--text-main)]"><X size={24} /></button>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className="text-[var(--text-sec)] text-sm mb-1 block">Como quer ser chamado?</label>
-                <input type="text" value={editNomeUsuario} onChange={(e) => setEditNomeUsuario(e.target.value)} placeholder="Ex: Luan, João, Maria..." className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" />
-              </div>
-              <button onClick={handleSalvarPerfil} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">
-                Salvar Alterações
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {modalPlanilhaAberto && (
         <div className="fixed inset-0 bg-[var(--accent)]/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
@@ -1290,6 +1303,110 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             <div className="flex flex-col gap-4">
               <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor da Recarga (R$)</label><input type="number" value={beneficioRecargaValor} onChange={(e) => setBeneficioRecargaValor(e.target.value)} placeholder="Ex: 500,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
               <button onClick={handleRecarregarBeneficio} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">Adicionar Saldo</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDITAR PERFIL COM AVATARES */}
+      {modalPerfilAberto && (
+        <div className="fixed inset-0 bg-[#090b10]/80 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+          <div className="bg-[#1f2327] border border-[#30363d] rounded-3xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/60 animate-in fade-in duration-200 relative">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#292e33] border border-[#383f45] flex items-center justify-center text-[#95bfa6]">
+                  <User size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[#e6f0ed]">Editar Perfil</h2>
+                  <p className="text-xs text-[#8baaa6]">Personalize seu nome e escolha seu avatar</p>
+                </div>
+              </div>
+              <button onClick={() => setModalPerfilAberto(false)} className="text-[#8baaa6] hover:text-[#e6f0ed] p-2 rounded-xl bg-[#292e33] border border-[#383f45] min-h-[40px] min-w-[40px] flex items-center justify-center">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {/* Preview Atual */}
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#171a1d] border border-[#2b3137]">
+                <AvatarBadge avatarId={editAvatarUsuario} nome={editNomeUsuario} tamanho="md" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#e6f0ed] truncate">{editNomeUsuario || 'Seu Nome'}</p>
+                  <p className="text-xs text-[#8baaa6] truncate">{emailLogin}</p>
+                </div>
+              </div>
+
+              {/* Campo Nome */}
+              <div>
+                <label className="text-[11px] font-bold text-[#8baaa6] uppercase tracking-wider block mb-2">Seu Nome / Apelido</label>
+                <input 
+                  type="text" 
+                  value={editNomeUsuario} 
+                  onChange={(e) => setEditNomeUsuario(e.target.value)} 
+                  placeholder="Como quer ser chamado?"
+                  className="w-full bg-[#171a1d] border border-[#30363d] rounded-xl px-4 py-3.5 text-[#e6f0ed] focus:outline-none focus:border-[#95bfa6] text-sm"
+                />
+              </div>
+
+              {/* Seletor de Avatar / Bonecos */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-[11px] font-bold text-[#8baaa6] uppercase tracking-wider block">Escolha seu Avatar</label>
+                  <span className="text-[10px] text-[#95bfa6] font-semibold">{AVATARES.length} opções prontas</span>
+                </div>
+
+                <div className="grid grid-cols-4 gap-3">
+                  {AVATARES.map((av) => {
+                    const Icone = av.icone;
+                    const selecionado = editAvatarUsuario === av.id;
+                    return (
+                      <button
+                        key={av.id}
+                        type="button"
+                        onClick={() => setEditAvatarUsuario(av.id)}
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all cursor-pointer relative group ${
+                          selecionado 
+                            ? 'bg-[#293532] border-[#95bfa6] shadow-[0_0_15px_rgba(149,191,166,0.3)]' 
+                            : 'bg-[#171a1d] border-[#2b3137] hover:border-[#3d454d] hover:bg-[#202428]'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${av.cor} p-0.5 shadow-sm`}>
+                          <div className="w-full h-full rounded-[10px] bg-[#0f1114] flex items-center justify-center">
+                            <Icone size={20} className={av.textCor} />
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-medium text-[#8baaa6] group-hover:text-[#e6f0ed] truncate w-full text-center">
+                          {av.nome}
+                        </span>
+                        {selecionado && (
+                          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#95bfa6] text-[#0f1114] flex items-center justify-center text-[10px] font-bold shadow-sm">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setModalPerfilAberto(false)}
+                  className="flex-1 bg-[#24282c] hover:bg-[#2e3338] text-[#8baaa6] hover:text-[#e6f0ed] font-medium py-3.5 rounded-xl border border-[#30363d] transition-colors text-sm"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleSalvarPerfil}
+                  className="flex-1 bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] font-bold py-3.5 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-colors text-sm"
+                >
+                  Salvar Perfil
+                </button>
+              </div>
             </div>
           </div>
         </div>

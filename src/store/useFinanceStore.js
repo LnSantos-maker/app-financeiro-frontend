@@ -25,6 +25,7 @@ export const useFinanceStore = create((set, get) => ({
 
   // 2. Dados da API (Estado Compartilhado)
   nomeUsuario: 'Usuário',
+  avatarUsuario: 'avatar-1',
   saldoReal: 0,
   transacoesReais: [],
   categoriasReais: [],
@@ -166,6 +167,7 @@ export const useFinanceStore = create((set, get) => ({
 
       set({
         nomeUsuario: dPerfil.nome_usuario || 'Usuário',
+        avatarUsuario: dPerfil.avatar_usuario || 'avatar-1',
         saldoReal: dSaldo.saldo_atual || 0,
         transacoesReais: dTx.transacoes || [],
         categoriasReais: dCat.categorias || [],
