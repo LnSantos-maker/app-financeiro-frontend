@@ -800,6 +800,24 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       </aside>
 
       <main className="flex-1 p-3.5 sm:p-6 md:p-10 pb-24 md:pb-10 overflow-y-auto overflow-x-hidden relative">
+        {/* Header Mobile com Logo da NEXUS */}
+        <div className="flex md:hidden items-center justify-between pb-3.5 mb-4 border-b border-[#26282d]/80">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.25)]">
+              <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-[0.2em] text-[#e3e4e8]">NEXUS</span>
+              <span className="text-[9px] uppercase tracking-widest text-[#5cb0b8] font-semibold">Sistema Financeiro</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#95bfa6] bg-[#95bfa6]/10 px-2.5 py-1 rounded-full border border-[#95bfa6]/20 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#95bfa6] animate-pulse"></span> Ativo
+            </span>
+          </div>
+        </div>
+
         <div className="hidden md:flex absolute top-8 left-10 items-center gap-2 pointer-events-none z-0 opacity-80">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 6L10 10L14 14" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -807,7 +825,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           </svg>
           <h1 className="text-2xl font-bold tracking-[0.2em] text-[#e3e4e8]">NEXUS</h1>
         </div>
-        <div className="h-2 md:h-6"></div>
+        <div className="h-1 md:h-6"></div>
         <AnimatePresence mode="wait">
           <motion.div
             key={telaAtiva}

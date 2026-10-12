@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, User, Mail, Lock, Eye, EyeOff, ArrowRight, CornerDownRight, TrendingUp, Target, BrainCircuit, X } from 'lucide-react';
+import { ShieldCheck, User, Mail, Lock, Eye, EyeOff, ArrowRight, CornerDownRight, TrendingUp, Target, BrainCircuit, X, CalendarClock, CreditCard, ArrowRightLeft, Wallet, ShoppingBag, Sparkles, CheckCircle2, ChevronRight, Info } from 'lucide-react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { MotionWrapper } from '../components/ui/MotionWrapper';
@@ -7,6 +7,8 @@ import { MotionWrapper } from '../components/ui/MotionWrapper';
 export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   // Navigation & Modal State
   const [showModal, setShowModal] = useState(false);
+  const [showModalRecursos, setShowModalRecursos] = useState(false);
+  const [showModalSobre, setShowModalSobre] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
   
   // Auth Form State
@@ -107,46 +109,44 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#1b3b40] opacity-50 blur-[150px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
       
       {/* Navbar */}
-      <header className="flex justify-between items-center px-6 lg:px-16 py-6 relative z-20">
-         <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#23272b] rounded-[10px] flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_8px_rgba(0,0,0,0.4)] border border-[#30363d]">
-               <img src="/favicon.svg" alt="Logo" className="w-6 h-6 object-contain" />
+      <header className="flex justify-between items-center px-4 sm:px-8 lg:px-16 py-5 sm:py-6 relative z-20">
+         <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-10 h-10 bg-[#23272b] rounded-xl flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),4px_4px_8px_rgba(0,0,0,0.4)] border border-[#30363d] overflow-hidden">
+               <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-bold tracking-[0.2em] text-[#e6f0ed]">NEXUS</span>
          </div>
-         <nav className="hidden lg:flex gap-8 text-sm font-semibold text-[#8baaa6]">
-            <a href="#" className="hover:text-[#e6f0ed] transition-colors">Recursos</a>
-            <a href="#" className="hover:text-[#e6f0ed] transition-colors">Planos</a>
-            <a href="#" className="hover:text-[#e6f0ed] transition-colors">Metas</a>
-            <a href="#" className="hover:text-[#e6f0ed] transition-colors">Sobre Nós</a>
-            <a href="#" className="hover:text-[#e6f0ed] transition-colors">Blog</a>
+         <nav className="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold text-[#8baaa6]">
+            <button type="button" onClick={() => setShowModalRecursos(true)} className="hover:text-[#e6f0ed] transition-colors py-1 cursor-pointer">
+              Recursos
+            </button>
+            <button type="button" onClick={() => setShowModalSobre(true)} className="hover:text-[#e6f0ed] transition-colors py-1 cursor-pointer">
+              Sobre Nós
+            </button>
          </nav>
-         <div className="flex items-center gap-2 sm:gap-6">
-            <button onClick={() => openAuthModal(true)} className="text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors min-h-[44px] px-2 md:px-0">Login</button>
-            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-4 md:px-6 py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-sm min-h-[44px]">
+         <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={() => openAuthModal(true)} className="text-xs sm:text-sm font-bold text-[#8baaa6] hover:text-[#e6f0ed] transition-colors min-h-[40px] px-2 sm:px-3">Login</button>
+            <button onClick={() => openAuthModal(false)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-xs sm:text-sm min-h-[40px]">
                Cadastrar-se
             </button>
          </div>
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col justify-center pt-10 pb-20 px-6 lg:px-16 relative z-10 w-full max-w-[1400px] mx-auto">
-         <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-16">
+      <main className="flex-1 flex flex-col justify-center pt-8 sm:pt-10 pb-16 sm:pb-20 px-4 sm:px-8 lg:px-16 relative z-10 w-full max-w-[1400px] mx-auto">
+         <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-12 lg:gap-16">
             
             {/* Left Content */}
             <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left z-10 w-full">
-               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] text-[#e6f0ed] mb-6 tracking-tight">
+               <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] text-[#e6f0ed] mb-6 tracking-tight">
                   UNA SUAS FINANÇAS.<br />CONSTRUA SEU FUTURO.
                </h1>
-               <p className="text-base sm:text-lg text-[#8baaa6] mb-10 max-w-lg leading-relaxed font-light">
+               <p className="text-sm sm:text-lg text-[#8baaa6] mb-8 sm:mb-10 max-w-lg leading-relaxed font-light">
                   Nexus: A Plataforma de Planejamento Financeiro Inteligente que Centraliza Contas, Otimiza Orçamentos e Traça Caminhos para suas Metas.
                </p>
                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                   <button onClick={() => openAuthModal(false)} className="bg-gradient-to-r from-[#14535c] to-[#1b3b40] border border-[#2a5056] text-[#e6f0ed] hover:from-[#1a6b77] hover:to-[#244b52] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_15px_rgba(0,0,0,0.4),inset_1px_1px_2px_rgba(255,255,255,0.1)] transition-all flex items-center justify-center gap-2 min-h-[44px]">
                      COMEÇAR AGORA <ArrowRight size={18} />
-                  </button>
-                  <button className="bg-[#23272b] border border-[#30363d] text-[#8baaa6] hover:text-[#e6f0ed] hover:bg-[#2d3238] px-8 py-4 rounded-2xl font-bold shadow-[4px_4px_10px_rgba(0,0,0,0.2)] transition-all flex items-center justify-center min-h-[44px]">
-                     VEJA OS PLANOS
                   </button>
                </div>
             </div>
@@ -338,6 +338,161 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
                </div>
             </MotionWrapper>
          </div>
+      )}
+      {/* Modal Recursos do Sistema */}
+      {showModalRecursos && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090b10]/85 backdrop-blur-md p-4">
+          <MotionWrapper className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#23272b] rounded-3xl p-6 sm:p-8 border border-[#30363d] shadow-[0_25px_60px_rgba(0,0,0,0.8)] relative">
+            <button 
+              type="button" 
+              onClick={() => setShowModalRecursos(false)} 
+              className="absolute z-20 top-4 right-4 sm:top-6 sm:right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_12px_rgba(45,212,191,0.2)]">
+                  <img src="/img/nexus_logo.jpg" alt="NEXUS" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#e6f0ed]">
+                    Recursos do NEXUS
+                  </h3>
+                  <span className="text-xs uppercase tracking-widest text-[#95bfa6] font-semibold">Tudo o que o aplicativo oferece</span>
+                </div>
+              </div>
+              <p className="text-[#8baaa6] text-sm leading-relaxed mt-2">
+                Conheça em detalhes cada módulo projetado para dar a você autonomia patrimonial e controle financeiro absoluto em alta performance.
+              </p>
+            </div>
+
+            {/* Grid de Recursos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              {[
+                {
+                  icon: <BrainCircuit size={22} className="text-[#95bfa6]" />,
+                  title: "Diagnóstico Financeiro 50/30/20",
+                  desc: "Separação inteligente automática das despesas entre Essenciais (50%), Estilo de Vida (30%) e Investimentos/Futuro (20%) com cálculo visual de equilíbrio."
+                },
+                {
+                  icon: <CalendarClock size={22} className="text-[#e69894]" />,
+                  title: "Agenda de Pagamentos com 0ms Delay",
+                  desc: "Fila de contas a pagar com alerta de vencimento, liquidação com um clique e atualização instantânea sem espera de servidor."
+                },
+                {
+                  icon: <CreditCard size={22} className="text-[#d4af37]" />,
+                  title: "Gestão de Cartões de Crédito 3D",
+                  desc: "Acompanhamento interativo de cartões físicos e virtuais, cálculo dinâmico de limite disponível, fatura atual, dia de fechamento e dia de vencimento."
+                },
+                {
+                  icon: <ArrowRightLeft size={22} className="text-[#a4c5c1]" />,
+                  title: "Extrato Completo & Auditoria",
+                  desc: "Histórico detalhado de movimentações com pesquisa por descrição, agrupamento por data (Hoje/Ontem) e filtros rápidos por entradas, saídas e cartões."
+                },
+                {
+                  icon: <Target size={22} className="text-[#95bfa6]" />,
+                  title: "Cofres Patrimoniais & Metas",
+                  desc: "Separe seu dinheiro guardado em cofres temáticos com cálculo de progresso em tempo real, aportes rápidos e resgates seguros."
+                },
+                {
+                  icon: <ShoppingBag size={22} className="text-[#a4c5c1]" />,
+                  title: "Vales & Benefícios Corporativos",
+                  desc: "Gestão dedicada para saldos de Vale Refeição, Vale Alimentação e cartões de benefícios flexíveis com histórico de consumo."
+                },
+                {
+                  icon: <Sparkles size={22} className="text-[#d4af37]" />,
+                  title: "Assistente de IA NEXUS AI",
+                  desc: "Algoritmo preditivo de análise orçamentária que gera recomendações e alertas personalizados para manter suas finanças no rumo certo."
+                },
+                {
+                  icon: <ShieldCheck size={22} className="text-[#95bfa6]" />,
+                  title: "Segurança 2FA & Acesso Internacional",
+                  desc: "Proteção com autenticação em dois fatores (TOTP / Google Authenticator) com janela de tolerância para fuso horário de qualquer país e conexões via VPN."
+                }
+              ].map((item, idx) => (
+                <div key={idx} className="bg-[#1e2226] border border-[#30363d] rounded-2xl p-4 sm:p-5 shadow-[inset_1px_1px_3px_rgba(255,255,255,0.02),4px_4px_10px_rgba(0,0,0,0.3)] hover:border-[#38434b] transition-colors">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 rounded-xl bg-[#292e33] border border-[#383f45]">
+                      {item.icon}
+                    </div>
+                    <h4 className="font-bold text-sm sm:text-base text-[#e6f0ed]">{item.title}</h4>
+                  </div>
+                  <p className="text-xs text-[#8baaa6] leading-relaxed pl-1">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#30363d]">
+              <div className="flex items-center gap-2 text-xs text-[#8baaa6]">
+                <CheckCircle2 size={16} className="text-[#95bfa6]" />
+                <span>Todos os módulos inclusos na sua conta</span>
+              </div>
+              <button 
+                onClick={() => { setShowModalRecursos(false); openAuthModal(false); }}
+                className="w-full sm:w-auto bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] font-bold px-6 py-3 rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all text-sm flex items-center justify-center gap-2"
+              >
+                Começar a Usar Agora <ArrowRight size={16} />
+              </button>
+            </div>
+          </MotionWrapper>
+        </div>
+      )}
+
+      {/* Modal Sobre Nós */}
+      {showModalSobre && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090b10]/85 backdrop-blur-md p-4">
+          <MotionWrapper className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#23272b] rounded-3xl p-6 sm:p-8 border border-[#30363d] shadow-[0_25px_60px_rgba(0,0,0,0.8)] relative">
+            <button 
+              type="button" 
+              onClick={() => setShowModalSobre(false)} 
+              className="absolute z-20 top-4 right-4 sm:top-6 sm:right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.25)]">
+                <img src="/img/nexus_logo.jpg" alt="NEXUS" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight text-[#e6f0ed]">Sobre o NEXUS</h3>
+                <span className="text-xs uppercase tracking-widest text-[#95bfa6] font-semibold">Tecnologia & Soberania Financeira</span>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-sm text-[#8baaa6] leading-relaxed">
+              <p>
+                O <strong className="text-[#e6f0ed]">NEXUS</strong> foi desenvolvido para redefinir o controle patrimonial moderno. Em um mundo onde planilhas manuais e aplicativos genéricos são lentos e confusos, criamos uma plataforma unificada que alia estética de ponta, velocidade de resposta instantânea e algoritmos de planejamento inteligente.
+              </p>
+              <p>
+                Nossa arquitetura foi construída para funcionar sem barreiras geográficas: seja você um profissional no Brasil, nos Estados Unidos ou na Europa, ou navegando protegido através de VPNs, o sistema garante precisão de fuso horário, segurança com 2FA e sincronização em tempo real.
+              </p>
+              <div className="p-4 bg-[#1e2226] rounded-2xl border border-[#30363d] space-y-2 mt-4">
+                <div className="text-xs font-bold text-[#e6f0ed] uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-[#95bfa6]" /> Nossos Pilares
+                </div>
+                <ul className="text-xs text-[#8baaa6] space-y-1.5 pl-6 list-disc">
+                  <li>Privacidade e criptografia de credenciais.</li>
+                  <li>Atualizações com zero latência percebida (Optimistic UI).</li>
+                  <li>Diagnóstico financeiro metodológico (50/30/20).</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-[#30363d] flex justify-end">
+              <button 
+                onClick={() => setShowModalSobre(false)}
+                className="bg-[#292e33] hover:bg-[#32383e] text-[#e6f0ed] font-medium px-5 py-2.5 rounded-xl border border-[#383f45] transition-colors text-sm"
+              >
+                Fechar
+              </button>
+            </div>
+          </MotionWrapper>
+        </div>
       )}
     </div>
   );
