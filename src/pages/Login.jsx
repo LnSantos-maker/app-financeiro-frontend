@@ -59,19 +59,31 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       if (!emailLogin || !senhaLogin) return mostrarNotificacao("Preencha e-mail e senha.", "erro");
     }
 
+    // Configuração de 2FA: Mudar para true quando quiser reativar o autenticador
+    const ATIVAR_2FA = false;
+
     setIsLoading(true);
     try {
+      const emailNormalizado = emailLogin.trim().toLowerCase();
       if (isLoginMode) {
-        // Validação rápida no Firebase Auth (~0.3s)
+        // Validação no Firebase Auth
         await signInWithEmailAndPassword(auth, emailLogin.trim(), senhaLogin);
-        // Transição INSTANTÂNEA para o código de 6 dígitos!
+        if (!ATIVAR_2FA) {
+          mostrarNotificacao("Autenticado com sucesso!", "sucesso");
+          onLoginSuccess(emailNormalizado);
+          return;
+        }
         setEtapaLogin(1);
         mostrarNotificacao("Acesso validado. Digite o código 2FA.", "sucesso");
       } else {
         await createUserWithEmailAndPassword(auth, emailLogin.trim(), senhaLogin);
+        if (!ATIVAR_2FA) {
+          mostrarNotificacao("Conta criada com sucesso!", "sucesso");
+          onLoginSuccess(emailNormalizado);
+          return;
+        }
         setEtapaLogin(1);
         mostrarNotificacao("Conta criada! Configure o 2FA.", "sucesso");
-        // Carrega o QR Code em segundo plano para nova conta
         carregarSetup2FA(emailLogin.trim());
       }
     } catch (error) {
