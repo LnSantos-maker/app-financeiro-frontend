@@ -27,11 +27,16 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Pré-aquecimento do backend para eliminar qualquer latência de cold start do Render
+  React.useEffect(() => {
+    fetch('https://app-financeiro-10tz.onrender.com/').catch(() => {});
+  }, []);
+
   const carregarSetup2FA = async (email) => {
     try {
       const res = await fetch(`https://app-financeiro-10tz.onrender.com/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
       const dados = await res.json();
-      if (res.ok) {
+      if (res.ok && dados.precisa_qrcode) {
         const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
         setChaveSecreta2FA(chave);
         const linkTotp = dados.link_qrcode || `otpauth://totp/PF:${email}?secret=${chave}&issuer=PF`;
@@ -56,12 +61,19 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
 
     setIsLoading(true);
     try {
-      if (isLoginMode) await signInWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      else await createUserWithEmailAndPassword(auth, emailLogin, senhaLogin);
-      
-      await carregarSetup2FA(emailLogin);
-      mostrarNotificacao(isLoginMode ? "Acesso liberado" : "Conta criada", "sucesso");
-      setEtapaLogin(1); 
+      if (isLoginMode) {
+        // Validação rápida no Firebase Auth (~0.3s)
+        await signInWithEmailAndPassword(auth, emailLogin.trim(), senhaLogin);
+        // Transição INSTANTÂNEA para o código de 6 dígitos!
+        setEtapaLogin(1);
+        mostrarNotificacao("Acesso validado. Digite o código 2FA.", "sucesso");
+      } else {
+        await createUserWithEmailAndPassword(auth, emailLogin.trim(), senhaLogin);
+        setEtapaLogin(1);
+        mostrarNotificacao("Conta criada! Configure o 2FA.", "sucesso");
+        // Carrega o QR Code em segundo plano para nova conta
+        carregarSetup2FA(emailLogin.trim());
+      }
     } catch (error) {
       let mensagem = "Erro de conexão.";
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') mensagem = "Credenciais inválidas.";
@@ -73,10 +85,10 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
     }
   };
 
-  const handleSubmeter2FA = async (e) => {
-    e.preventDefault();
+  const handleSubmeter2FA = async (e, codigoManual = null) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (isLoading) return;
-    const codigoLimpo = (codigo2FA || '').trim();
+    const codigoLimpo = (codigoManual || codigo2FA || '').trim();
     if (codigoLimpo.length !== 6) return mostrarNotificacao("Código inválido. Digite os 6 dígitos.", "erro");
     
     setIsLoading(true);
@@ -89,7 +101,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       });
       const dados = await resposta.json();
       if (resposta.ok) { 
-        mostrarNotificacao("Autenticado com sucesso", "sucesso"); 
+        mostrarNotificacao("Autenticado com sucesso!", "sucesso"); 
         onLoginSuccess(emailNormalizado); 
       } else { 
         mostrarNotificacao(dados.detail || "Código 2FA incorreto ou expirado.", "erro"); 
@@ -107,6 +119,8 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   };
 
   const openAuthModal = (isLogin) => {
+    // Pré-aquece o backend no momento que abre o modal
+    fetch('https://app-financeiro-10tz.onrender.com/').catch(() => {});
     setIsLoginMode(isLogin);
     setShowModal(true);
     setEtapaLogin(0);
@@ -364,7 +378,20 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
                  <form onSubmit={handleSubmeter2FA} className="space-y-6">
                    <div className="space-y-2">
                      <label className="text-[10px] font-bold text-[#8baaa6] uppercase tracking-widest">Código de 6 dígitos</label>
-                     <input type="text" maxLength="6" value={codigo2FA} onChange={(e) => setCodigo2FA(e.target.value.replace(/\D/g, ''))}
+                     <input
+                       type="text"
+                       inputMode="numeric"
+                       autoComplete="one-time-code"
+                       maxLength="6"
+                       value={codigo2FA}
+                       autoFocus
+                       onChange={(e) => {
+                         const val = e.target.value.replace(/\D/g, '');
+                         setCodigo2FA(val);
+                         if (val.length === 6) {
+                           handleSubmeter2FA(null, val);
+                         }
+                       }}
                        className="w-full bg-[#1e2226] border border-[#30363d] rounded-2xl shadow-[inset_2px_2px_5px_rgba(0,0,0,0.3)] py-4 text-2xl font-mono text-center tracking-[0.4em] text-[#e6f0ed] focus:outline-none focus:border-[#95bfa6] transition-colors"
                        placeholder="000000" />
                    </div>
