@@ -43,11 +43,11 @@ export default function ExtratoView({
   }, {});
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-[calc(100vh-100px)] pb-6">
-      <header className="flex justify-between items-end mb-8 shrink-0">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col min-h-screen pb-24 md:h-[calc(100vh-100px)] md:pb-6">
+      <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6 sm:mb-8 shrink-0">
         <div>
-          <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)] mb-1 flex items-center gap-2">Extrato</h1>
-          <p className="text-slate-500 text-sm">Histórico completo de movimentos e fluxo de caixa</p>
+          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[var(--text-main)] mb-1 flex items-center gap-2">Extrato</h1>
+          <p className="text-slate-500 text-xs sm:text-sm">Histórico completo de movimentos e fluxo de caixa</p>
         </div>
 
         <div className="hidden md:flex gap-6 bg-[#0a0c10] border border-white/5 p-4 rounded-2xl shadow-inner">

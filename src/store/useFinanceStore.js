@@ -9,8 +9,19 @@ export const useFinanceStore = create((set, get) => ({
   dataSelecionada: new Date(),
   setDataSelecionada: (data) => set({ dataSelecionada: data }),
   
-  mesAnterior: () => set(state => ({ dataSelecionada: new Date(state.dataSelecionada.setMonth(state.dataSelecionada.getMonth() - 1)) })),
-  proximoMes: () => set(state => ({ dataSelecionada: new Date(state.dataSelecionada.setMonth(state.dataSelecionada.getMonth() + 1)) })),
+  // Navegação de mês segura (evita overflow em dias 29/30/31 e mutação direta)
+  mesAnterior: () => set(state => {
+    const d = new Date(state.dataSelecionada);
+    d.setDate(1);
+    d.setMonth(d.getMonth() - 1);
+    return { dataSelecionada: d };
+  }),
+  proximoMes: () => set(state => {
+    const d = new Date(state.dataSelecionada);
+    d.setDate(1);
+    d.setMonth(d.getMonth() + 1);
+    return { dataSelecionada: d };
+  }),
 
   // 2. Dados da API (Estado Compartilhado)
   nomeUsuario: 'Usuário',
@@ -32,7 +43,71 @@ export const useFinanceStore = create((set, get) => ({
     futuro: { valor: 0, porcentagem: 0, limite_ideal: 20, itens: [] }
   },
 
-  // 3. Modais (Estado Visual Global)
+  // 3. Atualizações Otimistas (Instantâneas 0ms)
+  adicionarAgendamentoOtimista: (novoAgendamento) => set(state => ({
+    agendamentosReais: [...(state.agendamentosReais || []), novoAgendamento].sort((a, b) => 
+      (a.data_vencimento || '').localeCompare(b.data_vencimento || '')
+    )
+  })),
+
+  removerAgendamentoOtimista: (id) => set(state => ({
+    agendamentosReais: (state.agendamentosReais || []).filter(a => a.id !== id)
+  })),
+
+  pagarAgendamentoOtimista: (idAgendamento) => set(state => {
+    const agenda = (state.agendamentosReais || []).find(a => a.id === idAgendamento);
+    const agendamentosRestantes = (state.agendamentosReais || []).filter(a => a.id !== idAgendamento);
+    if (!agenda) return { agendamentosReais: agendamentosRestantes };
+
+    const valorNum = parseFloat(agenda.valor || 0);
+    const hojeStr = new Date().toLocaleDateString('pt-BR').split('/').reverse().join('-');
+
+    const novaTx = {
+      id: `tx-otimista-${Date.now()}`,
+      tipo: 'Despesa',
+      valor: valorNum,
+      categoria: `${agenda.categoria || 'Geral'}: ${agenda.descricao}`,
+      data: hojeStr,
+      classificacao: agenda.classificacao || 'essencial'
+    };
+
+    const novoSaldo = Math.max(0, (state.saldoReal || 0) - valorNum);
+    const novoBalanco = {
+      ...state.balancoReal,
+      despesas: (state.balancoReal?.despesas || 0) + valorNum,
+      balanco: (state.balancoReal?.balanco || 0) - valorNum
+    };
+
+    return {
+      agendamentosReais: agendamentosRestantes,
+      saldoReal: novoSaldo,
+      transacoesReais: [novaTx, ...(state.transacoesReais || [])],
+      balancoReal: novoBalanco
+    };
+  }),
+
+  adicionarTransacaoOtimista: (novaTx) => set(state => {
+    const valorNum = parseFloat(novaTx.valor || 0);
+    const isReceita = novaTx.tipo === 'Receita';
+    const novoSaldo = isReceita ? (state.saldoReal + valorNum) : (state.saldoReal - valorNum);
+    
+    return {
+      transacoesReais: [novaTx, ...(state.transacoesReais || [])],
+      saldoReal: novoSaldo,
+      balancoReal: {
+        ...state.balancoReal,
+        receitas: isReceita ? ((state.balancoReal?.receitas || 0) + valorNum) : (state.balancoReal?.receitas || 0),
+        despesas: !isReceita ? ((state.balancoReal?.despesas || 0) + valorNum) : (state.balancoReal?.despesas || 0),
+        balanco: isReceita ? ((state.balancoReal?.balanco || 0) + valorNum) : ((state.balancoReal?.balanco || 0) - valorNum)
+      }
+    };
+  }),
+
+  removerTransacaoOtimista: (idTx) => set(state => ({
+    transacoesReais: (state.transacoesReais || []).filter(t => t.id !== idTx)
+  })),
+
+  // 4. Modais (Estado Visual Global)
   modalReceitaAberto: false, setModalReceitaAberto: (val) => set({ modalReceitaAberto: val }),
   modalDespesaAberto: false, setModalDespesaAberto: (val) => set({ modalDespesaAberto: val }),
   modalCofreAberto: false, setModalCofreAberto: (val) => set({ modalCofreAberto: val }),
@@ -47,7 +122,24 @@ export const useFinanceStore = create((set, get) => ({
   modalOrcamentoAberto: false, setModalOrcamentoAberto: (val) => set({ modalOrcamentoAberto: val }),
   modalCommandPaletteAberto: false, setModalCommandPaletteAberto: (val) => set({ modalCommandPaletteAberto: val }),
 
-  // 4. Ação Principal de Carregamento Assíncrono (Busca de Dados)
+  // 5. Recarregamento direcionado ultrarrápido (apenas agendamentos)
+  recarregarAgendamentos: async (idConta) => {
+    const id = idConta || get().idContaReal;
+    if (!id) return;
+    const { dataSelecionada } = get();
+    const mesFormatado = `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
+    try {
+      const res = await fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${id}?mes=${mesFormatado}`);
+      const data = await res.json();
+      if (data && data.agendamentos) {
+        set({ agendamentosReais: data.agendamentos });
+      }
+    } catch (e) {
+      console.warn("Recarregamento silencioso de agendamentos falhou:", e);
+    }
+  },
+
+  // 6. Ação Principal de Carregamento Assíncrono Completo
   carregarDadosDaTela: async () => {
     const { idContaReal, dataSelecionada, telaAtiva } = get();
     if (!idContaReal) return;

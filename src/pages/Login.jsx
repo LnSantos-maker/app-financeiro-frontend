@@ -211,7 +211,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
       {/* Auth Modal Overlay */}
       {showModal && (
          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#090b10]/80 backdrop-blur-md p-4">
-            <MotionWrapper className="w-full max-w-md bg-[#23272b] rounded-[2rem] p-8 border border-[#30363d] shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            <MotionWrapper className="w-full max-w-md max-h-[92vh] overflow-y-auto bg-[#23272b] rounded-[2rem] p-6 sm:p-8 border border-[#30363d] shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative">
                
                <button type="button" onClick={() => setShowModal(false)} className="absolute z-50 top-4 right-4 md:top-6 md:right-6 text-[#8baaa6] hover:text-[#e6f0ed] bg-[#1e2226] p-2 rounded-full border border-[#30363d] shadow-[2px_2px_5px_rgba(0,0,0,0.2)] min-h-[44px] min-w-[44px] flex items-center justify-center">
                   <X size={16}/>

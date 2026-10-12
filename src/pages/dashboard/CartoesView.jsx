@@ -132,12 +132,12 @@ export default function CartoesView({
 }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pb-24">
-      <header className="flex justify-between items-center mb-10">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-10">
         <div>
-          <h1 className="text-3xl font-light tracking-tight text-[var(--text-main)] mb-1 flex items-center gap-2">Gestão de Cartões</h1>
-          <p className="text-slate-500 text-sm">Controle financeiro de limites e faturas ativas</p>
+          <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-[var(--text-main)] mb-1 flex items-center gap-2">Gestão de Cartões</h1>
+          <p className="text-slate-500 text-xs sm:text-sm">Controle financeiro de limites e faturas ativas</p>
         </div>
-        <button onClick={() => setModalCartaoAberto(true)} className="bg-[var(--accent)] hover:bg-teal-400 text-[#0f1115] font-bold px-6 py-3 rounded-2xl flex items-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(45,212,191,0.2)]">
+        <button onClick={() => setModalCartaoAberto(true)} className="w-full sm:w-auto bg-[var(--accent)] hover:bg-teal-400 text-[#0f1115] font-bold px-6 py-3 min-h-[44px] rounded-2xl flex items-center justify-center gap-2 font-medium transition-all shadow-[0_0_20px_rgba(45,212,191,0.2)] text-sm">
           <Plus size={20} /> Emitir Novo Cartão
         </button>
       </header>
@@ -172,11 +172,11 @@ export default function CartoesView({
               <CreditCard3D cartao={cartao} />
 
               {/* Ações do Cartão */}
-              <div className="flex gap-4 relative z-10">
-                <button onClick={() => abrirModalCompraCartao(cartao.id)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3.5 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-10">
+                <button onClick={() => abrirModalCompraCartao(cartao.id)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2 min-h-[44px]">
                   <CreditCard size={16} /> Lançar Despesa
                 </button>
-                <button onClick={() => handlePagarFatura(cartao.id, cartao.fatura_atual)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3.5 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2">
+                <button onClick={() => handlePagarFatura(cartao.id, cartao.fatura_atual)} className="flex-1 bg-[#0a0c10] hover:bg-teal-500/10 hover:text-teal-400 text-slate-300 font-medium py-3 rounded-2xl transition-colors text-sm border border-white/5 shadow-inner flex justify-center items-center gap-2 min-h-[44px]">
                   <Plus size={16} /> Pagar Fatura
                 </button>
               </div>

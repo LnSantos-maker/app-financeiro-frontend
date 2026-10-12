@@ -31,19 +31,19 @@ export default function HomeView({
           <button onClick={proximoMes} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white transition-colors"><ChevronRight size={16} /></button>
         </div>
 
-        <div className="flex flex-wrap justify-center md:justify-end gap-2 md:gap-4 w-full md:w-auto">
-          <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#292e33] text-slate-300 hover:bg-[#32383e] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-medium transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3),-2px_-2px_10px_rgba(255,255,255,0.05)] text-xs md:text-sm border border-[#383f45]"><CalendarClock size={16} /> Agendar</button>
-          <button onClick={() => setModalReceitaAberto(true)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingUp size={16} /> Receita</button>
-          <button onClick={() => setModalDespesaAberto(true)} className="bg-[#e69894] text-[#4a1c1a] hover:bg-[#f7a5a1] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingDown size={16} /> Despesa</button>
-          <button onClick={() => abrirModalAporte('')} className="bg-[#14535c] text-white hover:bg-[#1a6b77] px-4 md:px-5 py-2.5 min-h-[44px] rounded-2xl flex flex-1 sm:flex-none justify-center items-center gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><ArrowRightLeft size={16} /> Guardar</button>
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center md:justify-end gap-2 md:gap-4 w-full md:w-auto">
+          <button onClick={() => setModalAgendamentoAberto(true)} className="bg-[#292e33] text-slate-300 hover:bg-[#32383e] px-3 sm:px-5 py-2.5 min-h-[44px] rounded-2xl flex justify-center items-center gap-1.5 sm:gap-2 font-medium transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3),-2px_-2px_10px_rgba(255,255,255,0.05)] text-xs md:text-sm border border-[#383f45]"><CalendarClock size={16} /> Agendar</button>
+          <button onClick={() => setModalReceitaAberto(true)} className="bg-[#95bfa6] text-[#1a2f24] hover:bg-[#a6d1b7] px-3 sm:px-5 py-2.5 min-h-[44px] rounded-2xl flex justify-center items-center gap-1.5 sm:gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingUp size={16} /> Receita</button>
+          <button onClick={() => setModalDespesaAberto(true)} className="bg-[#e69894] text-[#4a1c1a] hover:bg-[#f7a5a1] px-3 sm:px-5 py-2.5 min-h-[44px] rounded-2xl flex justify-center items-center gap-1.5 sm:gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><TrendingDown size={16} /> Despesa</button>
+          <button onClick={() => abrirModalAporte('')} className="bg-[#14535c] text-white hover:bg-[#1a6b77] px-3 sm:px-5 py-2.5 min-h-[44px] rounded-2xl flex justify-center items-center gap-1.5 sm:gap-2 font-bold transition-all shadow-[4px_4px_10px_rgba(0,0,0,0.3)] text-xs md:text-sm"><ArrowRightLeft size={16} /> Guardar</button>
         </div>
       </header>
 
       {/* Top Cards - Deep Teal */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         
         {/* Saldo Livre */}
-        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)]">
+        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-5 md:p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)]">
           <div className="flex justify-between items-center mb-4 relative z-10">
             <div className="flex items-center gap-2">
               <Wallet size={18} className="text-[#a4c5c1]" />
@@ -51,7 +51,7 @@ export default function HomeView({
             </div>
             <button onClick={abrirModalEditSaldo} className="text-[#8baaa6] hover:text-[#e6f0ed] transition-colors p-1" title="Ajuste Manual"><Pencil size={14} /></button>
           </div>
-          <p className="text-[34px] font-bold text-[#e6f0ed] mb-1 relative z-10 tracking-tight">{(saldoReal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+          <p className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-[#e6f0ed] mb-1 relative z-10 tracking-tight truncate">{(saldoReal || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
           <p className="text-[#8baaa6] text-xs relative z-10">Disponível para uso</p>
           {/* Gold wave decoration */}
           <svg className="absolute bottom-0 left-0 w-full h-16 opacity-80" viewBox="0 0 400 100" preserveAspectRatio="none">
@@ -67,7 +67,7 @@ export default function HomeView({
         </div>
 
         {/* Gastos Totais */}
-        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between group">
+        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-5 md:p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between group">
           <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
              <TrendingDown size={140} />
           </div>
@@ -76,7 +76,7 @@ export default function HomeView({
               <TrendingDown size={18} className="text-[#e69894]" />
               <span className="text-sm font-medium text-[#e69894]">Gastos Totais</span>
             </div>
-            <p className="text-[34px] font-bold text-[#e6f0ed] mb-1 relative z-10 tracking-tight">{(despesas || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+            <p className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-[#e6f0ed] mb-1 relative z-10 tracking-tight truncate">{(despesas || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
           </div>
           <div className="flex justify-between items-end relative z-10 mt-4">
             <p className="text-[#8baaa6] text-xs">Despesas do mês atual</p>
@@ -84,7 +84,7 @@ export default function HomeView({
         </div>
 
         {/* Total Guardado */}
-        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between group">
+        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-5 md:p-6 relative overflow-hidden shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between group">
           <div className="absolute right-[-20px] top-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
              <Lock size={140} />
           </div>
@@ -93,30 +93,30 @@ export default function HomeView({
               <Target size={18} className="text-[#a4c5c1]" />
               <span className="text-sm font-medium text-[#a4c5c1]">Total Guardado</span>
             </div>
-            <p className="text-[34px] font-bold text-[#e0e8cd] mb-1 relative z-10 tracking-tight">{(totalGuardado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+            <p className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-[#e0e8cd] mb-1 relative z-10 tracking-tight truncate">{(totalGuardado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
           </div>
           <div className="flex justify-between items-end relative z-10 mt-4">
             <p className="text-[#8baaa6] text-xs">Soma de todos os cofres</p>
-            <button onClick={() => abrirModalAporte('')} className="bg-[#244b52] hover:bg-[#2c5b63] text-[#e6f0ed] px-4 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_5px_rgba(0,0,0,0.3)] transition-colors border border-[#316168]">Poupar agora</button>
+            <button onClick={() => abrirModalAporte('')} className="bg-[#244b52] hover:bg-[#2c5b63] text-[#e6f0ed] px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_5px_rgba(0,0,0,0.3)] transition-colors border border-[#316168]">Poupar agora</button>
           </div>
         </div>
 
         {/* Balanço do Mês */}
-        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-6 shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-[#1b3b40] to-[#112a2e] border border-[#2a5056] rounded-2xl p-5 md:p-6 shadow-[6px_6px_15px_rgba(0,0,0,0.4),-4px_-4px_12px_rgba(255,255,255,0.03)] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-sm font-medium text-[#a4c5c1]">Balanço do Mês</span>
             </div>
-            <p className="text-[34px] font-bold text-[#e6f0ed] mb-1 tracking-tight">{(valBalanco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+            <p className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-[#e6f0ed] mb-1 tracking-tight truncate">{(valBalanco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
           </div>
           <div className="flex justify-between items-center mt-4 border-t border-[#2a5056]/50 pt-3">
             <div className="flex flex-col">
               <div className="flex items-center gap-1 text-[#95bfa6] text-xs font-bold mb-1"><div className="bg-[#95bfa6]/20 p-0.5 rounded-full"><TrendingUp size={10} /></div> Receita</div>
-              <span className="text-[#8baaa6] text-[11px]">R: {receitas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+              <span className="text-[#8baaa6] text-[11px] truncate">R: {receitas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1 text-[#e69894] text-xs font-bold mb-1"><div className="bg-[#e69894]/20 p-0.5 rounded-full"><TrendingDown size={10} /></div> Despesa</div>
-              <span className="text-[#8baaa6] text-[11px]">D: {despesas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+              <span className="text-[#8baaa6] text-[11px] truncate">D: {despesas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default function HomeView({
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:row gap-6">
           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Essenciais */}
@@ -274,19 +274,19 @@ export default function HomeView({
               <p className="text-[#8e98a3] text-sm text-center py-8">Nenhuma conta na fila.</p>
             ) : (
               (agendamentosReais || []).map((agenda) => (
-                <div key={agenda.id} className="flex items-center justify-between p-4 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)]">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-[#e69894]/10 text-[#e69894] border border-[#e69894]/20"><CalendarClock size={18} /></div>
-                    <div>
-                      <h4 className="font-bold text-[#e2e8f0] text-sm">{agenda.descricao}</h4>
-                      <p className="text-[#8e98a3] text-[10px] mt-1 uppercase tracking-widest">Vence dia <span className="font-bold">{agenda.data_vencimento.split('-').reverse().join('/')}</span></p>
+                <div key={agenda.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)] gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-[#e69894]/10 text-[#e69894] border border-[#e69894]/20 flex-shrink-0"><CalendarClock size={18} /></div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-[#e2e8f0] text-sm truncate">{agenda.descricao}</h4>
+                      <p className="text-[#8e98a3] text-[10px] mt-1 uppercase tracking-widest">Vence dia <span className="font-bold">{agenda.data_vencimento ? agenda.data_vencimento.split('-').reverse().join('/') : ''}</span></p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="font-bold text-[#e69894]">{(agenda.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => handlePagarAgendamento(agenda.id)} className="bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] p-2 rounded-xl transition-colors font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Pagar"><CheckSquare size={16} /></button>
-                      <button onClick={() => handleExcluirAgendamento(agenda.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 rounded-xl transition-colors shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Excluir"><Trash2 size={16} /></button>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                    <span className="font-bold text-[#e69894] text-sm sm:text-base whitespace-nowrap">{(agenda.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => handlePagarAgendamento(agenda.id)} className="bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors font-bold shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Pagar"><CheckSquare size={16} /></button>
+                      <button onClick={() => handleExcluirAgendamento(agenda.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors shadow-[2px_2px_5px_rgba(0,0,0,0.3)]" title="Excluir"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 </div>
@@ -302,22 +302,22 @@ export default function HomeView({
           </div>
           <div className="flex flex-col gap-3">
             {(transacoesReais || []).slice(0, 5).map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between p-3 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)]">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl border ${tx.tipo === 'Receita' ? 'bg-[#95bfa6]/10 text-[#95bfa6] border-[#95bfa6]/20' : tx.tipo === 'Cartao' ? 'bg-[#1b3b40] text-[#a4c5c1] border-[#2a5056]' : 'bg-[#e69894]/10 text-[#e69894] border-[#e69894]/20'}`}>
+              <div key={tx.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-3.5 bg-[#24282c] border border-[#30363d] rounded-2xl hover:bg-[#2d3238] transition-colors group shadow-[inset_1px_1px_3px_rgba(0,0,0,0.5)] gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2.5 sm:p-3 rounded-xl border flex-shrink-0 ${tx.tipo === 'Receita' ? 'bg-[#95bfa6]/10 text-[#95bfa6] border-[#95bfa6]/20' : tx.tipo === 'Cartao' ? 'bg-[#1b3b40] text-[#a4c5c1] border-[#2a5056]' : 'bg-[#e69894]/10 text-[#e69894] border-[#e69894]/20'}`}>
                      {tx.tipo === 'Receita' ? <TrendingUp size={16}/> : tx.tipo === 'Cartao' ? <Wallet size={16}/> : <TrendingDown size={16}/>}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-[#e2e8f0] text-sm">{tx.categoria}</h4>
-                    <p className="text-[#8e98a3] text-[10px] mt-1">{tx.data.split('-').reverse().join('/')}</p>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-[#e2e8f0] text-sm truncate">{tx.categoria || tx.descricao}</h4>
+                    <p className="text-[#8e98a3] text-[10px] mt-1">{tx.data ? tx.data.split('-').reverse().join('/') : ''}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className={`font-bold ${tx.tipo === 'Receita' ? 'text-[#95bfa6]' : tx.tipo === 'Cartao' ? 'text-[#a4c5c1]' : 'text-[#e69894]'}`}>
+                <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                  <span className={`font-bold whitespace-nowrap text-sm sm:text-base ${tx.tipo === 'Receita' ? 'text-[#95bfa6]' : tx.tipo === 'Cartao' ? 'text-[#a4c5c1]' : 'text-[#e69894]'}`}>
                     {tx.tipo === 'Receita' ? '+' : '-'}{(tx.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 rounded-xl transition-colors"><Trash2 size={16} /></button>
+                  <div className="flex gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                     <button onClick={() => handleExcluirTransacao(tx.id)} className="bg-[#30363d] hover:bg-[#e69894] text-[#8e98a3] hover:text-[#4a1c1a] p-2 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl transition-colors"><Trash2 size={16} /></button>
                   </div>
                 </div>
               </div>
