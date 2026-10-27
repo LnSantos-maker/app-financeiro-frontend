@@ -3,6 +3,7 @@ import { ShieldCheck, User, Mail, Lock, Eye, EyeOff, ArrowRight, CornerDownRight
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { MotionWrapper } from '../components/ui/MotionWrapper';
+import { API_URL } from '../config';
 
 export default function Login({ onLoginSuccess, mostrarNotificacao }) {
   // Navigation & Modal State
@@ -29,12 +30,12 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
 
   // Pré-aquecimento do backend para eliminar qualquer latência de cold start do Render
   React.useEffect(() => {
-    fetch('https://app-financeiro-10tz.onrender.com/').catch(() => {});
+    fetch(`${API_URL}/`).catch(() => {});
   }, []);
 
   const carregarSetup2FA = async (email) => {
     try {
-      const res = await fetch(`https://app-financeiro-10tz.onrender.com/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${API_URL}/auth/setup-2fa/?email=${encodeURIComponent(email)}`);
       const dados = await res.json();
       if (res.ok && dados.precisa_qrcode) {
         const chave = dados.chave_secreta || 'CHAVE-JA-SALVA-NO-BACKEND';
@@ -106,7 +107,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
     setIsLoading(true);
     const emailNormalizado = (emailLogin || '').trim().toLowerCase();
     try {
-      const resposta = await fetch('https://app-financeiro-10tz.onrender.com/auth/verificar-2fa/', { 
+      const resposta = await fetch(`${API_URL}/auth/verificar-2fa/`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ email: emailNormalizado, codigo_2fa: codigoLimpo }) 
@@ -132,7 +133,7 @@ export default function Login({ onLoginSuccess, mostrarNotificacao }) {
 
   const openAuthModal = (isLogin) => {
     // Pré-aquece o backend no momento que abre o modal
-    fetch('https://app-financeiro-10tz.onrender.com/').catch(() => {});
+    fetch(`${API_URL}/`).catch(() => {});
     setIsLoginMode(isLogin);
     setShowModal(true);
     setEtapaLogin(0);

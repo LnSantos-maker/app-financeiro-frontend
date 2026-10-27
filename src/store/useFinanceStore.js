@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { API_URL } from '../config';
 
 export const useFinanceStore = create((set, get) => ({
   // 1. Contexto Global
@@ -130,7 +131,7 @@ export const useFinanceStore = create((set, get) => ({
     const { dataSelecionada } = get();
     const mesFormatado = `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
     try {
-      const res = await fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${id}?mes=${mesFormatado}`);
+      const res = await fetch(`${API_URL}/listar_agendamentos/${id}?mes=${mesFormatado}`);
       const data = await res.json();
       if (data && data.agendamentos) {
         set({ agendamentosReais: data.agendamentos });
@@ -150,19 +151,19 @@ export const useFinanceStore = create((set, get) => ({
 
     try {
       const [dPerfil, dSaldo, dTx, dCat, dMetas, dBal, dEvo, dIntel, dCartoes, dAgenda, dPlanilha, dOrcamentos, dBeneficios] = await Promise.all([
-        fetch(`https://app-financeiro-10tz.onrender.com/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/graficos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_metas/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/balanco/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/evolucao/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/inteligencia/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({})),
-        fetch(`https://app-financeiro-10tz.onrender.com/listar_beneficios/${idContaReal}`).then(r => r.json()).catch(() => ({}))
+        fetch(`${API_URL}/perfil/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/saldo/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_transacoes/${idContaReal}?mes=${mesParametroAPI}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/graficos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_metas/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/balanco/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/evolucao/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/inteligencia/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_cartoes/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_agendamentos/${idContaReal}?mes=${mesFormatado}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_planilha/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/orcamentos/${idContaReal}`).then(r => r.json()).catch(() => ({})),
+        fetch(`${API_URL}/listar_beneficios/${idContaReal}`).then(r => r.json()).catch(() => ({}))
       ]);
 
       set({
