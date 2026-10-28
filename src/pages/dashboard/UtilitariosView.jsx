@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Calculator, StickyNote, Save, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calculator, StickyNote, Trash2 } from 'lucide-react';
 
 export default function UtilitariosView() {
   const [nota, setNota] = useState(() => localStorage.getItem('appFinanceiroNota') || '');
@@ -14,7 +14,7 @@ export default function UtilitariosView() {
     if (val === '=') {
       try {
         setCalcDisplay(eval(calcDisplay).toString());
-      } catch (e) {
+      } catch {
         setCalcDisplay('Erro');
       }
       return;
@@ -37,7 +37,7 @@ export default function UtilitariosView() {
     <div className="animate-in fade-in duration-300 h-full flex flex-col">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-[var(--text-main)]">Utilitários</h1>
-        <p className="text-[var(--text-sec)]">Suas ferramentas de produtividade diária.</p>
+        <p className="text-[var(--text-sec)]">Suas ferramentas de produtividade diária</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-1">
@@ -47,7 +47,7 @@ export default function UtilitariosView() {
             <div className="bg-[var(--accent)]/10 text-[var(--accent)] p-2 rounded-[12px]"><StickyNote size={20} /></div>
             <h2 className="text-xl font-bold text-[var(--text-main)]">Bloco de Notas</h2>
           </div>
-          <textarea 
+          <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}
             placeholder="Anotações rápidas, lembretes..."
@@ -65,21 +65,21 @@ export default function UtilitariosView() {
             <div className="bg-[var(--accent)]/10 text-[var(--accent)] p-2 rounded-[12px]"><Calculator size={20} /></div>
             <h2 className="text-xl font-bold text-[var(--text-main)]">Calculadora Rápida</h2>
           </div>
-          
+
           <div className="bg-[var(--bg-main)] border border-[var(--border-card)] rounded-[12px] p-6 mb-6">
             <div className="text-right text-3xl font-mono text-[var(--text-main)] overflow-x-auto overflow-y-hidden whitespace-nowrap">{calcDisplay}</div>
           </div>
 
           <div className="grid grid-cols-4 gap-3 flex-1">
             {botoesCalc.map((btn, idx) => (
-              <button 
+              <button
                 key={idx}
                 onClick={() => handleCalc(btn)}
                 className={`text-xl font-bold rounded-[12px] transition-colors ${
                   btn === '=' ? 'bg-[var(--accent)] text-emerald-950 hover:bg-emerald-400' :
                   btn === 'C' ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20' :
-                  ['/','*','-','+'].includes(btn) ? 'bg-[#101e22] text-[var(--accent)] hover:bg-zinc-700' :
-                  'bg-[#101e22]/50 text-[var(--text-main)] hover:bg-zinc-700'
+                  ['/','*','-','+'].includes(btn) ? 'bg-[#26311f] text-[var(--accent)] hover:bg-zinc-700' :
+                  'bg-[#26311f]/50 text-[var(--text-main)] hover:bg-zinc-700'
                 }`}
               >
                 {btn}

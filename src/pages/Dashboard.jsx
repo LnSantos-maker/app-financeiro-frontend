@@ -1,24 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Home, CreditCard, ArrowRightLeft, Target, Settings, Wallet, Plus, TrendingUp, TrendingDown, Zap, ShoppingBag, Calendar, ChevronDown, X, CheckCircle, AlertCircle, BrainCircuit, Trash2, Download, Eraser, Pencil, User, Mail, Lock, EyeOff, Eye, ArrowRight, ChevronLeft, ChevronRight, Smartphone, ShieldCheck, Search, Filter, TrendingUp as Speed, LogOut, CalendarClock, CheckSquare, QrCode, ClipboardList, MessageCircle, Calculator } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import DashboardNavigation from '../components/DashboardNavigation';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { BatteryCharging, CreditCard, ArrowRightLeft, Target, TrendingUp, TrendingDown, ShoppingBag, X, AlertCircle, Download, Pencil, User, CalendarClock, ClipboardList } from 'lucide-react';
+
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { MotionWrapper } from '../components/ui/MotionWrapper';
+
 import HomeView from './dashboard/HomeView';
-import ExtratoView from './dashboard/ExtratoView';
-import MetasView from './dashboard/MetasView';
-import PlanilhaView from './dashboard/PlanilhaView';
-import CartoesView from './dashboard/CartoesView';
-import BeneficiosView from './dashboard/BeneficiosView';
-import ConfiguracoesView from './dashboard/ConfiguracoesView';
-import UtilitariosView from './dashboard/UtilitariosView';
+const ExtratoView = lazy(() => import('./dashboard/ExtratoView'));
+const MetasView = lazy(() => import('./dashboard/MetasView'));
+const PlanilhaView = lazy(() => import('./dashboard/PlanilhaView'));
+const CartoesView = lazy(() => import('./dashboard/CartoesView'));
+const BeneficiosView = lazy(() => import('./dashboard/BeneficiosView'));
+const ConfiguracoesView = lazy(() => import('./dashboard/ConfiguracoesView'));
+const UtilitariosView = lazy(() => import('./dashboard/UtilitariosView'));
 import { AVATARES, AvatarBadge } from '../components/ui/Avatar';
 import CommandPalette from '../components/CommandPalette';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { API_URL } from '../config';
 
-export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) {
+export default function Dashboard({ onInitialReady, emailLogin, onLogout, mostrarNotificacao }) {
 
   const {
     idContaReal, setIdContaReal,
@@ -48,11 +49,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   } = useFinanceStore();
 
   const [toast, setToast] = useState({ visivel: false, mensagem: '', tipo: 'sucesso' });
-  
+
   const [dialogoConfirmacao, setDialogoConfirmacao] = useState({
     aberto: false, titulo: '', mensagem: '', textoAcao: '', corAcao: '', corIcone: '', onConfirm: () => {}
   });
-  
+
   const [editNomeUsuario, setEditNomeUsuario] = useState('');
   const [editAvatarUsuario, setEditAvatarUsuario] = useState('avatar-1');
 
@@ -72,17 +73,17 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [metaEditGuardado, setMetaEditGuardado] = useState('');
   const [metaEditPrazo, setMetaEditPrazo] = useState('');
 
- 
+
 
   const [tituloReceita, setTituloReceita] = useState('');
   const [valorReceita, setValorReceita] = useState('');
-  const [categoriaReceita, setCategoriaReceita] = useState('Salário'); 
-  
+  const [categoriaReceita, setCategoriaReceita] = useState('Salário');
+
   const [tituloDespesa, setTituloDespesa] = useState('');
   const [valorDespesa, setValorDespesa] = useState('');
-  const [categoriaDespesa, setCategoriaDespesa] = useState('Alimentação'); 
+  const [categoriaDespesa, setCategoriaDespesa] = useState('Alimentação');
   const [classificacaoDespesa, setClassificacaoDespesa] = useState('essencial');
-  
+
   const [tituloAgendamento, setTituloAgendamento] = useState('');
   const [valorAgendamento, setValorAgendamento] = useState('');
   const [dataAgendamento, setDataAgendamento] = useState('');
@@ -93,7 +94,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [tituloMeta, setTituloMeta] = useState('');
   const [objetivoMeta, setObjetivoMeta] = useState('');
   const [mesesMeta, setMesesMeta] = useState('');
-  
+
   const [metaSelecionada, setMetaSelecionada] = useState('');
   const [valorAporte, setValorAporte] = useState('');
   const [metaResgateSelecionada, setMetaResgateSelecionada] = useState('');
@@ -128,7 +129,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [modalEditBeneficioAberto, setModalEditBeneficioAberto] = useState(false);
   const [modalCompraBeneficioAberto, setModalCompraBeneficioAberto] = useState(false);
   const [modalRecargaBeneficioAberto, setModalRecargaBeneficioAberto] = useState(false);
-  
+
   const [beneficioNome, setBeneficioNome] = useState('');
   const [beneficioSaldo, setBeneficioSaldo] = useState('');
   const [beneficioSelecionadoId, setBeneficioSelecionadoId] = useState('');
@@ -141,22 +142,23 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const [cartaoExpandidoExtrato, setCartaoExpandidoExtrato] = useState(null);
 
   // ==============================================================================
-  // FUNCIONALIDADES E INTEGRAÇÕES 
+  // FUNCIONALIDADES E INTEGRAÇÕES
   // ==============================================================================
-  
+
   const nomeMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   const mesFormatadoExibicao = `${nomeMeses[dataSelecionada.getMonth()]} de ${dataSelecionada.getFullYear()}`;
   const mesParametroAPI = telaAtiva === 'extrato' ? "todos" : `${dataSelecionada.getFullYear()}-${String(dataSelecionada.getMonth() + 1).padStart(2, '0')}`;
 
-  
-  useEffect(() => { if (idContaReal) { carregarDadosDaTela(idContaReal); } }, [dataSelecionada, telaAtiva]); 
+
+  useEffect(() => { if (idContaReal) { carregarDadosDaTela(idContaReal); } }, [dataSelecionada, telaAtiva]);
 
   useEffect(() => {
     if (emailLogin) {
       fetch(`${API_URL}/configurar/?email=${encodeURIComponent(emailLogin)}`)
         .then(res => res.json())
-        .then(data => { setIdContaReal(data.id_conta); carregarDadosDaTela(data.id_conta); })
-        .catch(err => console.error("Erro na configuração", err));
+        .then(data => { setIdContaReal(data.id_conta); return carregarDadosDaTela(data.id_conta); })
+        .catch(err => console.error("Erro na configuração", err))
+        .finally(() => onInitialReady?.());
     }
   }, [emailLogin]);
 
@@ -165,51 +167,51 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const toggleExtratoBeneficio = (idBeneficio) => { beneficioExpandidoExtrato === idBeneficio ? setBeneficioExpandidoExtrato(null) : setBeneficioExpandidoExtrato(idBeneficio); };
 
   const handleSalvarPerfil = async () => {
-    if (!editNomeUsuario.trim()) return mostrarNotificacao("O nome não pode ficar vazio.", "erro");
+    if (!editNomeUsuario.trim()) return mostrarNotificacao("O nome não pode ficar vazio", "erro");
     try {
-      useFinanceStore.setState({ 
+      useFinanceStore.setState({
         nomeUsuario: editNomeUsuario.trim(),
-        avatarUsuario: editAvatarUsuario 
+        avatarUsuario: editAvatarUsuario
       });
       setModalPerfilAberto(false);
       mostrarNotificacao("Perfil atualizado com sucesso!");
 
-      const resposta = await fetch(`${API_URL}/perfil/${idContaReal}`, { 
+      const resposta = await fetch(`${API_URL}/perfil/${idContaReal}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           nome_usuario: editNomeUsuario.trim(),
-          avatar_usuario: editAvatarUsuario 
-        }) 
+          avatar_usuario: editAvatarUsuario
+        })
       });
-      if (resposta.ok) { 
-        carregarDadosDaTela(idContaReal); 
+      if (resposta.ok) {
+        carregarDadosDaTela(idContaReal);
       }
-    } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleExcluirTransacao = (idTransacao) => {
     setDialogoConfirmacao({
-      aberto: true, titulo: 'Apagar Transação', mensagem: 'Tem certeza que deseja apagar esta transação? O valor será estornado.', textoAcao: 'Sim, Apagar', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      aberto: true, titulo: 'Apagar Transação', mensagem: 'Tem certeza que deseja apagar esta transação? O valor será estornado', textoAcao: 'Sim, Apagar', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const resposta = await fetch(`${API_URL}/transacoes/${idContaReal}/${idTransacao}`, { method: 'DELETE' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Transação apagada com sucesso!"); }
-        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
 
   const handleZerarSaldo = () => {
     setDialogoConfirmacao({
-      aberto: true, titulo: 'Formatar Conta Inteira', mensagem: 'Deseja FORMATAR a sua conta? Isso apagará TODAS as transações e zerará o saldo. Essa ação não tem volta.', textoAcao: 'Zerar Tudo', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      aberto: true, titulo: 'Formatar Conta Inteira', mensagem: 'Deseja FORMATAR a sua conta? Isso apagará TODAS as transações e zerará o saldo Essa ação não tem volta', textoAcao: 'Zerar Tudo', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const resposta = await fetch(`${API_URL}/zerar_saldo/${idContaReal}`, { method: 'PUT' });
-          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta formatada! Ficha limpa."); setTelaAtiva('home'); }
-        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Conta formatada! Ficha limpa"); setTelaAtiva('home'); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
@@ -217,35 +219,35 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   // NOVA FUNÇÃO DE RESETAR O 2FA
   const handleReset2FA = () => {
     setDialogoConfirmacao({
-      aberto: true, 
-      titulo: 'Redefinir Autenticador (2FA)', 
-      mensagem: 'Isso apagará sua chave de segurança atual. No próximo login, você precisará escanear um novo QR Code no Google Authenticator. Tem certeza?', 
-      textoAcao: 'Sim, Redefinir 2FA', 
-      corAcao: 'bg-amber-500 hover:bg-amber-400', 
+      aberto: true,
+      titulo: 'Redefinir Autenticador (2FA)',
+      mensagem: 'Isso apagará sua chave de segurança atual No próximo login, você precisará escanear um novo QR Code no Google Authenticator Tem certeza?',
+      textoAcao: 'Sim, Redefinir 2FA',
+      corAcao: 'bg-amber-500 hover:bg-amber-400',
       corIcone: 'text-amber-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const emailAtual = emailLogin;
           const resposta = await fetch(`${API_URL}/auth/reset-2fa/${encodeURIComponent(emailAtual)}`, { method: 'DELETE' });
-          if (resposta.ok) { mostrarNotificacao("2FA resetado! O QR Code voltará a aparecer no próximo login."); }
-          else { mostrarNotificacao("Erro ao resetar no servidor.", "erro"); }
-        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+          if (resposta.ok) { mostrarNotificacao("2FA resetado! O QR Code voltará a aparecer no próximo login"); }
+          else { mostrarNotificacao("Erro ao resetar no servidor", "erro"); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
 
   const handlePagarFatura = (idCartao, valorFaturaAtual) => {
-    if (valorFaturaAtual <= 0) return mostrarNotificacao("A fatura já está zerada.", "erro");
+    if (valorFaturaAtual <= 0) return mostrarNotificacao("A fatura já está zerada", "erro");
     setDialogoConfirmacao({
       aberto: true, titulo: 'Pagar Fatura', mensagem: `Deseja pagar a fatura de R$ ${valorFaturaAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}? Esse valor sairá do seu Saldo Livre.`, textoAcao: 'Confirmar Pagamento', corAcao: 'bg-[var(--accent)] hover:bg-emerald-400', corIcone: 'text-[var(--accent)]',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const resposta = await fetch(`${API_URL}/cartoes/pagar/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: idCartao, valor: valorFaturaAtual }) });
-          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Fatura paga com sucesso!"); } 
+          if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Fatura paga com sucesso!"); }
           else { const erro = await resposta.json(); mostrarNotificacao(erro.detail, "erro"); }
-        } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
@@ -258,17 +260,17 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     if (editSaldoValor === '') return mostrarNotificacao("Preencha um valor", "erro");
     const valorNum = Math.max(0, parseFloat(editSaldoValor.toString().replace(',', '.')) || 0);
     try {
-      const resposta = await fetch(`${API_URL}/saldo/${idContaReal}`, { 
-        method: 'PUT', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ novo_saldo: valorNum }) 
+      const resposta = await fetch(`${API_URL}/saldo/${idContaReal}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ novo_saldo: valorNum })
       });
-      if (resposta.ok) { 
-        setModalEditSaldoAberto(false); 
-        carregarDadosDaTela(idContaReal); 
-        mostrarNotificacao("Saldo ajustado com sucesso!"); 
+      if (resposta.ok) {
+        setModalEditSaldoAberto(false);
+        carregarDadosDaTela(idContaReal);
+        mostrarNotificacao("Saldo ajustado com sucesso!");
       }
-    } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const abrirModalEditTx = (tx) => {
@@ -278,39 +280,39 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   };
 
   const handleSalvarEditTx = async () => {
-    if (!txEditTitulo || !txEditValor) return mostrarNotificacao("Preencha título e valor.", "erro");
+    if (!txEditTitulo || !txEditValor) return mostrarNotificacao("Preencha título e valor", "erro");
     const valorNum = Math.max(0, parseFloat(txEditValor.toString().replace(',', '.')) || 0);
-    const txAtualizada = { 
-      id_conta: idContaReal, 
-      tipo: txEditTipo, 
-      valor: valorNum, 
-      categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo, 
-      data: new Date().toISOString().split('T')[0], 
-      classificacao: txEditCat 
+    const txAtualizada = {
+      id_conta: idContaReal,
+      tipo: txEditTipo,
+      valor: valorNum,
+      categoria: txEditTipo === 'Receita' ? `${txEditCat}: ${txEditTitulo}` : txEditTitulo,
+      data: new Date().toISOString().split('T')[0],
+      classificacao: txEditCat
     };
     try {
-      const resposta = await fetch(`${API_URL}/transacoes/${idContaReal}/${txEditId}`, { 
-        method: 'PUT', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(txAtualizada) 
+      const resposta = await fetch(`${API_URL}/transacoes/${idContaReal}/${txEditId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(txAtualizada)
       });
-      if (resposta.ok) { 
-        setModalEditTxAberto(false); 
-        carregarDadosDaTela(idContaReal); 
-        mostrarNotificacao("Transação editada com sucesso!"); 
+      if (resposta.ok) {
+        setModalEditTxAberto(false);
+        carregarDadosDaTela(idContaReal);
+        mostrarNotificacao("Transação editada com sucesso!");
       }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const abrirModalEditMeta = (meta) => { setMetaEditId(meta.id); setMetaEditTitulo(meta.titulo); setMetaEditObjetivo(meta.objetivo.toString()); setMetaEditGuardado(meta.guardado.toString()); setMetaEditPrazo(Math.round(meta.dias_restantes / 30).toString()); setModalEditMetaAberto(true); };
-  
+
   const handleSalvarEditMeta = async () => {
-    if (!metaEditTitulo || !metaEditObjetivo || !metaEditGuardado) return mostrarNotificacao("Preencha os campos essenciais.", "erro");
+    if (!metaEditTitulo || !metaEditObjetivo || !metaEditGuardado) return mostrarNotificacao("Preencha os campos essenciais", "erro");
     const metaAtualizada = { id_conta: idContaReal, titulo: metaEditTitulo, objetivo: parseFloat(metaEditObjetivo.toString().replace(',', '.')), guardado: parseFloat(metaEditGuardado.toString().replace(',', '.')), dias_restantes: parseInt(metaEditPrazo || 1) * 30 };
     try {
       const resposta = await fetch(`${API_URL}/metas/${idContaReal}/${metaEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(metaAtualizada) });
       if (resposta.ok) { setModalEditMetaAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre editado!"); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const getLocalDateString = (d = new Date()) => {
@@ -321,9 +323,9 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   };
 
   const handleSalvarReceita = async () => {
-    if (!tituloReceita.trim() || !valorReceita) return mostrarNotificacao("Preencha título e valor.", "erro");
+    if (!tituloReceita.trim() || !valorReceita) return mostrarNotificacao("Preencha título e valor", "erro");
     const valorNum = parseFloat(valorReceita.toString().replace(',', '.'));
-    if (isNaN(valorNum) || valorNum <= 0) return mostrarNotificacao("Valor inválido.", "erro");
+    if (isNaN(valorNum) || valorNum <= 0) return mostrarNotificacao("Valor inválido", "erro");
 
     const tempId = `tx-rec-${Date.now()}`;
     const novaTransacao = {
@@ -353,18 +355,18 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       if (!resposta.ok) {
         removerTransacaoOtimista(tempId);
         carregarDadosDaTela(idContaReal);
-        mostrarNotificacao("Erro ao persistir receita.", "erro");
+        mostrarNotificacao("Erro ao persistir receita", "erro");
       }
-    } catch (e) {
+    } catch {
       removerTransacaoOtimista(tempId);
       carregarDadosDaTela(idContaReal);
-      mostrarNotificacao("Erro de conexão.", "erro");
+      mostrarNotificacao("Erro de conexão", "erro");
     }
   };
 
   const processarSalvamentoDespesa = async () => {
     const valorNum = parseFloat(valorDespesa.toString().replace(',', '.'));
-    if (isNaN(valorNum) || valorNum <= 0) return mostrarNotificacao("Valor inválido.", "erro");
+    if (isNaN(valorNum) || valorNum <= 0) return mostrarNotificacao("Valor inválido", "erro");
 
     const tempId = `tx-desp-${Date.now()}`;
     const novaTransacao = {
@@ -395,17 +397,17 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       if (!resposta.ok) {
         removerTransacaoOtimista(tempId);
         carregarDadosDaTela(idContaReal);
-        mostrarNotificacao("Erro ao persistir despesa.", "erro");
+        mostrarNotificacao("Erro ao persistir despesa", "erro");
       }
-    } catch (e) {
+    } catch {
       removerTransacaoOtimista(tempId);
       carregarDadosDaTela(idContaReal);
-      mostrarNotificacao("Erro de conexão.", "erro");
+      mostrarNotificacao("Erro de conexão", "erro");
     }
   };
 
   const handleSalvarDespesa = () => {
-    if (!tituloDespesa.trim() || !valorDespesa) return mostrarNotificacao("Preencha título e valor.", "erro");
+    if (!tituloDespesa.trim() || !valorDespesa) return mostrarNotificacao("Preencha título e valor", "erro");
     if (classificacaoDespesa === 'estilo_vida' && inteligenciaReal?.total_receitas > 0 && ((inteligenciaReal?.estilo_vida?.valor || 0) + parseFloat(valorDespesa.replace(',', '.')) > inteligenciaReal.total_receitas * 0.30)) {
         setDialogoConfirmacao({ aberto: true, titulo: 'Alerta Financeiro!', mensagem: `Esse gasto vai ultrapassar o limite recomendado de 30% para Estilo de Vida neste mês. Tem certeza?`, textoAcao: 'Sim, Gastar Mesmo Assim', corAcao: 'bg-amber-500 hover:bg-amber-400', corIcone: 'text-amber-500', onConfirm: () => { setDialogoConfirmacao(prev => ({ ...prev, aberto: false })); processarSalvamentoDespesa(); } });
         return;
@@ -415,11 +417,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   const handleSalvarAgendamento = async () => {
     if (!tituloAgendamento.trim() || !valorAgendamento || !dataAgendamento) {
-      return mostrarNotificacao("Preencha todos os campos do agendamento.", "erro");
+      return mostrarNotificacao("Preencha todos os campos do agendamento", "erro");
     }
     const valorNum = parseFloat(valorAgendamento.toString().replace(',', '.'));
     if (isNaN(valorNum) || valorNum <= 0) {
-      return mostrarNotificacao("Informe um valor válido.", "erro");
+      return mostrarNotificacao("Informe um valor válido", "erro");
     }
 
     const tempId = `agenda-${Date.now()}`;
@@ -463,13 +465,13 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       if (!resposta.ok) {
         removerAgendamentoOtimista(tempId);
         const err = await resposta.json().catch(() => ({}));
-        mostrarNotificacao(err.detail || "Erro ao agendar no servidor.", "erro");
+        mostrarNotificacao(err.detail || "Erro ao agendar no servidor", "erro");
       } else {
         recarregarAgendamentos(idContaReal);
       }
-    } catch (e) {
+    } catch {
       removerAgendamentoOtimista(tempId);
-      mostrarNotificacao("Erro de conexão ao salvar agendamento.", "erro");
+      mostrarNotificacao("Erro de conexão ao salvar agendamento", "erro");
     }
   };
 
@@ -482,13 +484,13 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       const resposta = await fetch(`${API_URL}/agendamentos/pagar/${idAgendamento}`, { method: 'POST' });
       if (!resposta.ok) {
         carregarDadosDaTela(idContaReal);
-        mostrarNotificacao("Erro ao sincronizar pagamento.", "erro");
+        mostrarNotificacao("Erro ao sincronizar pagamento", "erro");
       } else {
         recarregarAgendamentos(idContaReal);
       }
-    } catch (e) {
+    } catch {
       carregarDadosDaTela(idContaReal);
-      mostrarNotificacao("Erro de conexão ao pagar conta.", "erro");
+      mostrarNotificacao("Erro de conexão ao pagar conta", "erro");
     }
   };
 
@@ -501,11 +503,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       const resposta = await fetch(`${API_URL}/agendamentos/${idAgendamento}`, { method: 'DELETE' });
       if (!resposta.ok) {
         recarregarAgendamentos(idContaReal);
-        mostrarNotificacao("Erro ao excluir agendamento.", "erro");
+        mostrarNotificacao("Erro ao excluir agendamento", "erro");
       }
-    } catch (e) {
+    } catch {
       recarregarAgendamentos(idContaReal);
-      mostrarNotificacao("Erro de conexão.", "erro");
+      mostrarNotificacao("Erro de conexão", "erro");
     }
   };
 
@@ -514,35 +516,35 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const progressoGlobal = totalObjetivoGlobal > 0 ? Math.min(100, Math.round((totalGuardado / totalObjetivoGlobal) * 100)) : 0;
 
   const handleSalvarMeta = async () => {
-    if (!tituloMeta || !objetivoMeta || !mesesMeta) return mostrarNotificacao("Preencha todos os campos.", "erro");
+    if (!tituloMeta || !objetivoMeta || !mesesMeta) return mostrarNotificacao("Preencha todos os campos", "erro");
     try {
       const resposta = await fetch(`${API_URL}/metas/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, titulo: tituloMeta, objetivo: parseFloat(objetivoMeta.toString().replace(',', '.')), dias_restantes: parseInt(mesesMeta) * 30 }) });
       if (resposta.ok) { setModalCofreAberto(false); setTituloMeta(''); setObjetivoMeta(''); setMesesMeta(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cofre criado com sucesso!"); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleSalvarAporte = async () => {
-    if (!metaSelecionada || !valorAporte) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
+    if (!metaSelecionada || !valorAporte) return mostrarNotificacao("Escolha o cofre e o valor", "erro");
     try {
       const resposta = await fetch(`${API_URL}/aportes/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaSelecionada, valor_aporte: parseFloat(valorAporte.replace(',', '.')) }) });
-      if (resposta.ok) { setModalAporteAberto(false); setValorAporte(''); setMetaSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro guardado!"); } 
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      if (resposta.ok) { setModalAporteAberto(false); setValorAporte(''); setMetaSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro guardado!"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleSalvarResgate = async () => {
-    if (!metaResgateSelecionada || !valorResgate) return mostrarNotificacao("Escolha o cofre e o valor.", "erro");
+    if (!metaResgateSelecionada || !valorResgate) return mostrarNotificacao("Escolha o cofre e o valor", "erro");
     try {
       const resposta = await fetch(`${API_URL}/resgatar/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_meta: metaResgateSelecionada, valor_resgate: parseFloat(valorResgate.replace(',', '.')) }) });
-      if (resposta.ok) { setModalResgateAberto(false); setValorResgate(''); setMetaResgateSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro resgatado para o Saldo Livre!"); } 
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      if (resposta.ok) { setModalResgateAberto(false); setValorResgate(''); setMetaResgateSelecionada(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Dinheiro resgatado para o Saldo Livre!"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleSalvarCartao = async () => {
-    if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
+    if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados", "erro");
     try {
       const resposta = await fetch(`${API_URL}/cartoes/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
-      if (resposta.ok) { setModalCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão adicionado!"); } 
-    } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      if (resposta.ok) { setModalCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão adicionado!"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const abrirModalEdicaoCartao = (cartao) => {
@@ -556,16 +558,16 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   };
 
   const handleEditarCartao = async () => {
-    if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados.", "erro");
+    if (!nomeCartao || !limiteCartao || !diaFechamento || !diaVencimento) return mostrarNotificacao("Preencha todos os dados", "erro");
     try {
       const resposta = await fetch(`${API_URL}/cartoes/${idContaReal}/${cartaoEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: nomeCartao, limite_total: parseFloat(limiteCartao.toString().replace(',', '.')), dia_fechamento: parseInt(diaFechamento), dia_vencimento: parseInt(diaVencimento), instituicao: instituicaoCartao }) });
-      if (resposta.ok) { setModalEditCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão atualizado!"); } 
-    } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      if (resposta.ok) { setModalEditCartaoAberto(false); setNomeCartao(''); setLimiteCartao(''); setDiaFechamento(''); setDiaVencimento(''); setInstituicaoCartao('Nubank'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Cartão atualizado!"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleExcluirCartao = (idCartao) => {
     setDialogoConfirmacao({
-      aberto: true, titulo: 'Excluir Cartão', mensagem: 'Tem certeza que deseja apagar este cartão? Vamos tentar excluir todas as compras pendentes primeiro e depois o cartão.', textoAcao: 'Sim, Apagar Tudo', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      aberto: true, titulo: 'Excluir Cartão', mensagem: 'Tem certeza que deseja apagar este cartão? Vamos tentar excluir todas as compras pendentes primeiro e depois o cartão', textoAcao: 'Sim, Apagar Tudo', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
@@ -578,26 +580,26 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           }
           // Tenta apagar o cartão em si
           const resposta = await fetch(`${API_URL}/cartoes/${idContaReal}/${idCartao}`, { method: 'DELETE' });
-          if (resposta.ok) { 
-            carregarDadosDaTela(idContaReal); 
-            mostrarNotificacao("Cartão apagado com sucesso!"); 
+          if (resposta.ok) {
+            carregarDadosDaTela(idContaReal);
+            mostrarNotificacao("Cartão apagado com sucesso!");
           } else {
             const err = await resposta.json();
             mostrarNotificacao(err.detail || "Erro ao apagar cartão", "erro");
           }
-        } catch (erro) { mostrarNotificacao("Erro de conexão.", "erro"); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
 
   const abrirModalCompraCartao = (idCartao) => { setCartaoSelecionadoId(idCartao); setParcelasCompraCartao('1'); setModalCompraCartaoAberto(true); };
-  
+
   const handleLancarCompraCartao = async () => {
-    if (!descricaoCompraCartao || !valorCompraCartao) return mostrarNotificacao("Preencha a descrição e o valor.", "erro");
+    if (!descricaoCompraCartao || !valorCompraCartao) return mostrarNotificacao("Preencha a descrição e o valor", "erro");
     try {
       const resposta = await fetch(`${API_URL}/cartoes/comprar/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, id_cartao: cartaoSelecionadoId, descricao: descricaoCompraCartao, valor: parseFloat(valorCompraCartao.replace(',', '.')), parcelas: parseInt(parcelasCompraCartao) || 1 }) });
-      if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); setParcelasCompraCartao('1'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); } 
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+      if (resposta.ok) { setModalCompraCartaoAberto(false); setDescricaoCompraCartao(''); setValorCompraCartao(''); setParcelasCompraCartao('1'); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra lançada no cartão!"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const abrirModalEditCompraCartao = (compra) => {
@@ -608,42 +610,42 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   };
 
   const handleSalvarEditCompraCartao = async () => {
-    if (!compraCartaoEditDescricao || !compraCartaoEditValor) return mostrarNotificacao("Preencha todos os dados.", "erro");
+    if (!compraCartaoEditDescricao || !compraCartaoEditValor) return mostrarNotificacao("Preencha todos os dados", "erro");
     try {
       const resposta = await fetch(`${API_URL}/cartoes/transacoes/${idContaReal}/${compraCartaoEditId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ descricao: compraCartaoEditDescricao, valor: parseFloat(compraCartaoEditValor.replace(',', '.')) })
       });
       if (resposta.ok) { setModalEditCompraCartaoAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra atualizada!"); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleExcluirCompraCartao = (idCompra) => {
     setDialogoConfirmacao({
-      aberto: true, titulo: 'Excluir Compra do Cartão', mensagem: 'Deseja excluir esta compra? O limite ocupado será liberado.', textoAcao: 'Sim, Excluir', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      aberto: true, titulo: 'Excluir Compra do Cartão', mensagem: 'Deseja excluir esta compra? O limite ocupado será liberado', textoAcao: 'Sim, Excluir', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
         try {
           const resposta = await fetch(`${API_URL}/cartoes/transacoes/${idContaReal}/${idCompra}`, { method: 'DELETE' });
           if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Compra excluída e limite restaurado!"); }
-        } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+        } catch { mostrarNotificacao("Erro de conexão", "erro"); }
       }
     });
   };
 
   const handleSalvarPlanilha = async () => {
-    if (!tituloPlanilha || !valorPlanilha || !dataPlanilha) return mostrarNotificacao("Preencha todos os campos.", "erro");
+    if (!tituloPlanilha || !valorPlanilha || !dataPlanilha) return mostrarNotificacao("Preencha todos os campos", "erro");
     try {
       const resposta = await fetch(`${API_URL}/planilha/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_conta: idContaReal, descricao: tituloPlanilha, valor: parseFloat(valorPlanilha.replace(',', '.')), vencimento: dataPlanilha }) });
       if (resposta.ok) { setModalPlanilhaAberto(false); setTituloPlanilha(''); setValorPlanilha(''); setDataPlanilha(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Item adicionado à planilha!"); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleExcluirPlanilha = async (idItem) => {
     try {
       const resposta = await fetch(`${API_URL}/planilha/${idItem}`, { method: 'DELETE' });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); mostrarNotificacao("Item removido!"); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   const handleAlternarStatusPlanilha = async (idItem, statusAtual) => {
@@ -651,12 +653,12 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
     try {
       const resposta = await fetch(`${API_URL}/planilha/${idItem}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: novoStatus }) });
       if (resposta.ok) { carregarDadosDaTela(idContaReal); }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
 
   const handleSalvarOrcamento = async () => {
-    if (!valorLimiteOrcamento) return mostrarNotificacao("Preencha o valor limite.", "erro");
+    if (!valorLimiteOrcamento) return mostrarNotificacao("Preencha o valor limite", "erro");
     try {
       const resposta = await fetch(`${API_URL}/orcamentos/`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -668,19 +670,19 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         carregarDadosDaTela(idContaReal);
         mostrarNotificacao("Orçamento salvo com sucesso!");
       }
-    } catch (e) { mostrarNotificacao("Erro de conexão.", "erro"); }
+    } catch { mostrarNotificacao("Erro de conexão", "erro"); }
   };
 
   // Funções de Benefícios
   const handleSalvarBeneficio = async () => {
-    if (!beneficioNome || !beneficioSaldo) return mostrarNotificacao("Preencha nome e saldo.", "erro");
+    if (!beneficioNome || !beneficioSaldo) return mostrarNotificacao("Preencha nome e saldo", "erro");
     try {
       const resposta = await fetch(`${API_URL}/beneficios/`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_conta: idContaReal, nome: beneficioNome, saldo_atual: parseFloat(beneficioSaldo.replace(',', '.')) })
       });
       if (resposta.ok) { setModalBeneficioAberto(false); setBeneficioNome(''); setBeneficioSaldo(''); carregarDadosDaTela(idContaReal); mostrarNotificacao("Benefício cadastrado!"); }
-    } catch (e) { mostrarNotificacao("Erro.", "erro"); }
+    } catch { mostrarNotificacao("Erro.", "erro"); }
   };
 
   const abrirModalEdicaoBeneficio = (beneficio) => {
@@ -688,14 +690,14 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   };
 
   const handleEditarBeneficio = async () => {
-    if (!beneficioNome || !beneficioSaldo) return mostrarNotificacao("Preencha nome e saldo.", "erro");
+    if (!beneficioNome || !beneficioSaldo) return mostrarNotificacao("Preencha nome e saldo", "erro");
     try {
       const resposta = await fetch(`${API_URL}/beneficios/${idContaReal}/${beneficioSelecionadoId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome: beneficioNome, saldo_atual: parseFloat(beneficioSaldo.replace(',', '.')) })
       });
       if (resposta.ok) { setModalEditBeneficioAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Atualizado!"); }
-    } catch (e) { mostrarNotificacao("Erro.", "erro"); }
+    } catch { mostrarNotificacao("Erro.", "erro"); }
   };
 
   const handleExcluirBeneficio = (id) => {
@@ -712,7 +714,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   const abrirModalCompraBeneficio = (id) => { setBeneficioSelecionadoId(id); setBeneficioCompraDescricao(''); setBeneficioCompraValor(''); setModalCompraBeneficioAberto(true); };
 
   const handleLancarCompraBeneficio = async () => {
-    if (!beneficioCompraDescricao || !beneficioCompraValor) return mostrarNotificacao("Preencha tudo.", "erro");
+    if (!beneficioCompraDescricao || !beneficioCompraValor) return mostrarNotificacao("Preencha tudo", "erro");
     try {
       const resposta = await fetch(`${API_URL}/beneficios/comprar/`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -720,7 +722,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
       });
       if (resposta.ok) { setModalCompraBeneficioAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Gasto registrado!"); }
       else { const err = await resposta.json(); mostrarNotificacao(err.detail, "erro"); }
-    } catch (e) { mostrarNotificacao("Erro.", "erro"); }
+    } catch { mostrarNotificacao("Erro.", "erro"); }
   };
 
   const abrirModalRecargaBeneficio = (id) => { setBeneficioSelecionadoId(id); setBeneficioRecargaValor(''); setModalRecargaBeneficioAberto(true); };
@@ -733,25 +735,25 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         body: JSON.stringify({ id_conta: idContaReal, id_beneficio: beneficioSelecionadoId, valor: parseFloat(beneficioRecargaValor.replace(',', '.')) })
       });
       if (resposta.ok) { setModalRecargaBeneficioAberto(false); carregarDadosDaTela(idContaReal); mostrarNotificacao("Recarregado!"); }
-    } catch (e) { mostrarNotificacao("Erro.", "erro"); }
+    } catch { mostrarNotificacao("Erro.", "erro"); }
   };
 
   const handleExcluirCompraBeneficio = (idTransacao, idBeneficio) => {
     setDialogoConfirmacao({
-      aberto: true, titulo: 'Excluir Gasto', mensagem: 'Deseja excluir este gasto? O saldo do benefício NÃO será restaurado automaticamente neste caso simplificado.', textoAcao: 'Sim', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
+      aberto: true, titulo: 'Excluir Gasto', mensagem: 'Deseja excluir este gasto? O saldo do benefício NÃO será restaurado automaticamente neste caso simplificado', textoAcao: 'Sim', corAcao: 'bg-rose-500 hover:bg-rose-400', corIcone: 'text-rose-500',
       onConfirm: async () => {
         setDialogoConfirmacao(prev => ({ ...prev, aberto: false }));
-        // Note: For simplicity we aren't restoring the benefit balance, but ideally we should. 
+        // Note: For simplicity we aren't restoring the benefit balance, but ideally we should.
         // For now just deleting the tx. Actually wait, let's restore it in backend:
         // That requires a DELETE endpoint for transacoes_beneficios which I didn't create.
         // Let's just create it on backend later or ignore balance restore.
-        mostrarNotificacao("Operação em desenvolvimento.", "aviso");
+        mostrarNotificacao("Operação em desenvolvimento", "aviso");
       }
     });
   };
 
   const handleExportarWhatsApp = () => {
-    if (planilhaReal.length === 0) return mostrarNotificacao("A planilha está vazia.", "erro");
+    if (planilhaReal.length === 0) return mostrarNotificacao("A planilha está vazia", "erro");
     let texto = "*Minha Planilha de Contas* 📄\n\n";
     let total = 0;
     planilhaReal.forEach(item => {
@@ -773,7 +775,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
   const alertas = [];
   const hoje = new Date();
-  
+
   (agendamentosReais || []).forEach(ag => {
     if (!ag.data_vencimento) return;
     const parts = ag.data_vencimento.split('-');
@@ -805,9 +807,9 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
   });
 
   return (
-    <div className="flex w-full flex-1 h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans overflow-hidden relative">
-      
-      
+    <div className="dashboard-shell flex w-full flex-1 h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-sans overflow-hidden relative">
+
+
 
       {dialogoConfirmacao.aberto && (
         <div className="fixed inset-0 bg-[var(--accent)]/40 backdrop-blur-md backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -822,89 +824,16 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
         </div>
       )}
 
-      <aside className="w-full md:w-[80px] h-[64px] md:h-auto border-t md:border-t-0 md:border-r border-[#26282d] flex flex-row md:flex-col items-center justify-around md:justify-start py-1 md:py-6 shrink-0 bg-[#16171b]/95 backdrop-blur-lg z-50 fixed bottom-0 left-0 md:relative md:bottom-auto md:left-auto">
-        <div className="hidden md:flex w-12 h-12 rounded-[12px] bg-[#0a0c10] items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.2)] md:mb-8">
-          <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
-        </div>
-        <nav className="flex flex-row md:flex-col gap-1 sm:gap-2 md:gap-6 text-[#757982] w-full md:w-auto justify-around px-1 md:px-0">
-          <button onClick={() => setTelaAtiva('home')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'home' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Visão Geral"><Home size={22} /></button>
-          <button onClick={() => setTelaAtiva('cartoes')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'cartoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cartões"><CreditCard size={22} /></button>
-          <button onClick={() => setTelaAtiva('extrato')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'extrato' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Extrato Completo"><ArrowRightLeft size={22} /></button>
-          <button onClick={() => setTelaAtiva('metas')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'metas' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Cofres"><Target size={22} /></button>
-          <button onClick={() => setTelaAtiva('beneficios')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors ${telaAtiva === 'beneficios' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Vales & Benefícios"><ShoppingBag size={22} /></button>
-          <button onClick={() => setTelaAtiva('planilha')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] hidden sm:flex items-center justify-center transition-colors ${telaAtiva === 'planilha' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Planilha Fantasma"><ClipboardList size={22} /></button>
-          <button onClick={() => setTelaAtiva('utilitarios')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] hidden md:flex items-center justify-center transition-colors ${telaAtiva === 'utilitarios' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Utilitários"><Calculator size={22} /></button>
-          <button onClick={() => setTelaAtiva('configuracoes')} className={`p-2 md:p-3 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors md:mt-auto ${telaAtiva === 'configuracoes' ? 'bg-[#18393e] text-[#5cb0b8] border border-[#214c53]' : 'hover:text-zinc-200'}`} title="Configurações"><Settings size={22} /></button>
-          
-          {/* Avatar + Nome no Desktop Sidebar */}
-          <button 
-            onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }} 
-            className="hidden md:flex flex-col items-center gap-1 mt-2 pt-3 border-t border-[#26282d]/80 group cursor-pointer w-full px-1"
-            title={`Editar Perfil: ${nomeUsuario || 'Perfil'}`}
-          >
-            <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="xs" />
-            <span className="text-[10px] font-semibold text-[#8baaa6] group-hover:text-[#e6f0ed] truncate max-w-[64px] text-center capitalize">
-              {nomeUsuario || 'Perfil'}
-            </span>
-          </button>
-        </nav>
-      </aside>
-
-      <main className="flex-1 p-3.5 sm:p-6 md:p-10 pb-24 md:pb-10 overflow-y-auto overflow-x-hidden relative">
-        {/* Header Mobile com Logo da NEXUS e Perfil (Ícone + Nome) */}
-        <div className="flex md:hidden items-center justify-between pb-3.5 mb-4 border-b border-[#26282d]/80 gap-2">
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-[#0a0c10] flex items-center justify-center border border-teal-500/30 overflow-hidden shadow-[0_0_15px_rgba(45,212,191,0.25)]">
-              <img src="/img/nexus_logo.jpg" alt="NEXUS Logo" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-base font-bold tracking-[0.18em] text-[#e3e4e8]">NEXUS</span>
-              <span className="text-[8.5px] uppercase tracking-widest text-[#5cb0b8] font-semibold">Sistema Financeiro</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Botão de Perfil Mobile: Ícone + Nome/Apelido */}
-            <button 
-              onClick={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }}
-              className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-xl bg-[#1c2024] hover:bg-[#252a30] border border-[#2e343b] transition-all min-w-0 max-w-[130px] sm:max-w-[160px] group cursor-pointer shadow-sm"
-              title="Editar Perfil"
-            >
-              <div className="shrink-0">
-                <AvatarBadge avatarId={avatarUsuario} nome={nomeUsuario} tamanho="xs" />
-              </div>
-              <span className="text-xs font-semibold text-[#e6f0ed] group-hover:text-white truncate capitalize">
-                {nomeUsuario || emailLogin?.split('@')[0] || 'Perfil'}
-              </span>
-            </button>
-
-            {/* Botão de Sair Mobile */}
-            <button
-              onClick={onLogout}
-              className="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center transition-colors shrink-0"
-              title="Sair da Conta"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
-        </div>
-
-        <div className="hidden md:flex absolute top-8 left-10 items-center gap-2 pointer-events-none z-0 opacity-80">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 6L10 10L14 14" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M8 2H16C19.3137 2 22 4.68629 22 8V16C22 19.3137 19.3137 22 16 22H8C4.68629 22 2 19.3137 2 16V8C2 4.68629 4.68629 2 8 2Z" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <h1 className="text-2xl font-bold tracking-[0.2em] text-[#e3e4e8]">NEXUS</h1>
-        </div>
-        <div className="h-1 md:h-6"></div>
-        <AnimatePresence mode="wait">
+      <DashboardNavigation active={telaAtiva} onNavigate={setTelaAtiva} name={nomeUsuario} onProfile={() => { setEditNomeUsuario(nomeUsuario); setModalPerfilAberto(true); }} onLogout={onLogout} />
+      <main id="conteudo" className="dashboard-content">
+        <Suspense fallback={<div className="view-loading" role="status">Abrindo sua visão financeira…</div>}><AnimatePresence mode="wait">
           <motion.div
             key={telaAtiva}
-            initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="h-full"
+            className="dashboard-view"
           >
             {telaAtiva === 'home' && (
           <HomeView
@@ -939,7 +868,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
         {/* ================================== EXTRATO ================================== */}
         {telaAtiva === 'extrato' && (
-          <ExtratoView 
+          <ExtratoView
             transacoesReais={transacoesReais}
             abrirModalEditTx={abrirModalEditTx}
             handleExcluirTransacao={handleExcluirTransacao}
@@ -992,11 +921,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             onLogout={onLogout}
           />
         )}
-        
+
         {telaAtiva === 'utilitarios' && (
           <UtilitariosView />
         )}
-        
+
         {telaAtiva === 'cartoes' && (
             <CartoesView
             cartoesReais={cartoesReais}
@@ -1014,7 +943,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             handleExcluirCompraCartao={handleExcluirCompraCartao}
           />
         )}
-        
+
         {telaAtiva === 'beneficios' && (
           <BeneficiosView
             beneficiosReais={beneficiosReais}
@@ -1032,8 +961,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           />
         )}
           </motion.div>
-        </AnimatePresence>
-      </main>
+        </AnimatePresence></Suspense></main>
 
       {/* ==============================================================================
           MODAIS E FORMULÁRIOS
@@ -1080,13 +1008,13 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           </div>
         </div>
       )}
-      
+
       {modalEditSaldoAberto && (
         <div className="fixed inset-0 bg-[var(--accent)]/40 backdrop-blur-md backdrop-blur-sm z-[90] flex items-center justify-center p-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50 animate-in fade-in duration-200">
             <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2"><Pencil size={24} className="text-[var(--text-main)]"/> Ajustar Saldo Livre</h2><button onClick={() => setModalEditSaldoAberto(false)} className="text-[var(--text-sec)] hover:text-[var(--text-main)]"><X size={24} /></button></div>
             <div className="flex flex-col gap-4">
-              <p className="text-[var(--text-sec)] text-sm">Use isto para corrigir pequenas diferenças no saldo sem apagar o histórico.</p>
+              <p className="text-[var(--text-sec)] text-sm">Use isto para corrigir pequenas diferenças no saldo sem apagar o histórico</p>
               <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Novo Saldo Atual (R$)</label><input type="number" value={editSaldoValor} onChange={(e) => setEditSaldoValor(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
               <button onClick={handleSalvarEditSaldo} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Novo Saldo</button>
             </div>
@@ -1133,8 +1061,8 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={metaEditObjetivo} onChange={(e) => setMetaEditObjetivo(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={metaEditPrazo} onChange={(e) => setMetaEditPrazo(e.target.value)} placeholder="Ex: 12" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
               </div>
-              {parseFloat(metaEditObjetivo.toString().replace(',','.')) > 0 && parseInt(metaEditPrazo) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-xl p-3 text-center mt-1"><p className="text-[var(--text-main)] text-sm">💡 Meta: Guarde <strong>{(parseFloat(metaEditObjetivo.toString().replace(',','.')) / parseInt(metaEditPrazo)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês.</p></div>)}
-              <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Dinheiro Guardado (R$)</label><input type="number" value={metaEditGuardado} onChange={(e) => setMetaEditGuardado(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /><p className="text-xs text-[var(--text-sec)] mt-1">Atenção: Alterar este valor não afeta o Saldo Livre. Para resgatar saldo real, use o botão "Resgatar".</p></div>
+              {parseFloat(metaEditObjetivo.toString().replace(',','.')) > 0 && parseInt(metaEditPrazo) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-xl p-3 text-center mt-1"><p className="text-[var(--text-main)] text-sm">💡 Meta: Guarde <strong>{(parseFloat(metaEditObjetivo.toString().replace(',','.')) / parseInt(metaEditPrazo)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês</p></div>)}
+              <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Dinheiro Guardado (R$)</label><input type="number" value={metaEditGuardado} onChange={(e) => setMetaEditGuardado(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /><p className="text-xs text-[var(--text-sec)] mt-1">Atenção: Alterar este valor não afeta o Saldo Livre Para resgatar saldo real, use o botão "Resgatar"</p></div>
               <button onClick={handleSalvarEditMeta} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Alterações</button>
             </div>
           </div>
@@ -1151,7 +1079,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor (R$)</label><input type="number" value={valorReceita} onChange={(e) => setValorReceita(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Categoria</label><select value={categoriaReceita} onChange={(e) => setCategoriaReceita(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500"><option value="Salário">Salário</option><option value="Vendas">Vendas</option><option value="Rendimento">Rendimento</option><option value="Outros">Outros</option></select></div>
               </div>
-              <button onClick={handleSalvarReceita} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-[var(--text-main)] font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Receita</button>
+              <button onClick={handleSalvarReceita} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-[#ffffff] font-bold py-3.5 rounded-xl mt-4 transition-colors">Salvar Receita</button>
             </div>
           </div>
         </div>
@@ -1184,7 +1112,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor Objetivo (R$)</label><input type="number" value={objetivoMeta} onChange={(e) => setObjetivoMeta(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Prazo (Meses)</label><input type="number" value={mesesMeta} onChange={(e) => setMesesMeta(e.target.value)} placeholder="Ex: 12" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
               </div>
-              {parseFloat(objetivoMeta.replace(',','.')) > 0 && parseInt(mesesMeta) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-xl p-3 text-center mt-1"><p className="text-[var(--text-main)] text-sm">💡 Dica: Guarde <strong>{(parseFloat(objetivoMeta.replace(',','.')) / parseInt(mesesMeta)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês para atingir a meta.</p></div>)}
+              {parseFloat(objetivoMeta.replace(',','.')) > 0 && parseInt(mesesMeta) > 0 && (<div className="bg-zinc-800 border border-emerald-500/30 rounded-xl p-3 text-center mt-1"><p className="text-[var(--text-main)] text-sm">💡 Dica: Guarde <strong>{(parseFloat(objetivoMeta.replace(',','.')) / parseInt(mesesMeta)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> por mês para atingir a meta</p></div>)}
               <button onClick={handleSalvarMeta} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">Criar Cofre</button>
             </div>
           </div>
@@ -1197,14 +1125,14 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-2"><ArrowRightLeft size={24} className="text-[var(--text-main)]"/> Guardar Dinheiro</h2><button onClick={() => setModalAporteAberto(false)} className="text-[var(--text-sec)] hover:text-[var(--text-main)]"><X size={24} /></button></div>
             {(metasReais || []).length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 border border-dashed border-zinc-700 rounded-xl bg-[var(--bg-main)] mb-2">
-                 <Target size={40} className="text-[var(--text-sec)] mb-4" /><h3 className="text-[var(--text-main)] font-medium mb-2">Nenhum cofre disponível</h3><p className="text-[var(--text-sec)] text-sm text-center mb-6">Precisa de criar um cofre antes de guardar dinheiro.</p>
+                 <Target size={40} className="text-[var(--text-sec)] mb-4" /><h3 className="text-[var(--text-main)] font-medium mb-2">Nenhum cofre disponível</h3><p className="text-[var(--text-sec)] text-sm text-center mb-6">Precisa de criar um cofre antes de guardar dinheiro</p>
                  <button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="bg-zinc-800 text-[var(--text-main)] hover:bg-[#d4af37]/20 border border-emerald-500/30 px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">Criar Primeiro Cofre</button>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <div>
                   <div className="flex justify-between items-center mb-1"><label className="text-[var(--text-sec)] text-sm block">Escolha o Cofre</label><button onClick={() => { setModalAporteAberto(false); setModalCofreAberto(true); }} className="text-[var(--text-main)] text-xs font-medium hover:underline">+ Criar novo cofre</button></div>
-                  <select value={metaSelecionada} onChange={(e) => setMetaSelecionada(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo}</option>))}</select>
+                  <select value={metaSelecionada} onChange={(e) => setMetaSelecionada(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500"><option value="">Selecione</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo}</option>))}</select>
                 </div>
                 <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor a Guardar (R$)</label><input type="number" value={valorAporte} onChange={(e) => setValorAporte(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-emerald-500" /></div>
                 <button onClick={handleSalvarAporte} className="w-full bg-[var(--accent)] hover:bg-emerald-400 text-emerald-950 font-bold py-3.5 rounded-xl mt-4 transition-colors">Confirmar Transferência</button>
@@ -1221,7 +1149,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
             <div className="flex flex-col gap-4">
               <div>
                 <label className="text-[var(--text-sec)] text-sm mb-1 block">Escolha o Cofre</label>
-                <select value={metaResgateSelecionada} onChange={(e) => setMetaResgateSelecionada(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-slate-500"><option value="">Selecione...</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo} (Disponível: R$ {meta.guardado})</option>))}</select>
+                <select value={metaResgateSelecionada} onChange={(e) => setMetaResgateSelecionada(e.target.value)} className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-slate-500"><option value="">Selecione</option>{(metasReais || []).map(meta => (<option key={meta.id} value={meta.id}>{meta.titulo} (Disponível: R$ {meta.guardado})</option>))}</select>
               </div>
               <div><label className="text-[var(--text-sec)] text-sm mb-1 block">Valor a Resgatar (R$)</label><input type="number" value={valorResgate} onChange={(e) => setValorResgate(e.target.value)} placeholder="0,00" className="w-full bg-[var(--bg-main)] border border-zinc-700 rounded-xl px-4 py-3.5 text-[var(--text-main)] focus:outline-none focus:border-slate-500" /></div>
               <button onClick={handleSalvarResgate} className="w-full bg-slate-700 hover:bg-slate-600 text-[var(--text-main)] font-bold py-3.5 rounded-xl mt-4 transition-colors">Confirmar Resgate</button>
@@ -1357,50 +1285,50 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
       {/* MODAL EDITAR PERFIL COM AVATARES */}
       {modalPerfilAberto && (
-        <div className="fixed inset-0 bg-[#090b10]/80 backdrop-blur-md z-[90] flex items-center justify-center p-4">
-          <div className="bg-[#1f2327] border border-[#30363d] rounded-3xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/60 animate-in fade-in duration-200 relative">
+        <div className="fixed inset-0 bg-[#eef1f5]/80 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+          <div className="bg-[#1f2327] border border-[#3c4535] rounded-3xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/60 animate-in fade-in duration-200 relative">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#292e33] border border-[#383f45] flex items-center justify-center text-[#95bfa6]">
+                <div className="w-10 h-10 rounded-xl bg-[#2b3325] border border-[#9aacc0] flex items-center justify-center text-[#f34b27]">
                   <User size={20} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#e6f0ed]">Editar Perfil</h2>
-                  <p className="text-xs text-[#8baaa6]">Personalize seu nome e escolha seu avatar</p>
+                  <h2 className="text-xl font-bold text-[#172333]">Editar Perfil</h2>
+                  <p className="text-xs text-[#5c6d83]">Personalize seu nome e escolha seu avatar</p>
                 </div>
               </div>
-              <button onClick={() => setModalPerfilAberto(false)} className="text-[#8baaa6] hover:text-[#e6f0ed] p-2 rounded-xl bg-[#292e33] border border-[#383f45] min-h-[40px] min-w-[40px] flex items-center justify-center">
+              <button onClick={() => setModalPerfilAberto(false)} className="text-[#5c6d83] hover:text-[#172333] p-2 rounded-xl bg-[#2b3325] border border-[#9aacc0] min-h-[40px] min-w-[40px] flex items-center justify-center">
                 <X size={18} />
               </button>
             </div>
 
             <div className="flex flex-col gap-6">
               {/* Preview Atual */}
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#171a1d] border border-[#2b3137]">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#171a1d] border border-[#ced7e3]">
                 <AvatarBadge avatarId={editAvatarUsuario} nome={editNomeUsuario} tamanho="md" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#e6f0ed] truncate">{editNomeUsuario || 'Seu Nome'}</p>
-                  <p className="text-xs text-[#8baaa6] truncate">{emailLogin}</p>
+                  <p className="text-sm font-bold text-[#172333] truncate">{editNomeUsuario || 'Seu Nome'}</p>
+                  <p className="text-xs text-[#5c6d83] truncate">{emailLogin}</p>
                 </div>
               </div>
 
               {/* Campo Nome */}
               <div>
-                <label className="text-[11px] font-bold text-[#8baaa6] uppercase tracking-wider block mb-2">Seu Nome / Apelido</label>
-                <input 
-                  type="text" 
-                  value={editNomeUsuario} 
-                  onChange={(e) => setEditNomeUsuario(e.target.value)} 
+                <label className="text-[11px] font-bold text-[#5c6d83] uppercase tracking-wider block mb-2">Seu Nome / Apelido</label>
+                <input
+                  type="text"
+                  value={editNomeUsuario}
+                  onChange={(e) => setEditNomeUsuario(e.target.value)}
                   placeholder="Como quer ser chamado?"
-                  className="w-full bg-[#171a1d] border border-[#30363d] rounded-xl px-4 py-3.5 text-[#e6f0ed] focus:outline-none focus:border-[#95bfa6] text-sm"
+                  className="w-full bg-[#171a1d] border border-[#3c4535] rounded-xl px-4 py-3.5 text-[#172333] focus:outline-none focus:border-[#f34b27] text-sm"
                 />
               </div>
 
               {/* Seletor de Avatar / Bonecos */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-[11px] font-bold text-[#8baaa6] uppercase tracking-wider block">Escolha seu Avatar</label>
-                  <span className="text-[10px] text-[#95bfa6] font-semibold">{AVATARES.length} opções prontas</span>
+                  <label className="text-[11px] font-bold text-[#5c6d83] uppercase tracking-wider block">Escolha seu Avatar</label>
+                  <span className="text-[10px] text-[#f34b27] font-semibold">{AVATARES.length} opções prontas</span>
                 </div>
 
                 <div className="grid grid-cols-4 gap-3">
@@ -1413,9 +1341,9 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                         type="button"
                         onClick={() => setEditAvatarUsuario(av.id)}
                         className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all cursor-pointer relative group ${
-                          selecionado 
-                            ? 'bg-[#293532] border-[#95bfa6] shadow-[0_0_15px_rgba(149,191,166,0.3)]' 
-                            : 'bg-[#171a1d] border-[#2b3137] hover:border-[#3d454d] hover:bg-[#202428]'
+                          selecionado
+                            ? 'bg-[#293532] border-[#f34b27] shadow-none'
+                            : 'bg-[#171a1d] border-[#ced7e3] hover:border-[#3d454d] hover:bg-[#202428]'
                         }`}
                       >
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${av.cor} p-0.5 shadow-sm`}>
@@ -1423,11 +1351,11 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
                             <Icone size={20} className={av.textCor} />
                           </div>
                         </div>
-                        <span className="text-[10px] font-medium text-[#8baaa6] group-hover:text-[#e6f0ed] truncate w-full text-center">
+                        <span className="text-[10px] font-medium text-[#5c6d83] group-hover:text-[#172333] truncate w-full text-center">
                           {av.nome}
                         </span>
                         {selecionado && (
-                          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#95bfa6] text-[#0f1114] flex items-center justify-center text-[10px] font-bold shadow-sm">
+                          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#f34b27] text-[#0f1114] flex items-center justify-center text-[10px] font-bold shadow-sm">
                             ✓
                           </span>
                         )}
@@ -1439,17 +1367,17 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
 
               {/* Botões de Ação */}
               <div className="flex gap-3 pt-2">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setModalPerfilAberto(false)}
-                  className="flex-1 bg-[#24282c] hover:bg-[#2e3338] text-[#8baaa6] hover:text-[#e6f0ed] font-medium py-3.5 rounded-xl border border-[#30363d] transition-colors text-sm"
+                  className="flex-1 bg-[#24282c] hover:bg-[#2e3338] text-[#5c6d83] hover:text-[#172333] font-medium py-3.5 rounded-xl border border-[#3c4535] transition-colors text-sm"
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={handleSalvarPerfil}
-                  className="flex-1 bg-[#95bfa6] hover:bg-[#a6d1b7] text-[#1a2f24] font-bold py-3.5 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-colors text-sm"
+                  className="flex-1 bg-[#f34b27] hover:bg-[#d9401f] text-[#ffffff] font-bold py-3.5 rounded-xl shadow-none transition-colors text-sm"
                 >
                   Salvar Perfil
                 </button>
@@ -1458,7 +1386,7 @@ export default function Dashboard({ emailLogin, onLogout, mostrarNotificacao }) 
           </div>
         </div>
       )}
-      
+
       <AnimatePresence>
         <CommandPalette />
       </AnimatePresence>

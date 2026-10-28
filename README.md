@@ -90,3 +90,34 @@ O React Compiler não está habilitado neste template por causa do impacto no de
 ### Expandindo a configuração do ESLint
 
 Para uma aplicação de produção, recomendamos usar TypeScript com regras de lint com checagem de tipos. Veja o [template TS](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) e o [`typescript-eslint`](https://typescript-eslint.io).
+
+## Interface NEXUS
+
+A direção visual parte de um cofre que se abre em camadas: disponível, compromissos e objetivos. Combina vidro azulado, metal, tipografia Archivo e acento laranja. O scroll nativo coordena a cena 3D e os capítulos da apresentação; o painel usa a mesma linguagem com prioridade para leitura e ação.
+
+- `src/components/LandingPage.jsx`: composição da apresentação, coordenação do scroll e acesso à autenticação.
+- `src/features/experience/`: construção procedural do cofre, ciclo de vida do renderer, alternativa SVG e abertura com estados reais.
+- `src/styles/experience.css`: composição e responsividade da experiência pública.
+- `src/components/DashboardNavigation.jsx`: navegação completa no desktop e rolagem horizontal no celular.
+- `src/pages/dashboard/HomeView.jsx`: visão geral com dados reais; sem curva financeira fictícia quando não há histórico.
+- `src/styles/nexus.css`: composição responsiva e componentes visuais.
+- `src/index.css`: cores semânticas e estilos de base.
+
+As telas secundárias carregam sob demanda. Os serviços e fluxos de autenticação existentes são reutilizados.
+
+### Verificação da interface
+
+Os testes de navegador interceptam os serviços externos e usam dados fictícios. Não verificam a autenticação real no Firebase nem alteram contas reais.
+
+```powershell
+# Para usar o Microsoft Edge instalado no Windows:
+$env:PLAYWRIGHT_CHANNEL = 'msedge'
+npx playwright test
+npm run build
+```
+
+Sem essa variável, o Playwright usa seu Chromium padrão, que precisa estar instalado.
+
+A fonte é local (34,9 kB); sua licença está em `public/fonts/OFL-Archivo.txt`. Three.js é carregado sob demanda. A cena limita resolução, pausa fora da tela/aba oculta e suspende o desenho enquanto o formulário está aberto. O modo reduzido apresenta uma composição estática; falha de WebGL preserva ilustração, texto e ações.
+
+A observabilidade só é carregada quando `VITE_SENTRY_DSN` está configurada; não há envio para um DSN de exemplo.

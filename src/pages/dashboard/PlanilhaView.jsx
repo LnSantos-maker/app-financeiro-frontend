@@ -11,8 +11,8 @@ export default function PlanilhaView({
     <div className="animate-in fade-in duration-300">
       <header className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Planilha Fantasma</h1>
-          <p className="text-zinc-400 text-sm">Contas avulsas que não afetam o seu saldo livre.</p>
+          <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">Planejamento</h1>
+          <p className="text-zinc-400 text-sm">Contas avulsas que não afetam o seu saldo livre</p>
         </div>
         <div className="flex gap-3">
           <button onClick={handleExportarWhatsApp} className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-all border border-emerald-500/20">
@@ -28,7 +28,7 @@ export default function PlanilhaView({
         {(planilhaReal || []).length === 0 ? (
           <div className="text-center py-10">
             <ClipboardList size={48} className="mx-auto text-zinc-300 mb-4" />
-            <p className="text-zinc-400">Sua planilha está vazia.</p>
+            <p className="text-zinc-400">Sua planilha está vazia</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">

@@ -1,22 +1,23 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import * as Sentry from '@sentry/react'
-import './index.css'
-import App from './App.jsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
 
-Sentry.init({
-  dsn: "https://examplePublicKey@o0.ingest.sentry.io/0", // Substituir pelo DSN real posteriormente
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  tracesSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-});
+// Observability is optional. A placeholder DSN must never delay or record a session.
+if (import.meta.env.VITE_SENTRY_DSN) {
+	import("@sentry/react")
+		.then((Sentry) => {
+			Sentry.init({
+				dsn: import.meta.env.VITE_SENTRY_DSN,
+				integrations: [Sentry.browserTracingIntegration()],
+				tracesSampleRate: 0.1,
+			});
+		})
+		.catch(() => {});
+}
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+createRoot(document.getElementById("root")).render(
+	<StrictMode>
+		<App />
+	</StrictMode>,
+);
