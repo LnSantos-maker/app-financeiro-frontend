@@ -17,34 +17,39 @@ cd app-financeiro-frontend
 # 2. Instale as dependências
 npm install
 
-# 3. Crie seu arquivo de variáveis de ambiente
-cp .env.example .env.local        # Windows (PowerShell): copy .env.example .env.local
-
-# 4. Inicie o servidor de desenvolvimento
-npm run dev
+# 3. Inicie o servidor de desenvolvimento apontando para a API publicada
+npm run dev:conta-teste
 ```
 
-O app abre em `http://localhost:5173`.
+O app abre em `http://localhost:5173`. Na tela de login, **crie uma conta de teste** (ou use a que o responsável passar) e use somente ela. Não é necessário criar nenhum arquivo `.env`.
 
 ## Variáveis de ambiente
 
-| Variável | Descrição | Padrão em `npm run dev` |
-|---|---|---|
-| `VITE_API_URL` | URL base da API (backend) | `http://localhost:8000` |
+| Variável | Descrição |
+|---|---|
+| `VITE_API_URL` | URL base da API (backend) |
 
-Edite o `.env.local` (ele não é versionado). A leitura da variável está centralizada em [`src/config.js`](src/config.js).
+O valor é escolhido pelo modo de execução do Vite:
 
-> **Importante:** não aponte `VITE_API_URL` para a API de produção durante o desenvolvimento, porque isso altera dados reais. Peça ao responsável pela URL de um backend de **teste**.
+| Comando | `VITE_API_URL` usada |
+|---|---|
+| `npm run dev:conta-teste` | API publicada (definida em [`.env.conta-teste`](.env.conta-teste)) |
+| `npm run dev` | `http://localhost:8000` (backend local, se você tiver um) |
+
+Para usar outra URL, crie um arquivo `.env.local` na raiz com `VITE_API_URL=<url>` (ou copie o exemplo: `cp .env.example .env.local` no PowerShell/Git Bash/Mac/Linux, `copy .env.example .env.local` no cmd). Esse arquivo não é versionado. A leitura da variável está centralizada em [`src/config.js`](src/config.js).
 
 ### Backend e login
 
-Este repositório contém **apenas o frontend**. Sem uma API respondendo em `VITE_API_URL`, telas que dependem de dados (login, saldo, transações etc.) não carregam. O login usa Firebase, então solicite ao responsável uma **conta de teste**.
+Este repositório contém **apenas o frontend**; o backend é mantido em outro lugar e você não precisa dele para trabalhar. Com `npm run dev:conta-teste`, o app conversa com a API publicada, e o login é feito pelo Firebase.
+
+> **Importante:** como a API é a mesma usada pelos usuários reais, **use apenas contas de teste**. Nunca entre com contas de pessoas reais, e não apague nem altere dados que não sejam da sua conta de teste.
 
 ## Scripts
 
 | Comando | O que faz |
 |---|---|
-| `npm run dev` | Servidor de desenvolvimento com hot reload |
+| `npm run dev:conta-teste` | Servidor de desenvolvimento usando a API publicada (recomendado) |
+| `npm run dev` | Servidor de desenvolvimento usando a API em `localhost:8000` |
 | `npm run build` | Gera o build de produção em `dist/` |
 | `npm run preview` | Serve localmente o build de produção |
 | `npm run lint` | Executa o ESLint |
